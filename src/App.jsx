@@ -118,13 +118,14 @@ export default function App() {
 
       {phase === 'playing' && (
         <div className="absolute top-8 left-8 z-10 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px]">
-          <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Station</span>
+          <span className="text-xl font-bold uppercase tracking-[1.2px]">Station</span>
           <span className="text-[13px] font-medium text-[#444]">{station.name}</span>
+          <span className="text-[13px] font-medium text-[#444]">Round {round}/5</span>
           <button className="btn btn-primary" onClick={() => setHint(true)}>
             Reveal Hint?
           </button>
           {hint && (
-            <span className="text-[13px] font-medium text-[#444]">{"Language: " + (station.language || 'Unknown Language, sorry :P')}</span>
+            <span className="text-[13px] font-medium text-[#444]">{"Language: " + (station.language || 'Unknown Language, you\'re on your own :P')}</span>
           )}
         </div>
       )}
