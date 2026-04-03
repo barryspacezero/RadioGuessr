@@ -19,6 +19,7 @@ export async function fetchStation() {
           name: s.name || 'Unknown Station', url,
           country: s.country || '', countrycode: s.countrycode || '',
           state: s.state || '', lat, lng,
+          language: s.language || '',
         };
       }
     } catch { /* retry */ }

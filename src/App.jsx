@@ -3,43 +3,72 @@ import Globe from './Globe.jsx';
 import { fetchStation } from './api.js';
 import { playAudio, stopAudio } from './audio.js';
 import { calcScore } from './score.js';
-import { div } from 'three/tsl';
 
 export default function App() {
   const globe = useRef(null);
-  const [phase, setPhase] = useState('start'); // start | loading | playing | result
+  const [phase, setPhase] = useState('start'); // start | loading | playing | result | final
   const [station, setStation] = useState(null);
+  const [totalScore, setTotalScore] = useState(0)
   const [guess, setGuess] = useState(null);
+  const [round, setRound] = useState(0)
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [hint, setHint] = useState(false);
 
   async function startRound() {
-    stopAudio();
-    setGuess(null);
-    setResult(null);
-    setError('');
-    setPhase('loading');
-    globe.current.reset();
-
-    let s;
-    try {
-      s = await fetchStation();
-    } catch {
-      setError('Could not find a station. Try again.');
-      setPhase('start');
-      return;
+    if (round >= 5) {
+      setPhase('final')
+      return
     }
 
-    setStation(s);
-    setPhase('playing');
-    globe.current.setGuessing(true);
+    setRound(prev => prev + 1)
+
+    stopAudio()
+    setGuess(null)
+    setResult(null)
+    setError('')
+    setPhase('loading')
+    setHint(false)
+    globe.current.reset()
+
+    let s
+    try {
+      s = await fetchStation()
+    } catch {
+      setError('Could not find a station. Try again.')
+      setPhase('start')
+      return
+    }
+
+    setStation(s)
+    setPhase('playing')
+    globe.current.setGuessing(true)
 
     playAudio(s.url, {
       onError: () => {
-        setError('Stream failed. Try again.');
-        setPhase('start');
+        setError('Stream failed. Try again.')
+        setPhase('start')
       },
-    });
+    })
+  }
+
+  function nextStep() {
+    if (round >= 5) {
+      setPhase('final')
+    } else {
+      startRound()
+    }
+  }
+
+  function resetGame() {
+    setPhase('start')
+    setTotalScore(0)
+    setRound(0)
+    setStation(null)
+    setGuess(null)
+    setResult(null)
+    setError('')
+    setHint(false)
   }
 
   function submitGuess() {
@@ -48,6 +77,7 @@ export default function App() {
     const { km, score } = calcScore(guess.lat, guess.lng, station.lat, station.lng);
     globe.current.reveal(station.lat, station.lng, guess.lat, guess.lng);
     setResult({ km, score });
+    setTotalScore(prev => prev + score)
     setPhase('result');
   }
 
@@ -64,10 +94,11 @@ export default function App() {
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-[#f0ede6]">
           <h1 className="text-4xl font-bold tracking-tight">RadioGuessr</h1>
           <p className="text-sm text-[#555] text-center max-w-[260px] leading-relaxed">
-            Listen to a radio stream. Place a pin on the globe. Score points.
+            Listen to a Live radio stream. Place your guess on the globe. Score points.
           </p>
           {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
           <button className="btn btn-primary" onClick={startRound}>Start</button>
+          <span className="text-[13px] font-medium text-[#444]">Game Version: 1.0</span>
         </div>
       )}
 
@@ -89,6 +120,22 @@ export default function App() {
         <div className="absolute top-8 left-8 z-10 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px]">
           <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Station</span>
           <span className="text-[13px] font-medium text-[#444]">{station.name}</span>
+          <button className="btn btn-primary" onClick={() => setHint(true)}>
+            Reveal Hint?
+          </button>
+          {hint && (
+            <span className="text-[13px] font-medium text-[#444]">{"Language: " + (station.language || 'Unknown Language, sorry :P')}</span>
+          )}
+        </div>
+      )}
+
+      {phase === 'final' && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-[#f0ede6]">
+          <h1 className="text-4xl font-bold tracking-tight">Game Over</h1>
+          <p className="text-sm text-[#555] text-center max-w-[260px] leading-relaxed">
+            Total Score: {totalScore}
+          </p>
+          <button className="btn btn-primary" onClick={resetGame}>Play Again</button>
         </div>
       )}
 
@@ -106,7 +153,13 @@ export default function App() {
           <span className="text-[60px] font-bold leading-none tracking-[-2px]">
             {result.score.toLocaleString()}
           </span>
-          <button className="btn btn-primary mt-4" onClick={startRound}>Next Round</button>
+          <button className="btn btn-primary mt-4" onClick={() => {
+            if (round >= 5) {
+              setPhase('final')
+            } else {
+              startRound()
+            }
+          }}>Next Round</button>
         </div>
       )}
     </div>

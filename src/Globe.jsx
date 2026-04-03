@@ -2,12 +2,12 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import Globe from 'globe.gl';
 
 const EARTH = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
-const BUMP  = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
-const SKY   = 'https://unpkg.com/three-globe/example/img/night-sky.png';
+const BUMP = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
+const SKY = 'https://unpkg.com/three-globe/example/img/night-sky.png';
 
 export default forwardRef(function GlobeView({ onGuess }, ref) {
-  const el     = useRef(null);
-  const g      = useRef(null);
+  const el = useRef(null);
+  const g = useRef(null);
   const active = useRef(false);
 
   useEffect(() => {
@@ -26,8 +26,8 @@ export default forwardRef(function GlobeView({ onGuess }, ref) {
     globe.onGlobeClick(({ lat, lng }) => {
       if (!active.current) return;
       globe.pointsData([{ lat, lng }])
-        .pointColor(() => '#ff5252').pointRadius(() => 0.6)
-        .pointAltitude(() => 0.01).pointLabel(() => '📍 Your Guess');
+        .pointColor(() => '#ff5252').pointRadius(() => 0.4).pointAltitude(() => 0.01)
+        .pointLabel(() => 'Your Guess');
       onGuess({ lat, lng });
     });
 
