@@ -36,7 +36,7 @@ export default function App() {
       s = await fetchStation()
     } catch {
       setError('Could not find a station. Try again.')
-      setPhase('start')
+      s = await fetchStation()
       return
     }
 
@@ -52,13 +52,13 @@ export default function App() {
     })
   }
 
-  function nextStep() {
-    if (round >= 5) {
-      setPhase('final')
-    } else {
-      startRound()
-    }
-  }
+  // function nextStep() {
+  //   if (round >= 5) {
+  //     setPhase('final')
+  //   } else {
+  //     startRound()
+  //   }
+  // }
 
   function resetGame() {
     setPhase('start')
@@ -104,7 +104,7 @@ export default function App() {
 
       {/* Playing */}
       {phase === 'playing' && (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2.5">
+        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2.5">
           <button className="btn btn-primary" disabled={!guess} onClick={submitGuess}>
             Submit Guess
           </button>
@@ -142,7 +142,7 @@ export default function App() {
 
       {/* Result */}
       {phase === 'result' && result && station && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px] flex flex-col gap-1.5">
+        <div className="absolute top-8 left-8 z-20 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px] flex flex-col gap-1.5">
           <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Station</span>
           <span className="text-[13px] font-medium text-[#444]">{station.name}</span>
           <span className="text-[22px] font-bold tracking-tight">{location}</span>
@@ -160,7 +160,7 @@ export default function App() {
             } else {
               startRound()
             }
-          }}>Next Round</button>
+          }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
         </div>
       )}
     </div>
