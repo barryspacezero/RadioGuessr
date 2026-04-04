@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import Globe from './Globe.jsx';
 import { fetchStation } from './api.js';
-import { playAudio, stopAudio } from './audio.js';
+import { playAudio, stopAudio, isLoading } from './audio.js';
 import { calcScore } from './score.js';
 
 export default function App() {
@@ -20,9 +20,13 @@ export default function App() {
       setPhase('final')
       return
     }
+    if (isLoading(true)) {
+      setPhase('loading')
+      return
+    }
 
     setRound(prev => prev + 1)
-
+    isLoading(true)
     stopAudio()
     setGuess(null)
     setResult(null)
@@ -63,6 +67,7 @@ export default function App() {
   function resetGame() {
     setPhase('start')
     setTotalScore(0)
+    isLoading(false)
     setRound(0)
     setStation(null)
     setGuess(null)
@@ -97,8 +102,9 @@ export default function App() {
             Listen to a Live radio stream. Place your guess on the globe. Score points.
           </p>
           {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
-          <button className="btn btn-primary" onClick={startRound}>Start</button>
+          <button className="btn btn-primary" onClick={startRound}>Play</button>
           <span className="text-[13px] font-medium text-[#444]">Game Version: 1.0</span>
+          {/* <span className='bottom-10 absolute'>Created by : <a href="https://github.com/barryspacezero">barryspacezero</a> </span> */}
         </div>
       )}
 
@@ -116,9 +122,14 @@ export default function App() {
         </div>
       )}
 
+      {phase === 'loading' && (
+        <div className="absolute top-8 left-8 z-10 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px]">
+          <span className="text-xl font-bold uppercase tracking-[1.2px]">Loading...</span>
+        </div>
+      )}
       {phase === 'playing' && (
         <div className="absolute top-8 left-8 z-10 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px]">
-          <span className="text-xl font-bold uppercase tracking-[1.2px]">Station</span>
+          <span className="text-xl font-bold uppercase tracking-[1.2px]">Now Playing</span>
           <span className="text-[13px] font-medium text-[#444]">{station.name}</span>
           <span className="text-[13px] font-medium text-[#444]">Round {round}/5</span>
           <button className="btn btn-primary" onClick={() => setHint(true)}>
