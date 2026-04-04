@@ -9,6 +9,7 @@ export default function App() {
   const [phase, setPhase] = useState('start'); // start | loading | playing | result | final
   const [station, setStation] = useState(null);
   const [totalScore, setTotalScore] = useState(0)
+  const [isAudioLoading, setIsAudioLoading] = useState(false)
   const [guess, setGuess] = useState(null);
   const [round, setRound] = useState(0)
   const [result, setResult] = useState(null);
@@ -49,7 +50,10 @@ export default function App() {
     globe.current.setGuessing(true)
 
     playAudio(s.url, {
+      onLoading: () => setIsAudioLoading(true),
+      onPlaying: () => setIsAudioLoading(false),
       onError: () => {
+        setIsAudioLoading(false)
         setError('Stream failed. Try again.')
         setPhase('start')
       },
@@ -122,7 +126,7 @@ export default function App() {
         </div>
       )}
 
-      {phase === 'loading' && (
+      {isAudioLoading && (
         <div className="absolute top-8 left-8 z-10 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px]">
           <span className="text-xl font-bold uppercase tracking-[1.2px]">Loading...</span>
         </div>
