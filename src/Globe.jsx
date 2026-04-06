@@ -48,8 +48,8 @@ export default forwardRef(function GlobeView({ onGuess }, ref) {
       if (!g.current) return;
       g.current
         .pointsData([
-          { lat: gLat, lng: gLng, c: '#ff5252', l: '📍 Your Guess' },
-          { lat: aLat, lng: aLng, c: '#69f0ae', l: '📡 Station' },
+          { lat: gLat, lng: gLng, c: '#ff5252', l: 'Your Guess' },
+          { lat: aLat, lng: aLng, c: '#69f0ae', l: 'Radio Station' },
         ])
         .pointColor(d => d.c)
         .pointRadius(d => d.l.includes('Station') ? 0.8 : 0.5)

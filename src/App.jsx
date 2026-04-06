@@ -7,7 +7,7 @@ import { calcScore } from './score.js'
 export default function App() {
   const clickSound = new Audio('/click.mp3')
   const globe = useRef(null);
-  const [phase, setPhase] = useState('start');
+  const [phase, setPhase] = useState('start'); // start, playing, loading, result, final
   const [station, setStation] = useState(null);
   const [totalScore, setTotalScore] = useState(0)
   const [isAudioLoading, setIsAudioLoading] = useState(false)

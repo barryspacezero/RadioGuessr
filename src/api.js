@@ -2,7 +2,7 @@ const API = 'https://de1.api.radio-browser.info';
 
 const COUNTRY_POOL = [
   // South Asia
-  'IN', 'PK', 'BD', 'LK', 'NP', 'AF', 'MV',
+  'IN', 'IN', 'IN', 'IN', 'PK', 'BD', 'LK', 'NP', 'AF', 'MV',
 
   // East Asia
   'JP', 'KR', 'CN', 'TW', 'MN', 'HK',
@@ -78,8 +78,9 @@ export async function fetchStation() {
       const list = await res.json();
       for (const s of list) {
         const lat = parseFloat(s.geo_lat), lng = parseFloat(s.geo_long);
-        if (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) continue;
         const url = s.url_resolved || s.url;
+        if (!url.startsWith('https')) continue
+        if (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) continue;
         if (!url) continue;
         return {
           name: s.name || 'Unknown Station', url,
@@ -88,7 +89,10 @@ export async function fetchStation() {
           language: s.language || '',
         };
       }
-    } catch { /* retry */ }
+    } catch {
+      console.warn('Station fetch attempt failed, retrying...', err)
+    }
   }
   throw new Error('No station found');
 }
+

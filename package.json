@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
+    "@vercel/analytics": "^2.0.1",
     "globe.gl": "^2.45.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
