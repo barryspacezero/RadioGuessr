@@ -101,7 +101,7 @@ export default function App() {
           </p>
           {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
           <button className="btn btn-primary" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(); }}>Play</button>
-          <span className="text-[13px] font-medium text-[#444]">Game Version: 1.0</span>
+          <span className="text-[13px] font-medium text-[#444]">Game Version: 1.1</span>
         </div>
       )}
 
