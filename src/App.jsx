@@ -10,7 +10,7 @@ function AnimatedCard({ children, className = "", delay = 0 }) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20 }}
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
-      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-8 md:left-8 z-20 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000] md:shadow-[6px_6px_0_#000] p-8 md:p-10 rounded-t-3xl md:rounded-bl-none md:rounded-t-none ${className}`}
+      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-8 md:left-8 z-20 flex flex-col items-center gap-2.5 bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] p-8 md:p-10 rounded-t-3xl md:rounded-bl-none md:rounded-t-none ${className}`}
     >
       {children}
     </motion.div>
@@ -131,7 +131,7 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute bg-black/50 inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#f0ede6]"
+            className="absolute bg-black/60 backdrop-blur-md inset-0 z-50 flex flex-col items-center justify-center gap-5"
           >
             <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
             <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
@@ -142,7 +142,7 @@ export default function App() {
               <Play className="w-8 h-8 fill-current ml-1" />
             </button>
             <span className="text-[13px] font-medium text-white/70">Game Version: 1.2</span>
-            <span className="text-[13px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">barryspacezero</a></span>
+            <span className="text-[13px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">barryspace</a></span>
           </motion.div>
         )}
 
@@ -152,7 +152,7 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute bg-black/20 backdrop-blur-sm inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#f0ede6]"
+            className="absolute bg-black/60 backdrop-blur-md inset-0 z-50 flex flex-col items-center justify-center gap-5"
           >
             <h1 className="text-4xl text-white font-bold tracking-tight">Game Over</h1>
             <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
@@ -221,7 +221,7 @@ export default function App() {
                 Submit Guess
               </button>
               {!guess && (
-                <span className="text-xs font-medium text-[#f0ede6] bg-black px-3 py-1 rounded-sm shadow-md">
+                <span className="text-xs font-medium text-white bg-black px-3 py-1 rounded-sm shadow-md">
                   Click the globe to place your pin
                 </span>
               )}
