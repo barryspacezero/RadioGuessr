@@ -71,7 +71,7 @@ export async function fetchStation() {
       const country = COUNTRY_POOL[Math.floor(Math.random() * COUNTRY_POOL.length)];
       const params = new URLSearchParams({
         limit: 5, order: 'random', hidebroken: 'true',
-        has_geo_info: 'true', codec: 'MP3',
+        has_geo_info: 'true',
         countrycode: country, _: Date.now(),
       });
       const res = await fetch(`${API}/json/stations/search?${params}`);

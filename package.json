@@ -15,9 +15,13 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
     "@vercel/analytics": "^2.0.1",
+    "framer-motion": "^12.38.0",
     "globe.gl": "^2.45.0",
+    "hls.js": "^1.6.15",
+    "lucide-react": "^1.7.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-loading-skeleton": "^3.5.0",
     "tailwindcss": "^4.2.2",
     "three": "0.169.0"
   }

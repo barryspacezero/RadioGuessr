@@ -1,5 +1,21 @@
 import { useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Play } from 'lucide-react'
 import Globe from './Globe.jsx'
+
+function AnimatedCard({ children, className = "", delay = 0 }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+      transition={{ duration: 0.25, ease: 'easeOut', delay }}
+      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-8 md:left-8 z-20 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000] md:shadow-[6px_6px_0_#000] p-8 md:p-10 rounded-t-3xl md:rounded-bl-none md:rounded-t-none ${className}`}
+    >
+      {children}
+    </motion.div>
+  )
+}
 import { fetchStation } from './api.js'
 import { playAudio, stopAudio } from './audio.js'
 import { calcScore } from './score.js'
@@ -7,7 +23,7 @@ import { calcScore } from './score.js'
 export default function App() {
   const clickSound = new Audio('/click.mp3')
   const globe = useRef(null);
-  const [phase, setPhase] = useState('start'); // start, playing, loading, result, final
+  const [phase, setPhase] = useState('start'); // start, playing, loading, result, final, rerouting
   const [station, setStation] = useState(null);
   const [totalScore, setTotalScore] = useState(0)
   const [isAudioLoading, setIsAudioLoading] = useState(false)
@@ -33,34 +49,49 @@ export default function App() {
     setHint(false)
     globe.current.reset()
 
-    let s
-    try {
-      s = await fetchStation()
-    } catch {
-      setError('Could not find a station. Try again.')
-      setPhase('start')
-      return
+    async function fetchAndPlay(retriesLeft = 3) {
+      if (retriesLeft === 0) {
+        setError('Could not find a working station. Please check your internet connection and try again.')
+        setPhase('start')
+        setRound(prev => prev - 1)
+        return
+      }
+      try {
+        const s = await fetchStation()
+        setStation(s)
+        setPhase('playing')
+        globe.current.setGuessing(false) // Wait for audio to load before allowing guess
+        setIsAudioLoading(true)
+        playAudio(s.url, {
+          onLoading: () => {
+            setIsAudioLoading(true)
+            if (globe.current) globe.current.setGuessing(false)
+          },
+          onPlaying: () => {
+            setIsAudioLoading(false)
+            setError('')
+            if (globe.current) globe.current.setGuessing(true)
+          },
+          onError: () => {
+            setError('Stream failed. Trying again.')
+            setPhase('loading')
+            fetchAndPlay(retriesLeft - 1)
+          }
+        })
+      } catch (err) {
+        console.warn('Station fetch failed, retrying...', err)
+        fetchAndPlay(retriesLeft - 1)
+      }
     }
 
-    setStation(s)
-    setPhase('playing')
-    globe.current.setGuessing(true)
+    fetchAndPlay(3)
 
-    setIsAudioLoading(true)
-
-    playAudio(s.url, {
-      onLoading: () => setIsAudioLoading(true),
-      onPlaying: () => setIsAudioLoading(false),
-      onError: () => {
-        setIsAudioLoading(false)
-        setError('Stream failed. Try again.')
-        setPhase('start')
-      },
-    })
-
+    // Fallback: If after 6 seconds the stream still hasn't fired onPlaying, 
+    // let them guess anyway so they aren't stuck.
     setTimeout(() => {
       setIsAudioLoading(false)
-    }, 5000)
+      if (globe.current) globe.current.setGuessing(true)
+    }, 6000)
   }
 
   function resetGame() {
@@ -93,93 +124,111 @@ export default function App() {
     <div className="relative w-screen h-screen overflow-hidden">
       <Globe ref={globe} onGuess={setGuess} />
 
-      {phase === 'start' && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-[#f0ede6]">
-          <h1 className="text-4xl font-bold tracking-tight">RadioGuessr</h1>
-          <p className="text-sm text-[#555] text-center max-w-[260px] leading-relaxed">
-            Listen to a Live radio stream. Place your guess on the globe. Score points.
-          </p>
-          {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
-          <button className="btn btn-primary" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(); }}>Play</button>
-          <span className="text-[13px] font-medium text-[#444]">Game Version: 1.1</span>
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {phase === 'start' && (
+          <motion.div
+            key="start"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="absolute bg-black/50 inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#f0ede6]"
+          >
+            <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
+            <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
+              A GeoGuessr-style game where you listen to live radio streams from around the world and guess their location on a 3D globe.
+            </p>
+            {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
+            <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(); }}>
+              <Play className="w-8 h-8 fill-current ml-1" />
+            </button>
+            <span className="text-[13px] font-medium text-white/70">Game Version: 1.2</span>
+            <span className="text-[13px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">barryspacezero</a></span>
+          </motion.div>
+        )}
 
-      {phase === 'playing' && (
-        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2.5">
-          <button className="btn btn-primary" disabled={!guess} onClick={() => { submitGuess(); }}>
-            Submit Guess
-          </button>
-          {!guess && (
-            <span className="text-xs font-medium text-[#f0ede6] bg-black px-3 py-1">
-              Click the globe to place your pin
+        {phase === 'final' && (
+          <motion.div
+            key="final"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="absolute bg-black/20 backdrop-blur-sm inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#f0ede6]"
+          >
+            <h1 className="text-4xl text-white font-bold tracking-tight">Game Over</h1>
+            <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
+              Total Score: {totalScore}
+            </p>
+            <button className="btn " onClick={() => { clickSound.currentTime = 0; clickSound.play(); resetGame(); }}>Play Again</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait">
+        {phase === 'loading' && (
+          <AnimatedCard key="loading">
+            <span className="text-xl font-bold uppercase tracking-[1.2px]">Loading...</span>
+          </AnimatedCard>
+        )}
+
+        {phase === 'playing' && isAudioLoading && (
+          <AnimatedCard key="loading-audio">
+            <span className="text-xl font-bold uppercase tracking-[1.2px]">Loading...</span>
+          </AnimatedCard>
+        )}
+
+        {phase === 'playing' && isAudioLoading === false && (
+          <AnimatedCard key="playing">
+            <span className="text-xl font-bold uppercase tracking-[1.2px]">Now Playing</span>
+            <span className="text-[13px] font-medium text-[#444] text-center">{station.name}</span>
+            <span className="text-[13px] font-medium text-[#444]">Round {round}/5</span>
+            <button className="btn btn-primary mt-2" onClick={() => setHint(true)}>
+              {hint ? `Language: ${station.language || 'Unknown'}` : 'Reveal Hint?'}
+            </button>
+          </AnimatedCard>
+        )}
+
+        {phase === 'result' && result && station && (
+          <AnimatedCard key="result" delay={2.2} className="!items-start gap-1.5 md:!min-w-[340px]">
+            <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Station</span>
+            <span className="text-[13px] font-medium text-[#444] line-clamp-2">{station.name}</span>
+            <span className="text-xl md:text-[22px] font-bold tracking-tight leading-tight">{location}</span>
+            <span className="text-[13px] text-[#555]">
+              {result.km < 1 ? 'Less than 1 km away' : `${result.km.toLocaleString()} km away`}
             </span>
-          )}
-        </div>
-      )}
-
-      {phase === 'loading' && (
-        <div className="absolute top-8 left-8 z-10 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px]">
-          <span className="text-xl font-bold uppercase tracking-[1.2px]">Loading...</span>
-        </div>
-      )}
-
-      {phase === 'playing' && isAudioLoading && (
-        <div className="absolute top-8 left-8 z-20 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px]">
-          <span className="text-xl font-bold uppercase tracking-[1.2px]">Loading...</span>
-        </div>
-      )}
-
-      {phase === 'playing' && isAudioLoading === false && (
-        <div className="absolute top-8 left-8 z-10 flex flex-col items-center gap-2.5 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10">
-          <span className="text-xl font-bold uppercase tracking-[1.2px]">Now Playing</span>
-          <span className="text-[13px] font-medium text-[#444]">{station.name}</span>
-          <span className="text-[13px] font-medium text-[#444]">Round {round}/5</span>
-          <button className="btn btn-primary" onClick={() => setHint(true)}>
-            {hint ? 'Language: ' + (station.language || 'Unknown Language, you\'re on your own :P') : 'Reveal Hint?'}
-          </button>
-          {/* {hint && (
-            <span className="text-[13px] font-medium text-[#444]">
-              {"Language: " + (station.language || 'Unknown Language, you\'re on your own :P')}
+            <div className="my-3 border-t-2 border-black w-full" />
+            <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Score</span>
+            <span className="text-5xl md:text-[60px] font-bold leading-none tracking-[-2px]">
+              {result.score.toLocaleString()}
             </span>
-          )} */}
-        </div>
-      )}
+            <button className="btn btn-primary mt-4 w-full" onClick={() => {
+              if (round >= 5) setPhase('final')
+              else { clickSound.currentTime = 0; clickSound.play(); startRound() }
+            }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
+          </AnimatedCard>
+        )}
+      </AnimatePresence>
 
-      {phase === 'final' && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-5 bg-[#f0ede6]">
-          <h1 className="text-4xl font-bold tracking-tight">Game Over</h1>
-          <p className="text-sm text-[#555] text-center max-w-[260px] leading-relaxed">
-            Total Score: {totalScore}
-          </p>
-          <button className="btn btn-primary" onClick={() => { clickSound.currentTime = 0; clickSound.play(); resetGame(); }}>Play Again</button>
-        </div>
-      )}
-
-      {phase === 'result' && result && station && (
-        <div className="absolute top-8 left-8 z-20 bg-[#f0ede6] border-2 border-black shadow-[6px_6px_0_#000] p-10 min-w-[300px] flex flex-col gap-1.5">
-          <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Station</span>
-          <span className="text-[13px] font-medium text-[#444]">{station.name}</span>
-          <span className="text-[22px] font-bold tracking-tight">{location}</span>
-          <span className="text-[13px] text-[#555]">
-            {result.km < 1 ? 'Less than 1 km away' : `${result.km.toLocaleString()} km away`}
-          </span>
-          <div className="my-3 border-t-2 border-black" />
-          <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Score</span>
-          <span className="text-[60px] font-bold leading-none tracking-[-2px]">
-            {result.score.toLocaleString()}
-          </span>
-          <button className="btn btn-primary mt-4" onClick={() => {
-            if (round >= 5) {
-              setPhase('final')
-            } else {
-              clickSound.currentTime = 0;
-              clickSound.play();
-              startRound()
-            }
-          }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
-        </div>
-      )}
+      <AnimatePresence>
+        {phase === 'playing' && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-8 left-0 w-full md:absolute md:top-auto md:bottom-16 md:left-1/2 md:-translate-x-1/2 md:w-auto z-10 flex flex-col items-center gap-2.5 pointer-events-none"
+          >
+            <div className="pointer-events-auto flex flex-col items-center gap-2.5">
+              <button className="btn btn-primary shadow-xl" disabled={!guess} onClick={submitGuess}>
+                Submit Guess
+              </button>
+              {!guess && (
+                <span className="text-xs font-medium text-[#f0ede6] bg-black px-3 py-1 rounded-sm shadow-md">
+                  Click the globe to place your pin
+                </span>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
