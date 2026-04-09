@@ -13,6 +13,11 @@ body,
   font-family: 'Space Grotesk', system-ui, sans-serif;
 }
 
+/* Ping animation for globe markers — defined globally because markers are runtime DOM nodes outside Tailwind's scope */
+@keyframes ping {
+  75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+
 /* Buttons — pseudo-state box-shadow+transform combos don't work cleanly as Tailwind utilities */
 .btn {
   padding: 11px 28px;

@@ -23,11 +23,36 @@ export default forwardRef(function GlobeView({ onGuess }, ref) {
       minDistance: 140, maxDistance: 600,
     });
 
+    const createMarker = (color, label) => {
+      // globe.gl anchors the TOP-LEFT of this returned element to the lat/lng coordinate.
+      // We therefore build the root element directly and apply translate(-50%, -50%) to IT,
+      // so the visual center of the dot sits exactly on the coordinate (and on the arc endpoints).
+      const root = document.createElement('div');
+      Object.assign(root.style, {
+        position: 'absolute',
+        transform: 'translate(-50%, -50%)',
+        pointerEvents: 'none',
+      });
+      root.innerHTML = `
+        <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; pointer-events: auto;">
+          <!-- ping ring -->
+          <div style="position: absolute; width: 32px; height: 32px; border-radius: 50%; background-color: ${color}; opacity: 0.5; animation: ping 1.5s cubic-bezier(0,0,0.2,1) infinite; pointer-events: none;"></div>
+          <!-- solid dot -->
+          <div style="width: 16px; height: 16px; border-radius: 50%; background-color: ${color}; border: 2px solid #000; box-shadow: 2px 2px 0px rgba(0,0,0,1); position: relative; z-index: 1;"></div>
+          <!-- label -->
+          <div style="position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: #fdfdfd; border: 2px solid #000; color: #000; padding: 2px 10px; font-weight: 700; font-size: 12px; box-shadow: 3px 3px 0px rgba(0,0,0,1); border-radius: 3px; pointer-events: none;">
+            ${label}
+          </div>
+        </div>
+      `;
+      return root;
+    };
+    globe._createMarker = createMarker;
+
     globe.onGlobeClick(({ lat, lng }) => {
       if (!active.current) return;
-      globe.pointsData([{ lat, lng }])
-        .pointColor(() => '#ff5252').pointRadius(() => 0.4).pointAltitude(() => 0.01)
-        .pointLabel(() => 'Your Guess');
+      globe.htmlElementsData([{ lat, lng, c: '#ff5252', l: 'Your Guess' }])
+        .htmlElement(d => globe._createMarker(d.c, d.l));
       onGuess({ lat, lng });
     });
 
@@ -47,14 +72,11 @@ export default forwardRef(function GlobeView({ onGuess }, ref) {
     reveal(aLat, aLng, gLat, gLng) {
       if (!g.current) return;
       g.current
-        .pointsData([
+        .htmlElementsData([
           { lat: gLat, lng: gLng, c: '#ff5252', l: 'Your Guess' },
           { lat: aLat, lng: aLng, c: '#69f0ae', l: 'Radio Station' },
         ])
-        .pointColor(d => d.c)
-        .pointRadius(d => d.l.includes('Station') ? 0.8 : 0.5)
-        .pointAltitude(d => d.l.includes('Station') ? 0.015 : 0.01)
-        .pointLabel(d => d.l);
+        .htmlElement(d => g.current._createMarker(d.c, d.l));
       g.current
         .arcsData([{ startLat: gLat, startLng: gLng, endLat: aLat, endLng: aLng }])
         .arcColor(() => ['#ff5252', '#69f0ae'])
@@ -65,7 +87,7 @@ export default forwardRef(function GlobeView({ onGuess }, ref) {
     reset() {
       active.current = false;
       if (g.current) {
-        g.current.pointsData([]).arcsData([]);
+        g.current.htmlElementsData([]).arcsData([]);
         g.current.controls().autoRotate = true;
         el.current.style.cursor = 'grab';
       }
