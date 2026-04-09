@@ -8,7 +8,7 @@ function AnimatedCard({ children, className = "", delay = 0 }) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+      exit={{ opacity: 0, scale: 0.95, y: 20, transition: { delay: 0 } }}
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
       className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-8 md:left-8 z-20 flex flex-col items-center gap-2.5 bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] p-8 md:p-10 rounded-t-3xl md:rounded-bl-none md:rounded-t-none ${className}`}
     >
@@ -64,7 +64,7 @@ export default function App() {
         setIsAudioLoading(true)
         playAudio(s.url, {
           onLoading: () => {
-            setIsAudioLoading(true)
+            // setIsAudioLoading(true)
             if (globe.current) globe.current.setGuessing(false)
           },
           onPlaying: () => {
@@ -164,11 +164,11 @@ export default function App() {
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
-        {phase === 'loading' && (
+        {/* {phase === 'loading' && (
           <AnimatedCard key="loading">
             <span className="text-xl font-bold uppercase tracking-[1.2px]">Loading...</span>
           </AnimatedCard>
-        )}
+        )} */}
 
         {phase === 'playing' && isAudioLoading && (
           <AnimatedCard key="loading-audio">
@@ -184,14 +184,34 @@ export default function App() {
             <button className="btn btn-primary mt-2" onClick={() => setHint(true)}>
               {hint ? `Language: ${station.language || 'Unknown'}` : 'Reveal Hint?'}
             </button>
+
+            <div className="flex md:hidden flex-col items-center gap-2 w-full mt-1 border-t-2 border-black/10 pt-4">
+              <button className="btn btn-primary w-full" disabled={!guess} onClick={submitGuess}>
+                Submit Guess
+              </button>
+              {!guess && (
+                <span className="text-[11px] font-medium text-[#555] text-center">
+                  Click the globe to place your pin
+                </span>
+              )}
+            </div>
           </AnimatedCard>
         )}
 
         {phase === 'result' && result && station && (
           <AnimatedCard key="result" delay={2.2} className="!items-start gap-1.5 md:!min-w-[340px]">
             <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Station</span>
-            <span className="text-[13px] font-medium text-[#444] line-clamp-2">{station.name}</span>
-            <span className="text-xl md:text-[22px] font-bold tracking-tight leading-tight">{location}</span>
+            <span className="text-[13px] font-medium text-[#444] line-clamp-2 ">{station.name}</span>
+            <div className="flex items-center gap-2.5 mt-0.5">
+              {station.countrycode && (
+                <img
+                  src={`https://flagcdn.com/w40/${station.countrycode.toLowerCase()}.png`}
+                  // alt={station.country}
+                  className="w-16 border-2 border-black shadow-[2px_2px_0_#000000] object-cover"
+                />
+              )}
+              <span className="text-xl md:text-[22px] font-bold tracking-tight leading-tight">{location}</span>
+            </div>
             <span className="text-[13px] text-[#555]">
               {result.km < 1 ? 'Less than 1 km away' : `${result.km.toLocaleString()} km away`}
             </span>
@@ -200,7 +220,7 @@ export default function App() {
             <span className="text-5xl md:text-[60px] font-bold leading-none tracking-[-2px]">
               {result.score.toLocaleString()}
             </span>
-            <button className="btn btn-primary mt-4 w-full" onClick={() => {
+            <button disabled={phase !== 'result'} className="btn btn-primary mt-4 w-full" onClick={() => {
               if (round >= 5) setPhase('final')
               else { clickSound.currentTime = 0; clickSound.play(); startRound() }
             }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
@@ -214,7 +234,7 @@ export default function App() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-8 left-0 w-full md:absolute md:top-auto md:bottom-16 md:left-1/2 md:-translate-x-1/2 md:w-auto z-10 flex flex-col items-center gap-2.5 pointer-events-none"
+            className="hidden md:flex absolute bottom-16 left-1/2 -translate-x-1/2 w-auto z-10 flex-col items-center gap-2.5 pointer-events-none"
           >
             <div className="pointer-events-auto flex flex-col items-center gap-2.5">
               <button className="btn btn-primary shadow-xl" disabled={!guess} onClick={submitGuess}>
