@@ -32,6 +32,7 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [hint, setHint] = useState(false);
+  const [history, setHistory] = useState([])
 
   async function startRound() {
     if (round >= 5) {
@@ -96,6 +97,7 @@ export default function App() {
 
   function resetGame() {
     setPhase('start')
+    setHistory([])
     setTotalScore(0)
     setRound(0)
     setStation(null)
@@ -114,6 +116,11 @@ export default function App() {
     setResult({ km, score });
     setTotalScore(prev => prev + score)
     setPhase('result');
+    setHistory(prev => [...prev, {
+      country: station.country,
+      code: station.countrycode,
+      score: score,
+    }])
   }
 
   const location = station
@@ -154,7 +161,28 @@ export default function App() {
             exit={{ opacity: 0, scale: 0.95 }}
             className="absolute bg-black/60 backdrop-blur-md inset-0 z-50 flex flex-col items-center justify-center gap-5"
           >
-            <h1 className="text-4xl text-white font-bold tracking-tight">Game Over</h1>
+            <span className="text-xl text-white font-bold text-center uppercase tracking-[1.2px]">Countries visited this session</span>
+            <div className="flex flex-wrap justify-center items-center bg-white p-4 md:p-6 gap-5 md:gap-8 border-2 border-black shadow-[6px_6px_0_#000000]">
+              {history.map((item, index) => (
+                <div key={index} className="relative group flex flex-col items-center cursor-pointer">
+                  {item.code && (
+                    <img
+                      src={`https://flagcdn.com/w80/${item.code.toLowerCase()}.png`}
+                      alt={item.country}
+                      className="h-10 md:h-14 w-auto border-2 border-black shadow-[2px_2px_0_#000000] group-hover:-translate-y-1 group-hover:shadow-[4px_4px_0_#000000] transition-all object-cover"
+                    />
+                  )}
+                  <span className="text-[14px] font-bold text-[#444] mt-2">{item.score}</span>
+
+                  {/* Custom Tooltip */}
+                  <div className="absolute -top-12 scale-0 group-hover:scale-100 transition-transform origin-bottom bg-black text-white text-xs font-bold px-3 py-1.5 border-2 border-white/20 whitespace-nowrap z-10 pointer-events-none rounded-sm">
+                    {item.country}
+                    <div className="absolute left-1/2 -bottom-[5px] w-2 h-2 bg-black border-r-2 border-b-2 border-white/20 rotate-45 -translate-x-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* <h1 className="text-4xl text-white font-bold tracking-tight">Game Over</h1> */}
             <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
               Total Score: {totalScore}
             </p>
