@@ -164,18 +164,18 @@ export default function App() {
             <span className="text-xl text-white font-bold text-center uppercase tracking-[1.2px]">Countries visited this session</span>
             <div className="flex flex-wrap justify-center items-center bg-white p-4 md:p-6 gap-5 md:gap-8 border-2 border-black shadow-[6px_6px_0_#000000]">
               {history.map((item, index) => (
-                <div key={index} className="relative group flex flex-col items-center cursor-pointer">
+                <div key={index} tabIndex="0" className="relative group flex flex-col items-center cursor-pointer focus:outline-none">
                   {item.code && (
                     <img
-                      src={`https://flagcdn.com/w80/${item.code.toLowerCase()}.png`}
+                      src={`https://flagcdn.com/${item.code.toLowerCase()}.svg`}
                       alt={item.country}
-                      className="h-10 md:h-14 w-auto border-2 border-black shadow-[2px_2px_0_#000000] group-hover:-translate-y-1 group-hover:shadow-[4px_4px_0_#000000] transition-all object-cover"
+                      className="h-10 md:h-14 w-auto border-2 border-black shadow-[2px_2px_0_#000000] group-hover:-translate-y-1 group-focus:-translate-y-1 group-hover:shadow-[4px_4px_0_#000000] group-focus:shadow-[4px_4px_0_#000000] transition-all object-cover"
                     />
                   )}
                   <span className="text-[14px] font-bold text-[#444] mt-2">{item.score}</span>
 
                   {/* Custom Tooltip */}
-                  <div className="absolute -top-12 scale-0 group-hover:scale-100 transition-transform origin-bottom bg-black text-white text-xs font-bold px-3 py-1.5 border-2 border-white/20 whitespace-nowrap z-10 pointer-events-none rounded-sm">
+                  <div className="absolute -top-12 scale-0 group-hover:scale-100 group-focus:scale-100 transition-transform origin-bottom bg-black text-white text-xs font-bold px-3 py-1.5 border-2 border-white/20 whitespace-nowrap z-10 pointer-events-none rounded-sm">
                     {item.country}
                     <div className="absolute left-1/2 -bottom-[5px] w-2 h-2 bg-black border-r-2 border-b-2 border-white/20 rotate-45 -translate-x-1/2" />
                   </div>
@@ -233,7 +233,7 @@ export default function App() {
             <div className="flex items-center gap-2.5 mt-0.5">
               {station.countrycode && (
                 <img
-                  src={`https://flagcdn.com/w40/${station.countrycode.toLowerCase()}.png`}
+                  src={`https://flagcdn.com/${station.countrycode.toLowerCase()}.svg`}
                   // alt={station.country}
                   className="w-16 border-2 border-black shadow-[2px_2px_0_#000000] object-cover"
                 />
