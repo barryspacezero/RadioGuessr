@@ -149,7 +149,7 @@ export default function App() {
               <Play className="w-8 h-8 fill-current ml-1" />
             </button>
             <span className="text-[13px] font-medium text-white/70">Game Version: 1.2</span>
-            <span className="text-[13px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">barryspace</a></span>
+            {/* <span className="text-[13px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">barryspace</a></span> */}
           </motion.div>
         )}
 
