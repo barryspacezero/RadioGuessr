@@ -1,18 +1,25 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import Globe from 'globe.gl';
 
-const EARTH = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
 const BUMP = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
 const SKY = 'https://unpkg.com/three-globe/example/img/night-sky.png';
 
-export default forwardRef(function GlobeView({ onGuess }, ref) {
+const SKINS = {
+  default: 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+  dark: 'https://unpkg.com/three-globe/example/img/earth-dark.jpg',
+  day: 'https://unpkg.com/three-globe/example/img/earth-day.jpg',
+  water: 'https://unpkg.com/three-globe/example/img/earth-water.png',
+  night: 'https://unpkg.com/three-globe/example/img/earth-night.jpg',
+};
+
+export default forwardRef(function GlobeView({ onGuess, theme = 'default' }, ref) {
   const el = useRef(null);
   const g = useRef(null);
   const active = useRef(false);
 
   useEffect(() => {
     const globe = Globe()
-      .globeImageUrl(EARTH).bumpImageUrl(BUMP).backgroundImageUrl(SKY)
+      .globeImageUrl(SKINS[theme] || SKINS.default).bumpImageUrl(BUMP).backgroundImageUrl(SKY)
       .showAtmosphere(true).atmosphereColor('#4fc3f7').atmosphereAltitude(0.18)
       .width(window.innerWidth).height(window.innerHeight)(el.current);
 
@@ -60,6 +67,12 @@ export default forwardRef(function GlobeView({ onGuess }, ref) {
       globe.width(window.innerWidth).height(window.innerHeight));
     g.current = globe;
   }, []); // eslint-disable-line
+
+  useEffect(() => {
+    if (g.current) {
+      g.current.globeImageUrl(SKINS[theme] || SKINS.default);
+    }
+  }, [theme]);
 
   useImperativeHandle(ref, () => ({
     setGuessing(on) {

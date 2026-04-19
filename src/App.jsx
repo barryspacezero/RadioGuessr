@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play } from 'lucide-react'
+import { Play, Volume2, VolumeX } from 'lucide-react'
 import Globe from './Globe.jsx'
 
 function AnimatedCard({ children, className = "", delay = 0 }) {
@@ -10,20 +10,22 @@ function AnimatedCard({ children, className = "", delay = 0 }) {
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20, transition: { delay: 0 } }}
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
-      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-8 md:left-8 z-20 flex flex-col items-center gap-2.5 bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] p-8 md:p-10 rounded-t-3xl md:rounded-bl-none md:rounded-t-none ${className}`}
+      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col items-center gap-2.5 bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] p-8 md:p-10 rounded-t-3xl md:rounded-bl-none md:rounded-t-none ${className}`}
     >
       {children}
     </motion.div>
   )
 }
 import { fetchStation } from './api.js'
-import { playAudio, stopAudio } from './audio.js'
+import { playAudio, stopAudio, setVolume } from './audio.js'
 import { calcScore } from './score.js'
 
 export default function App() {
   const clickSound = new Audio('/click.mp3')
   const globe = useRef(null);
   const [phase, setPhase] = useState('start'); // start, playing, loading, result, final, rerouting
+  const [volume, setVolumeState] = useState(0.85);
+  const [theme, setTheme] = useState('default');
   const [station, setStation] = useState(null);
   const [totalScore, setTotalScore] = useState(0)
   const [isAudioLoading, setIsAudioLoading] = useState(false)
@@ -129,7 +131,39 @@ export default function App() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      <Globe ref={globe} onGuess={setGuess} />
+      <Globe ref={globe} onGuess={setGuess} theme={theme} />
+
+      {phase !== 'start' && (
+        <>
+          <div className="hidden md:block absolute top-8 left-8 z-40 pointer-events-none">
+            <h1 className="text-3xl text-white font-bold tracking-tight" style={{ textShadow: '2px 2px 0px #000' }}>
+              RadioGuessr
+            </h1>
+          </div>
+
+          <div className="hidden md:flex group absolute top-8 right-8 z-40 bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center gap-0 hover:gap-3 transition-all cursor-pointer">
+            {volume === 0 ? <VolumeX className="w-6 h-6 shrink-0" /> : <Volume2 className="w-6 h-6 shrink-0" />}
+            <div className="w-0 overflow-hidden group-hover:w-32 py-2 transition-all duration-300 ease-in-out flex items-center shrink-0">
+              <input
+                type="range"
+                id="volume"
+                min="0"
+                max="1"
+                step="0.05"
+                value={volume}
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value);
+                  setVolumeState(v);
+                  setVolume(v);
+                  clickSound.volume = v;
+                }}
+                className="w-32 h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
+                title="Volume"
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       <AnimatePresence mode="wait">
         {phase === 'start' && (
@@ -144,6 +178,25 @@ export default function App() {
             <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
               A GeoGuessr-style game where you listen to live radio streams from around the world and guess their location on a 3D globe.
             </p>
+
+            <div className="flex flex-col items-center gap-1 mt-2">
+              <label htmlFor="theme" className="text-[10px] text-white/70 uppercase tracking-widest font-bold">
+                Globe Style
+              </label>
+              <select
+                id="theme"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
+                className="bg-transparent border-2 border-white/30 text-white text-sm font-medium px-3 py-1.5 rounded-sm outline-none cursor-pointer hover:border-white/60 transition-colors [&>option]:bg-black"
+              >
+                <option value="default">Blue Marble</option>
+                {/* <option value="dark">Dark Map</option> */}
+                <option value="day">Day Map</option>
+                <option value="water">Water Map</option>
+                <option value="night">Night Map</option>
+              </select>
+            </div>
+
             {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
             <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(); }}>
               <Play className="w-8 h-8 fill-current ml-1" />
@@ -161,6 +214,7 @@ export default function App() {
             exit={{ opacity: 0, scale: 0.95 }}
             className="absolute bg-black/60 backdrop-blur-md inset-0 z-50 flex flex-col items-center justify-center gap-5"
           >
+            <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
             <span className="text-xl text-white font-bold text-center uppercase tracking-[1.2px]">Countries visited this session</span>
             <div className="flex flex-wrap justify-center items-center bg-white p-4 md:p-6 gap-5 md:gap-8 border-2 border-black shadow-[6px_6px_0_#000000]">
               {history.map((item, index) => (

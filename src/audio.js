@@ -2,6 +2,12 @@ import Hls from "hls.js";
 let audio = null;
 let stopTimer = null;
 let hls = null;
+let globalVolume = 0.85;
+
+export function setVolume(vol) {
+  globalVolume = vol;
+  if (audio) { audio.volume = vol; }
+}
 
 export function playAudio(url, { onEnded, onError, onLoading, onPlaying } = {}) {
   stopAudio();
@@ -10,7 +16,7 @@ export function playAudio(url, { onEnded, onError, onLoading, onPlaying } = {}) 
   const currentAudio = new Audio(url);
   audio = currentAudio;
   
-  audio.volume = 0.85;
+  audio.volume = globalVolume;
   audio.onerror = () => { 
     if (audio === currentAudio) { audio = null; onError?.(); } 
   };
