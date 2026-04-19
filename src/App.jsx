@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Volume2, VolumeX } from 'lucide-react'
+import { Play, Volume2, VolumeX, Trophy } from 'lucide-react'
 import Globe from './Globe.jsx'
 
 function AnimatedCard({ children, className = "", delay = 0 }) {
@@ -141,25 +141,72 @@ export default function App() {
             </h1>
           </div>
 
-          <div className="hidden md:flex group absolute top-8 right-8 z-40 bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center gap-0 hover:gap-3 transition-all cursor-pointer">
-            {volume === 0 ? <VolumeX className="w-6 h-6 shrink-0" /> : <Volume2 className="w-6 h-6 shrink-0" />}
-            <div className="w-0 overflow-hidden group-hover:w-32 py-2 transition-all duration-300 ease-in-out flex items-center shrink-0">
-              <input
-                type="range"
-                id="volume"
-                min="0"
-                max="1"
-                step="0.05"
-                value={volume}
-                onChange={(e) => {
-                  const v = parseFloat(e.target.value);
-                  setVolumeState(v);
-                  setVolume(v);
-                  clickSound.volume = v;
-                }}
-                className="w-32 h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
-                title="Volume"
-              />
+          <div className="absolute top-4 right-4 md:top-8 md:right-8 z-40 flex items-start gap-3 md:gap-4 pointer-events-none">
+            {/* Scoreboard Tooltip */}
+            <div className="relative group pointer-events-auto" tabIndex="0">
+              <div className="bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">
+                <Trophy className="w-5 h-5 md:w-7 md:h-7 shrink-0" />
+              </div>
+
+              <div className="absolute top-full right-0 mt-3 md:mt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus:opacity-100 group-focus:visible transition-all duration-200 origin-top-right z-50">
+                <div className="bg-white border-2 border-black p-3 md:p-4 shadow-[4px_4px_0_#000000] w-48 flex flex-col pointer-events-auto">
+                  <div className="flex flex-col gap-2">
+                    {[1, 2, 3, 4, 5].map(r => {
+                      const pastRound = history[r - 1];
+                      const isCurrent = !pastRound && r === round;
+
+                      return (
+                        <div key={r} className="flex justify-between items-center text-sm font-medium">
+                          <span className={`${isCurrent ? 'text-black font-bold' : 'text-[#777]'}`}>R{r}</span>
+                          {pastRound ? (
+                            <span className="font-bold flex items-center gap-2">
+                              {pastRound.code && (
+                                <img
+                                  src={`https://flagcdn.com/${pastRound.code.toLowerCase()}.svg`}
+                                  className="h-3 w-4 border border-black object-cover"
+                                  alt=""
+                                />
+                              )}
+                              {pastRound.score}
+                            </span>
+                          ) : (isCurrent ? (
+                            <span className="animate-pulse text-black font-bold">...</span>
+                          ) : (
+                            <span className="text-[#aaa]">-</span>
+                          ))}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="border-t-2 border-black mt-3 pt-2 flex justify-between items-center font-bold text-base md:text-lg">
+                    <span className="uppercase tracking-wide text-[12px] mt-0.5">Total</span>
+                    <span>{totalScore}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Volume Control */}
+            <div className="hidden md:flex group bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center gap-0 hover:gap-3 transition-all cursor-pointer pointer-events-auto">
+              {volume === 0 ? <VolumeX className="w-7 h-7 shrink-0" /> : <Volume2 className="w-7 h-7 shrink-0" />}
+              <div className="w-0 overflow-hidden group-hover:w-32 py-2 transition-all duration-300 ease-in-out flex items-center shrink-0">
+                <input
+                  type="range"
+                  id="volume"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={volume}
+                  onChange={(e) => {
+                    const v = parseFloat(e.target.value);
+                    setVolumeState(v);
+                    setVolume(v);
+                    clickSound.volume = v;
+                  }}
+                  className="w-32 h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
+                  title="Volume"
+                />
+              </div>
             </div>
           </div>
         </>
