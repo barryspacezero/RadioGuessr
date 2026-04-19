@@ -3,7 +3,7 @@
 A GeoGuessr-style game where you tune into live radio streams from around the world and test your geography skills by guessing their broadcasting location on an interactive 3D globe.
 
 <p align="center">
-  <img src="./public/ss.png" alt="RadioGuessr Main Screenshot" width="800"/>
+  <img src="./public/start-page.png" alt="RadioGuessr Main Screenshot" width="800"/>
 </p>
 
 ## ✨ Features
