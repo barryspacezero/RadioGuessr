@@ -71,8 +71,8 @@ Ensure you have [Node.js](https://nodejs.org/) installed along with standard pac
 ## 🤝 Acknowledgements
 
 - Built around the incredible open-source community-driven [Radio Browser API](https://www.radio-browser.info/).
-- Continually refined based on UI/UX optimization for the best interactive web experience.
-- [FlagCDN](https://flagcdn.com) for rendering vector country flags
+- [Globe.gl](https://globe.gl) for an excellent 3D globe library.
+- [FlagCDN](https://flagcdn.com) for rendering vector country flags.
 - Built with ❤️ by [Sparsh](https://github.com/barryspacezero)
 
 ---
