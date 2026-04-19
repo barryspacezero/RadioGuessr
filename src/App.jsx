@@ -201,7 +201,7 @@ export default function App() {
             <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(); }}>
               <Play className="w-8 h-8 fill-current ml-1" />
             </button>
-            <span className="text-[13px] font-medium text-white/70">Game Version: 1.2</span>
+            <span className="text-[13px] font-medium text-white/70">Game Version: 1.3</span>
             {/* <span className="text-[13px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">barryspace</a></span> */}
           </motion.div>
         )}
