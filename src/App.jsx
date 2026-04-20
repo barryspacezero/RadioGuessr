@@ -1,22 +1,49 @@
 import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Volume2, VolumeX, Trophy } from 'lucide-react'
+import { Play, Volume2, VolumeX, Trophy, ChevronUp, ChevronDown } from 'lucide-react'
 import Globe from './Globe.jsx'
 
 function AnimatedCard({ children, className = "", delay = 0 }) {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const isItemsStart = className.includes('!items-start') || className.includes('items-start');
+  const gapClass = className.includes('gap-1.5') ? 'gap-1.5' : 'gap-2.5';
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20, transition: { delay: 0 } }}
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
-      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col items-center gap-2.5 bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] p-8 md:p-10 rounded-t-3xl md:rounded-bl-none md:rounded-t-none ${className}`}
+      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] rounded-t-3xl md:rounded-bl-none md:rounded-t-none overflow-hidden md:overflow-visible ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
     >
-      {children}
+      {/* Mobile Handle */}
+      <div
+        className="w-full flex justify-center items-center h-[36px] md:hidden cursor-pointer bg-white relative z-10 shrink-0 border-b-2 border-black/5"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        {isExpanded ? (
+          <ChevronDown className="w-6 h-6 text-black/40 pointer-events-none" />
+        ) : (
+          <ChevronUp className="w-6 h-6 text-black/40 pointer-events-none" />
+        )}
+      </div>
+
+      {/* Expandable Content */}
+      <motion.div
+        initial={false}
+        animate={{ height: isExpanded ? 'auto' : 0, opacity: isExpanded ? 1 : 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className={`w-full overflow-hidden ${isExpanded ? 'pointer-events-auto' : 'pointer-events-none md:pointer-events-auto'}`}
+      >
+        <div className={`w-full flex flex-col ${isItemsStart ? 'items-start' : 'items-center'} ${gapClass} px-5 pb-5 pt-1 md:p-10 md:pt-10`}>
+          {children}
+        </div>
+      </motion.div>
     </motion.div>
   )
 }
-import { fetchStation } from './api.js'
+import { fetchStation, COUNTRY_TO_REGION } from './api.js'
 import { playAudio, stopAudio, setVolume } from './audio.js'
 import { calcScore } from './score.js'
 
@@ -33,7 +60,8 @@ export default function App() {
   const [round, setRound] = useState(0)
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
-  const [hint, setHint] = useState(false);
+  const [hintCredits, setHintCredits] = useState(3);
+  const [roundHints, setRoundHints] = useState({ language: false, city: false, region: false });
   const [history, setHistory] = useState([])
 
   async function startRound() {
@@ -49,7 +77,7 @@ export default function App() {
     setResult(null)
     setError('')
     setPhase('loading')
-    setHint(false)
+    setRoundHints({ language: false, city: false, region: false })
     globe.current.reset()
 
     async function fetchAndPlay(retriesLeft = 3) {
@@ -106,8 +134,16 @@ export default function App() {
     setGuess(null)
     setResult(null)
     setError('')
-    setHint(false)
+    setHintCredits(3)
+    setRoundHints({ language: false, city: false, region: false })
     setIsAudioLoading(false)
+  }
+
+  function useHint(type) {
+    if (hintCredits > 0 && !roundHints[type]) {
+      setHintCredits(prev => prev - 1);
+      setRoundHints(prev => ({ ...prev, [type]: true }));
+    }
   }
 
   function submitGuess() {
@@ -203,7 +239,7 @@ export default function App() {
                     setVolume(v);
                     clickSound.volume = v;
                   }}
-                  className="w-32 h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
+                  className="w-32 h-3 bg-gray-200 appearance-none cursor-pointer accent-black"
                   title="Volume"
                 />
               </div>
@@ -234,7 +270,7 @@ export default function App() {
                 id="theme"
                 value={theme}
                 onChange={(e) => setTheme(e.target.value)}
-                className="bg-transparent border-2 border-white/30 text-white text-sm font-medium px-3 py-1.5 rounded-sm outline-none cursor-pointer hover:border-white/60 transition-colors [&>option]:bg-black"
+                className="bg-transparent border-2 border-white/30 text-white text-sm font-medium px-3 py-1.5 outline-none cursor-pointer hover:border-white/60 transition-colors [&>option]:bg-black"
               >
                 <option value="default">Blue Marble</option>
                 {/* <option value="dark">Dark Map</option> */}
@@ -276,7 +312,7 @@ export default function App() {
                   <span className="text-[14px] font-bold text-[#444] mt-2">{item.score}</span>
 
                   {/* Custom Tooltip */}
-                  <div className="absolute -top-12 scale-0 group-hover:scale-100 group-focus:scale-100 transition-transform origin-bottom bg-black text-white text-xs font-bold px-3 py-1.5 border-2 border-white/20 whitespace-nowrap z-10 pointer-events-none rounded-sm">
+                  <div className="absolute -top-12 scale-0 group-hover:scale-100 group-focus:scale-100 transition-transform origin-bottom bg-black text-white text-xs font-bold px-3 py-1.5 border-2 border-white/20 whitespace-nowrap z-10 pointer-events-none">
                     {item.country}
                     <div className="absolute left-1/2 -bottom-[5px] w-2 h-2 bg-black border-r-2 border-b-2 border-white/20 rotate-45 -translate-x-1/2" />
                   </div>
@@ -310,9 +346,44 @@ export default function App() {
             <span className="text-xl font-bold uppercase tracking-[1.2px]">Now Playing</span>
             <span className="text-[13px] font-medium text-[#444] text-center">{station.name}</span>
             <span className="text-[13px] font-medium text-[#444]">Round {round}/5</span>
-            <button className="btn btn-primary mt-2" onClick={() => setHint(true)}>
-              {hint ? `Language: ${station.language || 'Unknown'}` : 'Reveal Hint?'}
-            </button>
+            <div className="flex flex-col gap-2 w-full mt-2">
+              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-[#777]">
+                <span>Hints ({hintCredits} left)</span>
+              </div>
+              <div className="flex gap-2 w-full">
+                <button
+                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.language) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.language ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000000] disabled:shadow-[2px_2px_0_#cccccc]`}
+                  disabled={roundHints.language || hintCredits === 0}
+                  onClick={() => useHint('language')}
+                  title={roundHints.language ? (station.language || 'Unknown') : 'Use Hint: Language'}
+                >
+                  Lang
+                </button>
+                <button
+                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.city) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.city ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000000] disabled:shadow-[2px_2px_0_#cccccc]`}
+                  disabled={roundHints.city || hintCredits === 0}
+                  onClick={() => useHint('city')}
+                  title={roundHints.city ? (station.state || 'Unknown') : 'Use Hint: City'}
+                >
+                  City
+                </button>
+                <button
+                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.region) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.region ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000000] disabled:shadow-[2px_2px_0_#cccccc]`}
+                  disabled={roundHints.region || hintCredits === 0}
+                  onClick={() => useHint('region')}
+                  title={roundHints.region ? (COUNTRY_TO_REGION[station.countrycode] || 'Unknown') : 'Use Hint: Region'}
+                >
+                  Region
+                </button>
+              </div>
+              {(roundHints.language || roundHints.city || roundHints.region) && (
+                <div className="flex flex-col gap-1 mt-1 p-2 bg-[#f4f4f4] border-2 border-black max-h-[100px] overflow-y-auto shadow-[inset_2px_2px_0_rgba(0,0,0,0.1)]">
+                  {roundHints.language && <div className="text-[12px] font-bold"><span className="text-[#666]">Language:</span> {station.language || 'Unknown'}</div>}
+                  {roundHints.city && <div className="text-[12px] font-bold"><span className="text-[#666]">City/State:</span> {station.state || 'Unknown'}</div>}
+                  {roundHints.region && <div className="text-[12px] font-bold"><span className="text-[#666]">Region:</span> {COUNTRY_TO_REGION[station.countrycode] || 'Unknown'}</div>}
+                </div>
+              )}
+            </div>
 
             <div className="flex md:hidden flex-col items-center gap-2 w-full mt-1 border-t-2 border-black/10 pt-4">
               <button className="btn btn-primary w-full" disabled={!guess} onClick={submitGuess}>
@@ -370,7 +441,7 @@ export default function App() {
                 Submit Guess
               </button>
               {!guess && (
-                <span className="text-xs font-medium text-white bg-black px-3 py-1 rounded-sm shadow-md">
+                <span className="text-sm font-medium text-white bg-black px-3 py-1 rounded-sm shadow-md">
                   Click the globe to place your pin
                 </span>
               )}
