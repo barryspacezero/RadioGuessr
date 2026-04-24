@@ -9,11 +9,12 @@ A GeoGuessr-style game where you tune into live radio streams from around the wo
 ## ✨ Features
 
 - **Global Radio Exploration**: Listens to authentic, live radio streams served dynamically via the Radio Browser API.
-- **Interactive 3D Globe**: Spin, pan, and drop pins on a responsive, fully customized `globe.gl` powered 3D Earth.
+- **Curated High-Quality Stations**: Stream search natively prioritizes high-voted music and talk stations, automatically filtering out noise/ambiance.
+- **Interactive 3D Globe**: Spin, pan, and drop pins on a responsive, fully customized `globe.gl` powered 3D Earth, now enriched with optional TopoJSON country borders and interactive hover labels.
 - **Multiple Visual Themes**: Customize your globe aesthetic with themes including Blue Marble, Day Map, Water Map, and Night Map.
 - **Progressive Rounds**: Play 5 rounds per session with an intuitive, collapsible Round Score Tracker to monitor your performance.
-- **Hints System**: Stuck on a tricky stream? Reveal the broadcasting language for an easier guess.
-- **Premium Neobrutalist UI**: A highly refined, animated interface built with Tailwind CSS and Framer Motion for a dynamic, satisfying game loop.
+- **Hints System**: Stuck on a tricky stream? Request the broadcasting Language, City/State, or Region for an easier guess, featuring intelligent fallback mechanisms for missing API data.
+- **Enhanced Mobile UI**: A highly refined, animated interface built with Tailwind CSS and Framer Motion, featuring smart collapsing cards and persistently pinned buttons for a flawless mobile guessing experience.
 - **Session History Summary**: At the end of 5 rounds, review the countries you've "visited", complete with country flags seamlessly pulled from FlagCDN with custom styled tooltips.
 
 ## 🛠️ Tech Stack
@@ -77,4 +78,4 @@ Ensure you have [Node.js](https://nodejs.org/) installed along with standard pac
 
 ---
 
-*Game Version: 1.3*
+*Game Version: 1.4*

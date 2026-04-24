@@ -58,6 +58,8 @@ export default function App() {
   const [phase, setPhase] = useState('start'); // start, playing, loading, result, final, rerouting
   const [volume, setVolumeState] = useState(0.85);
   const [theme, setTheme] = useState('default');
+  const [showBorders, setShowBorders] = useState(false);
+  const [showNames, setShowNames] = useState(false);
   const [station, setStation] = useState(null);
   const [totalScore, setTotalScore] = useState(0)
   const [isAudioLoading, setIsAudioLoading] = useState(false)
@@ -172,7 +174,7 @@ export default function App() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      <Globe ref={globe} onGuess={setGuess} theme={theme} />
+      <Globe ref={globe} onGuess={setGuess} theme={theme} showBorders={showBorders} showNames={showNames} />
 
       {phase !== 'start' && (
         <>
@@ -285,11 +287,39 @@ export default function App() {
               </select>
             </div>
 
+            <div className="flex items-center gap-4 mt-1">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
+                  <input
+                    type="checkbox"
+                    className="opacity-0 absolute w-full h-full cursor-pointer"
+                    checked={showBorders}
+                    onChange={(e) => setShowBorders(e.target.checked)}
+                  />
+                  {showBorders && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
+                </div>
+                <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Borders</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
+                  <input
+                    type="checkbox"
+                    className="opacity-0 absolute w-full h-full cursor-pointer"
+                    checked={showNames}
+                    onChange={(e) => setShowNames(e.target.checked)}
+                  />
+                  {showNames && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
+                </div>
+                <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Labels</span>
+              </label>
+            </div>
+
             {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
             <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(); }}>
               <Play className="w-8 h-8 fill-current ml-1" />
             </button>
-            <span className="text-[13px] font-medium text-white/70">Game Version: 1.3</span>
+            <span className="text-[13px] font-medium text-white/70">Game Version: 1.4</span>
             <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">Sparsh</a></span>
           </motion.div>
         )}

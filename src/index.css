@@ -71,3 +71,13 @@ body,
   box-shadow: 4px 4px 0 #444;
   transform: none;
 }
+
+/* Clear default Three.js/Globe.gl tooltip bubble styling */
+[class^="float-tooltip"], .scene-tooltip {
+  background: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+  border-radius: 0 !important;
+  pointer-events: none !important;
+}
