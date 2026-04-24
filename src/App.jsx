@@ -47,12 +47,6 @@ function AnimatedCard({ children, className = "", delay = 0, persistentMobileCon
         )}
       </div>
 
-      {persistentMobileContent && (
-        <div className="w-full md:hidden px-5 pt-3 pb-1 shrink-0 relative z-10 bg-white/40 backdrop-blur-sm">
-          {persistentMobileContent}
-        </div>
-      )}
-
       {/* Expandable Content */}
       <motion.div
         initial={false}
@@ -64,6 +58,12 @@ function AnimatedCard({ children, className = "", delay = 0, persistentMobileCon
           {children}
         </div>
       </motion.div>
+
+      {persistentMobileContent && (
+        <div className="w-full md:hidden px-5 pt-1 pb-3 shrink-0 relative z-10 bg-white/40 backdrop-blur-sm">
+          {persistentMobileContent}
+        </div>
+      )}
     </motion.div>
   )
 }
@@ -477,14 +477,23 @@ export default function App() {
         )}
 
         {phase === 'result' && result && station && (
-          <AnimatedCard key="result" delay={2.2} className="!items-start gap-1.5 md:!min-w-[340px]">
+          <AnimatedCard 
+            key="result" 
+            delay={2.2} 
+            className="!items-start gap-1.5 md:!min-w-[340px]"
+            persistentMobileContent={
+              <button disabled={phase !== 'result'} className="btn btn-primary w-full shadow-lg" onClick={() => {
+                if (round >= 5) setPhase('final')
+                else { clickSound.currentTime = 0; clickSound.play(); startRound() }
+              }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
+            }
+          >
             <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Station</span>
             <span className="text-[13px] font-medium text-black line-clamp-2 ">{station.name}</span>
             <div className="flex items-center gap-2.5 mt-0.5">
               {station.countrycode && (
                 <img
                   src={`https://flagcdn.com/${station.countrycode.toLowerCase()}.svg`}
-                  // alt={station.country}
                   className="w-16 border-2 border-black shadow-[2px_2px_0_#000000] object-cover"
                 />
               )}
@@ -498,7 +507,7 @@ export default function App() {
             <span className="text-5xl md:text-[60px] font-bold leading-none tracking-[-2px] text-black">
               {result.score.toLocaleString()}
             </span>
-            <button disabled={phase !== 'result'} className="btn btn-primary mt-4 w-full" onClick={() => {
+            <button disabled={phase !== 'result'} className="hidden md:block btn btn-primary mt-4 w-full" onClick={() => {
               if (round >= 5) setPhase('final')
               else { clickSound.currentTime = 0; clickSound.play(); startRound() }
             }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
