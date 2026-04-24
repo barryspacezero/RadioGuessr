@@ -3,6 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Volume2, VolumeX, Trophy, ChevronUp, ChevronDown } from 'lucide-react'
 import Globe from './Globe.jsx'
 
+const CloudSvg = ({ className, style }) => (
+  <svg
+    viewBox="0 0 100 50"
+    className={`fill-white/90 blur-[3px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)] ${className}`}
+    style={style}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M75.3 19.5a18.3 18.3 0 0 0-35-5.5 13.8 13.8 0 0 0-21.7 8.3 11 11 0 0 0 2.2 21.7h59.6a16.5 16.5 0 0 0-5.1-24.5z" />
+  </svg>
+);
+
 function AnimatedCard({ children, className = "", delay = 0, persistentMobileContent }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -15,21 +26,29 @@ function AnimatedCard({ children, className = "", delay = 0, persistentMobileCon
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20, transition: { delay: 0 } }}
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
-      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] rounded-t-3xl md:rounded-bl-none md:rounded-t-none overflow-hidden md:overflow-visible ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
+      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-gradient-to-b from-[#7dd3fc] to-[#e0f2fe] border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] rounded-t-3xl md:rounded-none ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
     >
+      {/* Animated Sky Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden rounded-t-3xl md:rounded-none pointer-events-none">
+        <CloudSvg className="absolute top-4 -left-16 w-16" style={{ animation: 'float-cloud 30s linear infinite 0s' }} />
+        <CloudSvg className="absolute top-14 -left-20 w-24" style={{ animation: 'float-cloud 45s linear infinite 15s' }} />
+        <CloudSvg className="absolute -bottom-2 -left-32 w-32" style={{ animation: 'float-cloud 60s linear infinite 5s' }} />
+        <CloudSvg className="absolute top-28 -left-12 w-12" style={{ animation: 'float-cloud 25s linear infinite 20s' }} />
+      </div>
+
       <div
-        className="w-full flex justify-center items-center h-[36px] md:hidden cursor-pointer bg-white relative z-10 shrink-0 border-b-2 border-black/5"
+        className="w-full flex justify-center items-center h-[36px] md:hidden cursor-pointer relative z-10 shrink-0 border-b-2 border-black/10 bg-white/20 backdrop-blur-sm"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         {isExpanded ? (
-          <ChevronDown className="w-6 h-6 text-black/40 pointer-events-none" />
+          <ChevronDown className="w-6 h-6 text-black pointer-events-none" />
         ) : (
-          <ChevronUp className="w-6 h-6 text-black/40 pointer-events-none" />
+          <ChevronUp className="w-6 h-6 text-black pointer-events-none" />
         )}
       </div>
 
       {persistentMobileContent && (
-        <div className="w-full md:hidden bg-white px-5 pt-3 pb-1 shrink-0 relative z-10">
+        <div className="w-full md:hidden px-5 pt-3 pb-1 shrink-0 relative z-10 bg-white/40 backdrop-blur-sm">
           {persistentMobileContent}
         </div>
       )}
@@ -39,7 +58,7 @@ function AnimatedCard({ children, className = "", delay = 0, persistentMobileCon
         initial={false}
         animate={{ height: isExpanded ? 'auto' : 0, opacity: isExpanded ? 1 : 0 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className={`w-full overflow-hidden ${isExpanded ? 'pointer-events-auto' : 'pointer-events-none md:pointer-events-auto'}`}
+        className={`w-full relative z-10 ${isExpanded ? 'pointer-events-auto' : 'pointer-events-none md:pointer-events-auto'}`}
       >
         <div className={`w-full flex flex-col ${isItemsStart ? 'items-start' : 'items-center'} ${gapClass} px-5 pb-5 pt-1 md:p-10 md:pt-10`}>
           {children}
@@ -187,12 +206,12 @@ export default function App() {
           <div className="absolute top-4 right-4 md:top-8 md:right-8 z-40 flex items-start gap-3 md:gap-4 pointer-events-none">
             {/* Scoreboard Tooltip */}
             <div className="relative group pointer-events-auto" tabIndex="0">
-              <div className="bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">
+              <div className="bg-gradient-to-b from-[#7dd3fc] to-[#e0f2fe] border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">
                 <Trophy className="w-5 h-5 md:w-7 md:h-7 shrink-0" />
               </div>
 
               <div className="absolute top-full right-0 mt-3 md:mt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus:opacity-100 group-focus:visible transition-all duration-200 origin-top-right z-50">
-                <div className="bg-white border-2 border-black p-3 md:p-4 shadow-[4px_4px_0_#000000] w-48 flex flex-col pointer-events-auto">
+                <div className="bg-gradient-to-b from-[#7dd3fc] to-[#e0f2fe] border-2 border-black p-3 md:p-4 shadow-[4px_4px_0_#000000] w-48 flex flex-col pointer-events-auto">
                   <div className="flex flex-col gap-2">
                     {[1, 2, 3, 4, 5].map(r => {
                       const pastRound = history[r - 1];
@@ -200,7 +219,7 @@ export default function App() {
 
                       return (
                         <div key={r} className="flex justify-between items-center text-sm font-medium">
-                          <span className={`${isCurrent ? 'text-black font-bold' : 'text-[#777]'}`}>R{r}</span>
+                          <span className={`${isCurrent ? 'text-black font-bold' : 'text-black font-medium'}`}>R{r}</span>
                           {pastRound ? (
                             <span className="font-bold flex items-center gap-2">
                               {pastRound.code && (
@@ -215,7 +234,7 @@ export default function App() {
                           ) : (isCurrent ? (
                             <span className="animate-pulse text-black font-bold">...</span>
                           ) : (
-                            <span className="text-[#aaa]">-</span>
+                            <span className="text-black">-</span>
                           ))}
                         </div>
                       )
@@ -230,7 +249,7 @@ export default function App() {
             </div>
 
             {/* Volume Control */}
-            <div className="hidden md:flex group bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center gap-0 hover:gap-3 transition-all cursor-pointer pointer-events-auto">
+            <div className="hidden md:flex group bg-gradient-to-b from-[#7dd3fc] to-[#e0f2fe] border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center gap-0 hover:gap-3 transition-all cursor-pointer pointer-events-auto">
               {volume === 0 ? <VolumeX className="w-7 h-7 shrink-0" /> : <Volume2 className="w-7 h-7 shrink-0" />}
               <div className="w-0 overflow-hidden group-hover:w-32 py-2 transition-all duration-300 ease-in-out flex items-center shrink-0">
                 <input
@@ -311,7 +330,7 @@ export default function App() {
                   />
                   {showNames && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
                 </div>
-                <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Labels</span>
+                <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Country Labels</span>
               </label>
             </div>
 
@@ -398,7 +417,7 @@ export default function App() {
                   Submit Guess
                 </button>
                 {!guess && (
-                  <span className="text-[11px] font-medium text-[#777] text-center">
+                  <span className="text-[11px] font-medium text-black text-center">
                     Click the globe to place your pin
                   </span>
                 )}
@@ -414,9 +433,9 @@ export default function App() {
               </div>
               <span className="text-[16px] font-bold uppercase tracking-[1.2px] leading-none mt-0.5">Now Playing</span>
             </div>
-            <span className="text-[13px] font-medium text-[#444]">Round {round}/5</span>
+            <span className="text-[13px] font-medium text-black">Round {round}/5</span>
             <div className="flex flex-col gap-2 w-full mt-2">
-              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-[#777]">
+              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-black">
                 <span>Hints ({hintCredits} left)</span>
               </div>
               <div className="flex gap-2 w-full">
@@ -446,10 +465,10 @@ export default function App() {
                 </button>
               </div>
               {(roundHints.language || roundHints.city || roundHints.region) && (
-                <div className="flex flex-col gap-1 mt-1 p-2 bg-[#f4f4f4] border-2 border-black max-h-[100px] overflow-y-auto shadow-[inset_2px_2px_0_rgba(0,0,0,0.1)]">
-                  {roundHints.language && <div className="text-[12px] font-bold"><span className="text-[#666]">Language:</span> {station.language || 'Unknown'}</div>}
-                  {roundHints.city && <div className="text-[12px] font-bold"><span className="text-[#666]">City/State:</span> {station.state || 'Unknown'}</div>}
-                  {roundHints.region && <div className="text-[12px] font-bold"><span className="text-[#666]">Region:</span> {COUNTRY_TO_REGION[station.countrycode] || 'Unknown'}</div>}
+                <div className="flex flex-col gap-1 mt-1 p-2 bg-[#f4f4f4] border-2 border-black max-h-[100px] overflow-y-auto shadow-[inset_2px_2px_0_rgba(0,0,0,0.1)] text-black">
+                  {roundHints.language && <div className="text-[12px] font-bold"><span className="text-black/60">Language:</span> {station.language || 'Unknown'}</div>}
+                  {roundHints.city && <div className="text-[12px] font-bold"><span className="text-black/60">City/State:</span> {station.state || 'Unknown'}</div>}
+                  {roundHints.region && <div className="text-[12px] font-bold"><span className="text-black/60">Region:</span> {COUNTRY_TO_REGION[station.countrycode] || 'Unknown'}</div>}
                 </div>
               )}
             </div>
@@ -459,8 +478,8 @@ export default function App() {
 
         {phase === 'result' && result && station && (
           <AnimatedCard key="result" delay={2.2} className="!items-start gap-1.5 md:!min-w-[340px]">
-            <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Station</span>
-            <span className="text-[13px] font-medium text-[#444] line-clamp-2 ">{station.name}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Station</span>
+            <span className="text-[13px] font-medium text-black line-clamp-2 ">{station.name}</span>
             <div className="flex items-center gap-2.5 mt-0.5">
               {station.countrycode && (
                 <img
@@ -469,14 +488,14 @@ export default function App() {
                   className="w-16 border-2 border-black shadow-[2px_2px_0_#000000] object-cover"
                 />
               )}
-              <span className="text-xl md:text-[22px] font-bold tracking-tight leading-tight">{location}</span>
+              <span className="text-xl md:text-[22px] font-bold tracking-tight leading-tight text-black">{location}</span>
             </div>
-            <span className="text-[13px] text-[#555]">
+            <span className="text-[13px] text-black">
               {result.km < 1 ? 'Less than 1 km away' : `${result.km.toLocaleString()} km away`}
             </span>
             <div className="my-3 border-t-2 border-black w-full" />
-            <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#777]">Score</span>
-            <span className="text-5xl md:text-[60px] font-bold leading-none tracking-[-2px]">
+            <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Score</span>
+            <span className="text-5xl md:text-[60px] font-bold leading-none tracking-[-2px] text-black">
               {result.score.toLocaleString()}
             </span>
             <button disabled={phase !== 'result'} className="btn btn-primary mt-4 w-full" onClick={() => {

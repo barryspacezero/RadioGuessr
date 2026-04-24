@@ -83,8 +83,8 @@ export default forwardRef(function GlobeView({ onGuess, theme = 'default', showB
         g.current.polygonsData(countries)
           .polygonAltitude(0.005)
           .polygonCapColor(() => 'rgba(255, 255, 255, 0)') // Transparent fill
-          .polygonSideColor(() => 'rgba(81, 159, 255, 1)')
-          .polygonStrokeColor(() => showBorders ? 'rgba(124, 173, 247, 1)' : 'rgba(0,0,0,0)')
+          .polygonSideColor(() => 'rgba(255, 255, 255, 1)')
+          .polygonStrokeColor(() => showBorders ? 'rgba(255, 255, 255, 1)' : 'rgba(0,0,0,0)')
           .polygonLabel(d => showNames ? `<div style="background: white; border: 2px solid black; color: black; padding: 6px 10px; font-weight: 800; font-family: system-ui, -apple-system, sans-serif; font-size: 12px; pointer-events: none;">${d.properties.NAME}</div>` : null)
           .onPolygonClick((polygon, event, { lat, lng }) => {
             if (!active.current) return;
