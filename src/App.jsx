@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Play, Volume2, VolumeX, Trophy, ChevronUp, ChevronDown } from 'lucide-react'
 import Globe from './Globe.jsx'
 
-function AnimatedCard({ children, className = "", delay = 0 }) {
+function AnimatedCard({ children, className = "", delay = 0, persistentMobileContent }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const isItemsStart = className.includes('!items-start') || className.includes('items-start');
@@ -17,7 +17,6 @@ function AnimatedCard({ children, className = "", delay = 0 }) {
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
       className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] rounded-t-3xl md:rounded-bl-none md:rounded-t-none overflow-hidden md:overflow-visible ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
     >
-      {/* Mobile Handle */}
       <div
         className="w-full flex justify-center items-center h-[36px] md:hidden cursor-pointer bg-white relative z-10 shrink-0 border-b-2 border-black/5"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -28,6 +27,12 @@ function AnimatedCard({ children, className = "", delay = 0 }) {
           <ChevronUp className="w-6 h-6 text-black/40 pointer-events-none" />
         )}
       </div>
+
+      {persistentMobileContent && (
+        <div className="w-full md:hidden bg-white px-5 pt-3 pb-1 shrink-0 relative z-10">
+          {persistentMobileContent}
+        </div>
+      )}
 
       {/* Expandable Content */}
       <motion.div
@@ -171,8 +176,8 @@ export default function App() {
 
       {phase !== 'start' && (
         <>
-          <div className="hidden md:block absolute top-8 left-8 z-40 pointer-events-none">
-            <h1 className="text-3xl text-white font-bold tracking-tight" style={{ textShadow: '2px 2px 0px #000' }}>
+          <div className="absolute top-4 left-4 md:top-8 md:left-8 z-40 pointer-events-none">
+            <h1 className="text-2xl md:text-3xl text-white font-bold tracking-tight" style={{ textShadow: '2px 2px 0px #000' }}>
               RadioGuessr
             </h1>
           </div>
@@ -285,7 +290,7 @@ export default function App() {
               <Play className="w-8 h-8 fill-current ml-1" />
             </button>
             <span className="text-[13px] font-medium text-white/70">Game Version: 1.3</span>
-            <span className="text-[13px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">barryspace</a></span>
+            <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">Sparsh</a></span>
           </motion.div>
         )}
 
@@ -337,14 +342,48 @@ export default function App() {
 
         {phase === 'playing' && isAudioLoading && (
           <AnimatedCard key="loading-audio">
-            <span className="text-xl font-bold uppercase tracking-[1.2px]">Loading...</span>
+            <div className="flex flex-col items-center gap-2.5 w-full animate-pulse min-w-[240px]">
+              <div className="h-6 bg-gray-200 w-32 rounded-sm mb-1" />
+              <div className="h-4 bg-gray-200 w-3/4 rounded-sm" />
+              <div className="h-3 bg-gray-200 w-20 rounded-sm" />
+              <div className="flex flex-col gap-2 w-full mt-2">
+                <div className="h-3 bg-gray-200 w-24 rounded-sm" />
+                <div className="flex gap-2 w-full h-[32px] mt-0.5">
+                  <div className="flex-1 bg-gray-200 rounded-sm" />
+                  <div className="flex-1 bg-gray-200 rounded-sm" />
+                  <div className="flex-1 bg-gray-200 rounded-sm" />
+                </div>
+              </div>
+              <div className="flex md:hidden w-full h-10 bg-gray-200 rounded-sm mt-4" />
+            </div>
           </AnimatedCard>
         )}
 
         {phase === 'playing' && isAudioLoading === false && (
-          <AnimatedCard key="playing">
-            <span className="text-xl font-bold uppercase tracking-[1.2px]">Now Playing</span>
-            <span className="text-[13px] font-medium text-[#444] text-center">{station.name}</span>
+          <AnimatedCard
+            key="playing"
+            persistentMobileContent={
+              <div className="flex flex-col items-center gap-2 w-full">
+                <button className="btn btn-primary w-full shadow-lg" disabled={!guess} onClick={submitGuess}>
+                  Submit Guess
+                </button>
+                {!guess && (
+                  <span className="text-[11px] font-medium text-[#777] text-center">
+                    Click the globe to place your pin
+                  </span>
+                )}
+              </div>
+            }
+          >
+            <div className="flex items-center justify-center gap-2">
+              <div className="flex items-end gap-[3px] h-[14px]">
+                <motion.div animate={{ height: ['40%', '100%', '40%'] }} transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }} className="w-[3px] bg-black" />
+                <motion.div animate={{ height: ['100%', '40%', '100%'] }} transition={{ repeat: Infinity, duration: 1.1, ease: "easeInOut" }} className="w-[3px] bg-black" />
+                <motion.div animate={{ height: ['50%', '100%', '50%'] }} transition={{ repeat: Infinity, duration: 0.9, ease: "easeInOut" }} className="w-[3px] bg-black" />
+                <motion.div animate={{ height: ['80%', '30%', '80%'] }} transition={{ repeat: Infinity, duration: 1.3, ease: "easeInOut" }} className="w-[3px] bg-black" />
+              </div>
+              <span className="text-[16px] font-bold uppercase tracking-[1.2px] leading-none mt-0.5">Now Playing</span>
+            </div>
             <span className="text-[13px] font-medium text-[#444]">Round {round}/5</span>
             <div className="flex flex-col gap-2 w-full mt-2">
               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-[#777]">
@@ -385,16 +424,6 @@ export default function App() {
               )}
             </div>
 
-            <div className="flex md:hidden flex-col items-center gap-2 w-full mt-1 border-t-2 border-black/10 pt-4">
-              <button className="btn btn-primary w-full" disabled={!guess} onClick={submitGuess}>
-                Submit Guess
-              </button>
-              {!guess && (
-                <span className="text-[11px] font-medium text-[#555] text-center">
-                  Click the globe to place your pin
-                </span>
-              )}
-            </div>
           </AnimatedCard>
         )}
 

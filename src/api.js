@@ -11,10 +11,7 @@ const REGIONS = {
   'Africa - East': ['KE', 'ET', 'TZ', 'UG', 'RW', 'BI', 'SO', 'DJ', 'ER', 'MG', 'MU', 'SC'],
   'Africa - Central': ['CM', 'TD', 'CF', 'CG', 'CD', 'GA', 'GQ', 'ST', 'AO'],
   'Africa - South': ['ZA', 'ZW', 'ZM', 'MW', 'MZ', 'BW', 'NA', 'SZ', 'LS'],
-  'Europe - West': ['DE', 'FR', 'ES', 'PT', 'IT', 'NL', 'BE', 'CH', 'AT', 'LU', 'IE', 'GB'],
-  'Europe - North': ['SE', 'NO', 'DK', 'FI', 'IS', 'EE', 'LV', 'LT'],
-  'Europe - East': ['PL', 'RO', 'UA', 'BY', 'RU', 'CZ', 'SK', 'HU', 'MD'],
-  'Europe - South / Balkans': ['GR', 'TR', 'RS', 'HR', 'BA', 'SI', 'MK', 'AL', 'ME', 'BG', 'CY', 'MT'],
+  'Europe': ['DE', 'FR', 'ES', 'PT', 'IT', 'NL', 'BE', 'CH', 'AT', 'LU', 'IE', 'GB', 'SE', 'NO', 'DK', 'FI', 'IS', 'EE', 'LV', 'LT', 'PL', 'RO', 'UA', 'BY', 'RU', 'CZ', 'SK', 'HU', 'MD', 'GR', 'TR', 'RS', 'HR', 'BA', 'SI', 'MK', 'AL', 'ME', 'BG', 'CY', 'MT'],
   'Caucasus': ['GE', 'AM', 'AZ'],
   'North America': ['US', 'CA', 'MX'],
   'Caribbean': ['CU', 'JM', 'HT', 'DO', 'PR', 'TT', 'BB', 'LC', 'VC', 'GD', 'AG', 'DM', 'KN', 'BS'],
@@ -59,15 +56,65 @@ export const COUNTRY_TO_LANGUAGE = {
   NC: 'French', PF: 'French', GU: 'English', MP: 'English'
 };
 
+export const COUNTRY_TO_CITY = {
+  "IR": "Tehran", "AL": "Tirana", "WF": "Mata-Utu", "BE": "Brussels", "IO": "Diego Garcia",
+  "PM": "Saint-Pierre", "VC": "Kingstown", "MH": "Majuro", "TM": "Ashgabat", "NG": "Abuja", "TN": "Tunis", "SC": "Victoria",
+  "UY": "Montevideo", "PF": "Papeetē", "AE": "Abu Dhabi", "HT": "Port-au-Prince", "TR": "Ankara", "GY": "Georgetown",
+  "JO": "Amman", "SI": "Ljubljana", "OM": "Muscat", "ZA": "Pretoria", "PT": "Lisbon", "UG": "Kampala", "DK": "Copenhagen",
+  "DO": "Santo Domingo", "TO": "Nuku'alofa", "NF": "Kingston", "MT": "Valletta", "BD": "Dhaka", "SV": "San Salvador",
+  "TH": "Bangkok", "ZW": "Harare", "KZ": "Astana", "MY": "Kuala Lumpur", "MD": "Chișinău", "AX": "Mariehamn",
+  "HK": "City of Victoria", "IM": "Douglas", "LS": "Maseru", "VU": "Port Vila", "GT": "Guatemala City",
+  "SN": "Dakar", "DE": "Berlin", "MS": "Plymouth", "PN": "Adamstown", "SS": "Juba", "GW": "Bissau",
+  "CY": "Nicosia", "DZ": "Algiers", "PS": "Ramallah", "GE": "Tbilisi", "KW": "Kuwait City", "MU": "Port Louis",
+  "XK": "Pristina", "VI": "Charlotte Amalie", "CM": "Yaoundé", "GB": "London", "TT": "Port of Spain", "BF": "Ouagadougou",
+  "RS": "Belgrade", "TG": "Lomé", "CX": "Flying Fish Cove", "EH": "El Aaiún", "IE": "Dublin", "BY": "Minsk", "PH": "Manila",
+  "CC": "West Island", "CO": "Bogotá", "NA": "Windhoek", "CI": "Yamoussoukro", "US": "Washington, D.C.", "RO": "Bucharest",
+  "GR": "Athens", "NL": "Amsterdam", "GP": "Basse-Terre", "TC": "Cockburn Town", "RU": "Moscow", "KH": "Phnom Penh",
+  "GL": "Nuuk", "BB": "Bridgetown", "LC": "Castries", "MZ": "Maputo", "KP": "Pyongyang", "AM": "Yerevan", "GA": "Libreville",
+  "SJ": "Longyearbyen", "FO": "Tórshavn", "YE": "Sana'a", "NE": "Niamey", "IT": "Rome", "PR": "San Juan", "CN": "Beijing",
+  "PY": "Asunción", "NC": "Nouméa", "TF": "Port-aux-Français", "DM": "Roseau", "EG": "Cairo", "SL": "Freetown", "BR": "Brasília",
+  "ZM": "Lusaka", "ER": "Asmara", "MF": "Marigot", "FK": "Stanley", "RE": "Saint-Denis", "ME": "Podgorica", "LR": "Monrovia",
+  "SY": "Damascus", "TK": "Fakaofo", "BG": "Sofia", "ML": "Bamako", "LA": "Vientiane", "LT": "Vilnius", "MR": "Nouakchott",
+  "SK": "Bratislava", "CK": "Avarua", "SO": "Mogadishu", "FJ": "Suva", "KE": "Nairobi", "KI": "South Tarawa", "NO": "Oslo",
+  "GQ": "Ciudad de la Paz", "LY": "Tripoli", "LU": "Luxembourg", "PA": "Panama City", "GN": "Conakry", "CV": "Praia",
+  "ID": "Jakarta", "KN": "Basseterre", "BQ": "Kralendijk", "CR": "San José", "JE": "Saint Helier", "ES": "Madrid", "MW": "Lilongwe",
+  "SM": "City of San Marino", "BH": "Manama", "KY": "George Town", "KR": "Seoul", "AO": "Luanda", "FI": "Helsinki", "CU": "Havana",
+  "NU": "Alofi", "GH": "Accra", "EC": "Quito", "GU": "Hagåtña", "BS": "Nassau", "FM": "Palikir", "TV": "Funafuti", "CH": "Bern",
+  "TD": "N'Djamena", "HU": "Budapest", "MQ": "Fort-de-France", "VG": "Road Town", "MK": "Skopje", "NI": "Managua", "MX": "Mexico City",
+  "CL": "Santiago", "BN": "Bandar Seri Begawan", "GF": "Cayenne", "AT": "Vienna", "HR": "Zagreb", "CZ": "Prague", "MC": "Monaco",
+  "PW": "Ngerulmud", "SE": "Stockholm", "BI": "Gitega", "MP": "Saipan", "CD": "Kinshasa", "CG": "Brazzaville", "LI": "Vaduz",
+  "NZ": "Wellington", "JP": "Tokyo", "EE": "Tallinn", "GD": "St. George's", "SX": "Philipsburg", "AZ": "Baku", "SB": "Honiara",
+  "NP": "Kathmandu", "GG": "St. Peter Port", "AW": "Oranjestad", "UM": "Washington DC", "GM": "Banjul", "TZ": "Dodoma", "DJ": "Djibouti",
+  "IN": "New Delhi", "LK": "Sri Jayawardenepura Kotte", "PE": "Lima", "TJ": "Dushanbe", "PG": "Port Moresby", "BO": "Sucre", "UZ": "Tashkent",
+  "BL": "Gustavia", "JM": "Kingston", "TL": "Dili", "KM": "Moroni", "WS": "Apia", "SR": "Paramaribo", "MV": "Malé", "ST": "São Tomé",
+  "MN": "Ulan Bator", "CW": "Willemstad", "SD": "Khartoum", "BW": "Gaborone", "IL": "Jerusalem", "BZ": "Belmopan", "BJ": "Porto-Novo",
+  "LV": "Riga", "AR": "Buenos Aires", "MM": "Naypyidaw", "SG": "Singapore", "AI": "The Valley", "BM": "Hamilton", "RW": "Kigali",
+  "FR": "Paris", "SA": "Riyadh", "VN": "Hanoi", "AD": "Andorra la Vella", "GS": "King Edward Point", "HN": "Tegucigalpa",
+  "VA": "Vatican City", "AU": "Canberra", "PK": "Islamabad", "AF": "Kabul", "IS": "Reykjavik", "MG": "Antananarivo", "ET": "Addis Ababa",
+  "QA": "Doha", "KG": "Bishkek", "CF": "Bangui", "GI": "Gibraltar", "SZ": "Mbabane", "YT": "Mamoudzou", "UA": "Kyiv", "SH": "Jamestown",
+  "LB": "Beirut", "VE": "Caracas", "IQ": "Baghdad", "AS": "Pago Pago", "AG": "Saint John's", "PL": "Warsaw", "TW": "Taipei", "CA": "Ottawa",
+  "NR": "Yaren", "BT": "Thimphu", "MA": "Rabat", "BA": "Sarajevo"
+};
+
+const VALID_TAGS = ['music', 'talk', 'news', 'pop', 'rock', 'dance', 'jazz', 'classical', 'indie', 'hits', 'electronic', 'country', 'hiphop', 'rnb'];
+
 export async function fetchStation() {
   for (let i = 0; i < 5; i++) {
     try {
       const country = COUNTRY_POOL[Math.floor(Math.random() * COUNTRY_POOL.length)];
-      const params = new URLSearchParams({
-        limit: 5, order: 'votes', hidebroken: 'true',
+      const searchParamsObj = {
+        limit: 10, order: 'votes', reverse: 'true', hidebroken: 'true',
         has_geo_info: 'true',
         countrycode: country, _: Date.now(),
-      });
+      };
+
+      // Try to enforce a meaningful genre tag for the first 3 attempts
+      // This prevents random ambience stations and gets music or talk shows
+      if (i < 3) {
+        searchParamsObj.tag = VALID_TAGS[Math.floor(Math.random() * VALID_TAGS.length)];
+      }
+
+      const params = new URLSearchParams(searchParamsObj);
       const res = await fetch(`${API}/json/stations/search?${params}`);
       const list = await res.json();
       for (const s of list) {
@@ -79,11 +126,11 @@ export async function fetchStation() {
         return {
           name: s.name || 'Unknown Station', url,
           country: s.country || '', countrycode: s.countrycode || '',
-          state: s.state || '', lat, lng,
+          state: s.state || COUNTRY_TO_CITY[s.countrycode] || '', lat, lng,
           language: s.language || COUNTRY_TO_LANGUAGE[s.countrycode] || 'Unknown',
         };
       }
-    } catch {
+    } catch (err) {
       console.warn('Station fetch attempt failed, retrying...', err)
     }
   }
