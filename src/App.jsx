@@ -14,6 +14,12 @@ const CloudSvg = ({ className, style }) => (
   </svg>
 );
 
+const DiscordIcon = ({ className }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" className={className}>
+    <path fill="currentColor" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.09,53,91.08,65.69,84.69,65.69Z"/>
+  </svg>
+);
+
 function AnimatedCard({ children, className = "", delay = 0, persistentMobileContent }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -26,7 +32,7 @@ function AnimatedCard({ children, className = "", delay = 0, persistentMobileCon
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20, transition: { delay: 0 } }}
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
-      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-gradient-to-b from-[#7dd3fc] to-[#e0f2fe] border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000000] md:shadow-[6px_6px_0_#000000] rounded-t-3xl md:rounded-none ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
+      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-[#7dd3fc] border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000] md:shadow-[6px_6px_0_#000] rounded-t-3xl md:rounded-none ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
     >
       {/* Animated Sky Background */}
       <div className="absolute inset-0 z-0 overflow-hidden rounded-t-3xl md:rounded-none pointer-events-none">
@@ -86,7 +92,7 @@ export default function App() {
   const [round, setRound] = useState(0)
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
-  const [hintCredits, setHintCredits] = useState(3);
+  const [hintCredits, setHintCredits] = useState(5);
   const [roundHints, setRoundHints] = useState({ language: false, city: false, region: false });
   const [history, setHistory] = useState([])
 
@@ -160,7 +166,7 @@ export default function App() {
     setGuess(null)
     setResult(null)
     setError('')
-    setHintCredits(3)
+    setHintCredits(5)
     setRoundHints({ language: false, city: false, region: false })
     setIsAudioLoading(false)
   }
@@ -206,12 +212,12 @@ export default function App() {
           <div className="absolute top-4 right-4 md:top-8 md:right-8 z-40 flex items-start gap-3 md:gap-4 pointer-events-none">
             {/* Scoreboard Tooltip */}
             <div className="relative group pointer-events-auto" tabIndex="0">
-              <div className="bg-gradient-to-b from-[#7dd3fc] to-[#e0f2fe] border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">
+              <div className="bg-[#7dd3fc] border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">
                 <Trophy className="w-5 h-5 md:w-7 md:h-7 shrink-0" />
               </div>
 
               <div className="absolute top-full right-0 mt-3 md:mt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus:opacity-100 group-focus:visible transition-all duration-200 origin-top-right z-50">
-                <div className="bg-gradient-to-b from-[#7dd3fc] to-[#e0f2fe] border-2 border-black p-3 md:p-4 shadow-[4px_4px_0_#000000] w-48 flex flex-col pointer-events-auto">
+                <div className="bg-[#7dd3fc] border-2 border-black p-3 md:p-4 shadow-[4px_4px_0_#000] w-48 flex flex-col pointer-events-auto">
                   <div className="flex flex-col gap-2">
                     {[1, 2, 3, 4, 5].map(r => {
                       const pastRound = history[r - 1];
@@ -249,7 +255,7 @@ export default function App() {
             </div>
 
             {/* Volume Control */}
-            <div className="hidden md:flex group bg-gradient-to-b from-[#7dd3fc] to-[#e0f2fe] border-2 border-black p-3 shadow-[4px_4px_0_#000000] items-center gap-0 hover:gap-3 transition-all cursor-pointer pointer-events-auto">
+            <div className="hidden md:flex group bg-[#7dd3fc] border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center gap-0 hover:gap-3 transition-all cursor-pointer pointer-events-auto">
               {volume === 0 ? <VolumeX className="w-7 h-7 shrink-0" /> : <Volume2 className="w-7 h-7 shrink-0" />}
               <div className="w-0 overflow-hidden group-hover:w-32 py-2 transition-all duration-300 ease-in-out flex items-center shrink-0">
                 <input
@@ -281,7 +287,7 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute bg-black/60 backdrop-blur-md inset-0 z-50 flex flex-col items-center justify-center gap-5"
+            className="absolute bg-black/40 backdrop-blur-sm inset-0 z-50 flex flex-col items-center justify-center gap-5"
           >
             <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
             <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
@@ -340,6 +346,18 @@ export default function App() {
             </button>
             <span className="text-[13px] font-medium text-white/70">Game Version: 1.4</span>
             <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">Sparsh</a></span>
+            
+            {/* Discord Button */}
+            <a 
+              href="https://discord.gg/Vx3ckyrS6" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="absolute bottom-6 right-6 md:bottom-8 md:right-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white px-4 py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+              title="Join our Discord"
+            >
+              <DiscordIcon className="w-6 h-6 opacity-90 group-hover:opacity-100" />
+              <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Join Discord</span>
+            </a>
           </motion.div>
         )}
 
@@ -353,14 +371,14 @@ export default function App() {
           >
             <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
             <span className="text-xl text-white font-bold text-center uppercase tracking-[1.2px]">Countries visited this session</span>
-            <div className="flex flex-wrap justify-center items-center bg-white p-4 md:p-6 gap-5 md:gap-8 border-2 border-black shadow-[6px_6px_0_#000000]">
+            <div className="flex flex-wrap justify-center items-center bg-[#7dd3fc] p-4 md:p-6 gap-5 md:gap-8 border-2 border-black shadow-[6px_6px_0_#000]">
               {history.map((item, index) => (
                 <div key={index} tabIndex="0" className="relative group flex flex-col items-center cursor-pointer focus:outline-none">
                   {item.code && (
                     <img
                       src={`https://flagcdn.com/${item.code.toLowerCase()}.svg`}
                       alt={item.country}
-                      className="h-10 md:h-14 w-auto border-2 border-black shadow-[2px_2px_0_#000000] group-hover:-translate-y-1 group-focus:-translate-y-1 group-hover:shadow-[4px_4px_0_#000000] group-focus:shadow-[4px_4px_0_#000000] transition-all object-cover"
+                      className="h-10 md:h-14 w-auto border-2 border-black shadow-[2px_2px_0_#000] group-hover:-translate-y-1 group-focus:-translate-y-1 group-hover:shadow-[4px_4px_0_#000] group-focus:shadow-[4px_4px_0_#000] transition-all object-cover"
                     />
                   )}
                   <span className="text-[14px] font-bold text-[#444] mt-2">{item.score}</span>
@@ -440,7 +458,7 @@ export default function App() {
               </div>
               <div className="flex gap-2 w-full">
                 <button
-                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.language) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.language ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000000] disabled:shadow-[2px_2px_0_#cccccc]`}
+                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.language) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.language ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000] disabled:shadow-[2px_2px_0_#cccccc]`}
                   disabled={roundHints.language || hintCredits === 0}
                   onClick={() => useHint('language')}
                   title={roundHints.language ? (station.language || 'Unknown') : 'Use Hint: Language'}
@@ -448,7 +466,7 @@ export default function App() {
                   Lang
                 </button>
                 <button
-                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.city) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.city ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000000] disabled:shadow-[2px_2px_0_#cccccc]`}
+                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.city) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.city ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000] disabled:shadow-[2px_2px_0_#cccccc]`}
                   disabled={roundHints.city || hintCredits === 0}
                   onClick={() => useHint('city')}
                   title={roundHints.city ? (station.state || 'Unknown') : 'Use Hint: City'}
@@ -456,7 +474,7 @@ export default function App() {
                   City
                 </button>
                 <button
-                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.region) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.region ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000000] disabled:shadow-[2px_2px_0_#cccccc]`}
+                  className={`flex-1 text-[11px] py-1.5 font-bold uppercase border-2 ${(hintCredits > 0 || roundHints.region) ? 'border-black hover:bg-black hover:text-white cursor-pointer' : 'border-[#ccc] text-[#ccc] cursor-not-allowed'} ${roundHints.region ? 'bg-black text-white' : 'bg-white text-black'} transition-colors shadow-[2px_2px_0_#000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000] disabled:shadow-[2px_2px_0_#cccccc]`}
                   disabled={roundHints.region || hintCredits === 0}
                   onClick={() => useHint('region')}
                   title={roundHints.region ? (COUNTRY_TO_REGION[station.countrycode] || 'Unknown') : 'Use Hint: Region'}
@@ -477,9 +495,9 @@ export default function App() {
         )}
 
         {phase === 'result' && result && station && (
-          <AnimatedCard 
-            key="result" 
-            delay={2.2} 
+          <AnimatedCard
+            key="result"
+            delay={2.2}
             className="!items-start gap-1.5 md:!min-w-[340px]"
             persistentMobileContent={
               <button disabled={phase !== 'result'} className="btn btn-primary w-full shadow-lg" onClick={() => {
@@ -494,7 +512,7 @@ export default function App() {
               {station.countrycode && (
                 <img
                   src={`https://flagcdn.com/${station.countrycode.toLowerCase()}.svg`}
-                  className="w-16 border-2 border-black shadow-[2px_2px_0_#000000] object-cover"
+                  className="w-16 border-2 border-black shadow-[2px_2px_0_#000] object-cover"
                 />
               )}
               <span className="text-xl md:text-[22px] font-bold tracking-tight leading-tight text-black">{location}</span>
