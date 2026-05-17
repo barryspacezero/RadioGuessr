@@ -52,3 +52,16 @@ export function stopAudio() {
   if (hls) { hls.destroy(); hls = null; }
 }
 
+export function pauseAudio() {
+  if (audio) { audio.pause(); }
+}
+
+export function resumeAudio() {
+  if (audio) { audio.play().catch(err => console.error("Failed to resume audio:", err)); }
+}
+
+export function getAudioState() {
+  if (!audio) return "stopped";
+  return audio.paused ? "paused" : "playing";
+}
+

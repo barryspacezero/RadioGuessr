@@ -2,6 +2,14 @@
 
 All notable changes to the **RadioGuessr** project will be documented in this file.
 
+## [1.5.0] - 2026-05-17
+### Added
+- **Intelligent Same-Country Rerolls**: Designed and built the "Reroll (Same Country)" gameplay escape hatch inside loading placeholders and active playing panels to cleanly fetch alternative stations from the same country when encountering broken, silent, or slow streams. Includes in-memory seen station tracking to guarantee a fresh station.
+- **Conscious Playback Control**: Integrated automated stream pausing upon guess submission, prompting users with a clear "Keep Listening" resume action on the result card for improved audio choice and UX.
+- **Integrated GA4 Analytics Reporting**: Created a crash-safe analytics utility (`analytics.js`) communicating directly with GA4 (`G-J2MP9VVJHJ`) to record key player engagements (game started, round starts, stream load successes/fails, hints clicked, rerolls requested, guesses submitted, keep listening clicks, and game completions). Prints logs in the developer console during local dev.
+### Changed
+- **Hint Penalty Balance**: Adjusted playability configurations so active stream rerolls don't affect standard guessing parameters while preserving session continuity.
+
 ## [1.4.0] - 2026-04-24
 ### Added
 - **Curated Genres**: Smart Radio API filtering to query highly-voted music and talk stations instead of random ambient noise.

@@ -14,6 +14,8 @@ A GeoGuessr-style game where you tune into live radio streams from around the wo
 - **Multiple Visual Themes**: Customize your globe aesthetic with themes including Blue Marble, Day Map, Water Map, and Night Map.
 - **Progressive Rounds**: Play 5 rounds per session with an intuitive, collapsible Round Score Tracker to monitor your performance.
 - **Hints System**: Stuck on a tricky stream? Request the broadcasting Language, City/State, or Region for an easier guess, featuring intelligent fallback mechanisms for missing API data.
+- **Intelligent Station Rerolls**: Encounter a broken, slow, or silent stream? Use the **Reroll (Same Country)** escape hatch during the loading or playing phases to seamlessly fetch a different station from the same country.
+- **Keep Listening**: Submitting a guess automatically pauses the stream, letting you **keep listening** to your current station, or click to switch to a new one from the same country.
 - **Enhanced Mobile UI**: A highly refined, animated interface built with Tailwind CSS and Framer Motion, featuring smart collapsing cards and persistently pinned buttons for a flawless mobile guessing experience.
 - **Session History Summary**: At the end of 5 rounds, review the countries you've "visited", complete with country flags seamlessly pulled from FlagCDN with custom styled tooltips.
 
@@ -66,7 +68,7 @@ Ensure you have [Node.js](https://nodejs.org/) installed along with standard pac
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="./public/ss3.png" alt="RadioGuessr Gameplay Screenshot" width="800"/>
+  <img src="./public/ss2.png" alt="RadioGuessr Gameplay Screenshot" width="800"/>
 </p>
 
 ## 🤝 Acknowledgements
@@ -78,4 +80,4 @@ Ensure you have [Node.js](https://nodejs.org/) installed along with standard pac
 
 ---
 
-*Game Version: 1.4*
+*Game Version: 1.5*

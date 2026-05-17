@@ -1,5 +1,35 @@
 const API = 'https://de1.api.radio-browser.info';
 
+// ─── Layer 2: Pre-seeded station counts per country (sourced from /json/countrycodes) ───
+// These only need refreshing every few months. Used to compute random offsets.
+const COUNTRY_STATION_COUNTS = {
+  AD: 8, AE: 770, AF: 124, AG: 6, AI: 6, AL: 35, AM: 14, AO: 15,
+  AR: 746, AS: 13, AT: 330, AU: 2001, AW: 8, AZ: 41, BA: 142, BB: 22,
+  BD: 19, BE: 425, BF: 9, BG: 284, BH: 21, BI: 4, BJ: 5, BM: 11,
+  BN: 4, BO: 66, BR: 1331, BS: 10, BT: 1, BW: 6, BY: 93, BZ: 4,
+  CA: 1473, CD: 18, CF: 3, CG: 2, CH: 588, CI: 8, CL: 380, CM: 4,
+  CN: 1995, CO: 567, CR: 52, CU: 21, CV: 3, CW: 25, CY: 52, CZ: 289,
+  DE: 5724, DK: 239, DM: 7, DO: 94, DZ: 31, EC: 163, EE: 116, EG: 51,
+  ER: 5, ES: 1243, ET: 36, FI: 146, FJ: 6, FO: 7, FR: 2448, GA: 1,
+  GB: 2062, GD: 8, GE: 28, GF: 9, GH: 24, GI: 7, GL: 6, GM: 1,
+  GN: 2, GP: 6, GQ: 2, GR: 2063, GT: 72, GU: 5, GY: 9, HK: 88,
+  HN: 55, HR: 300, HT: 35, HU: 359, ID: 419, IE: 247, IL: 131, IN: 1102,
+  IQ: 27, IR: 31, IS: 27, IT: 1612, JM: 48, JO: 27, JP: 190, KE: 71,
+  KG: 8, KH: 2, KR: 94, KW: 14, KY: 11, KZ: 42, LA: 4, LB: 65,
+  LC: 12, LK: 73, LR: 1, LS: 2, LT: 100, LU: 34, LV: 107, LY: 11,
+  MA: 48, MC: 11, MD: 49, ME: 51, MG: 16, MK: 60, ML: 14, MM: 5,
+  MN: 6, MQ: 7, MR: 1, MT: 11, MU: 16, MV: 5, MW: 9, MX: 2185,
+  MY: 82, MZ: 8, NA: 17, NC: 9, NE: 4, NG: 62, NI: 27, NL: 1203,
+  NO: 114, NP: 29, NZ: 221, OM: 11, PA: 29, PE: 215, PF: 11, PG: 3,
+  PH: 864, PK: 71, PL: 1098, PR: 47, PS: 9, PT: 315, PW: 3, PY: 68,
+  QA: 23, RE: 34, RO: 787, RS: 388, RU: 3006, RW: 11, SA: 127, SC: 5,
+  SD: 4, SE: 224, SG: 62, SI: 129, SK: 175, SL: 4, SN: 33, SO: 3,
+  SR: 14, SS: 2, SV: 61, SY: 31, SZ: 2, TD: 2, TG: 8, TH: 84,
+  TJ: 2, TN: 77, TO: 1, TR: 723, TT: 28, TW: 203, TZ: 22, UA: 311,
+  UG: 361, US: 6983, UY: 160, UZ: 12, VA: 15, VC: 11, VE: 156, VN: 39,
+  VU: 6, WS: 1, XK: 17, YE: 15, ZA: 186, ZM: 6, ZW: 6,
+};
+
 const REGIONS = {
   'South Asia': ['IN', 'PK', 'BD', 'LK', 'NP', 'AF', 'MV'],
   'East Asia': ['JP', 'KR', 'CN', 'TW', 'MN', 'HK'],
@@ -18,20 +48,28 @@ const REGIONS = {
   'Central America': ['GT', 'BZ', 'SV', 'HN', 'NI', 'CR', 'PA'],
   'South America': ['BR', 'AR', 'CO', 'VE', 'PE', 'CL', 'EC', 'BO', 'PY', 'UY', 'GY', 'SR', 'GF'],
   'Oceania': ['AU', 'NZ', 'PG', 'FJ', 'SB', 'VU', 'WS', 'TO', 'KI', 'FM', 'PW'],
-  'Pacific / Territories': ['NC', 'PF', 'GU', 'MP']
+  'Pacific / Territories': ['NC', 'PF', 'GU', 'MP'],
 };
 
 export const COUNTRY_TO_REGION = {};
-const COUNTRY_POOL = ['IN', 'IN', 'IN']; // Added extra weight for IN to preserve original logic
+
+// ─── Layer 5: Logarithmic country weighting ───
+// Countries with more stations appear more often (log scale, capped at weight 4).
+// This ensures DE/US/RU (5k+ stations) get fair representation without monopolising.
+export const COUNTRY_POOL = [];
 
 for (const [region, countries] of Object.entries(REGIONS)) {
   for (const country of countries) {
     COUNTRY_TO_REGION[country] = region;
-    COUNTRY_POOL.push(country);
+    const count = COUNTRY_STATION_COUNTS[country] || 10;
+    const weight = Math.max(1, Math.min(4, Math.round(Math.log10(count) * 1.5)));
+    for (let w = 0; w < weight; w++) {
+      COUNTRY_POOL.push(country);
+    }
   }
 }
 
-//using the language list as a fallback if the metadata in the API does not have any language.
+// ─── Language / City fallbacks (unchanged) ───
 export const COUNTRY_TO_LANGUAGE = {
   IN: 'Hindi / English', PK: 'Urdu', BD: 'Bengali', LK: 'Sinhala / Tamil', NP: 'Nepali', AF: 'Pashto / Dari', MV: 'Dhivehi',
   JP: 'Japanese', KR: 'Korean', CN: 'Mandarin', TW: 'Mandarin', MN: 'Mongolian', HK: 'Cantonese',
@@ -53,7 +91,7 @@ export const COUNTRY_TO_LANGUAGE = {
   GT: 'Spanish', BZ: 'English', SV: 'Spanish', HN: 'Spanish', NI: 'Spanish', CR: 'Spanish', PA: 'Spanish',
   BR: 'Portuguese', AR: 'Spanish', CO: 'Spanish', VE: 'Spanish', PE: 'Spanish', CL: 'Spanish', EC: 'Spanish', BO: 'Spanish', PY: 'Spanish / Guarani', UY: 'Spanish', GY: 'English', SR: 'Dutch', GF: 'French',
   AU: 'English', NZ: 'English / Maori', PG: 'English / Tok Pisin / Hiri Motu', FJ: 'English / Fijian / Hindi', SB: 'English', VU: 'Bislama / English / French', WS: 'Samoan / English', TO: 'Tongan / English', KI: 'English / Gilbertese', FM: 'English', PW: 'Palauan / English',
-  NC: 'French', PF: 'French', GU: 'English', MP: 'English'
+  NC: 'French', PF: 'French', GU: 'English', MP: 'English',
 };
 
 export const COUNTRY_TO_CITY = {
@@ -93,36 +131,76 @@ export const COUNTRY_TO_CITY = {
   "VA": "Vatican City", "AU": "Canberra", "PK": "Islamabad", "AF": "Kabul", "IS": "Reykjavik", "MG": "Antananarivo", "ET": "Addis Ababa",
   "QA": "Doha", "KG": "Bishkek", "CF": "Bangui", "GI": "Gibraltar", "SZ": "Mbabane", "YT": "Mamoudzou", "UA": "Kyiv", "SH": "Jamestown",
   "LB": "Beirut", "VE": "Caracas", "IQ": "Baghdad", "AS": "Pago Pago", "AG": "Saint John's", "PL": "Warsaw", "TW": "Taipei", "CA": "Ottawa",
-  "NR": "Yaren", "BT": "Thimphu", "MA": "Rabat", "BA": "Sarajevo"
+  "NR": "Yaren", "BT": "Thimphu", "MA": "Rabat", "BA": "Sarajevo",
 };
 
 const VALID_TAGS = ['music', 'talk', 'news', 'pop', 'rock', 'dance', 'jazz', 'classical', 'indie', 'hits', 'electronic', 'country', 'hiphop', 'rnb'];
 
-export async function fetchStation() {
+// ─── Layer 4: Session-level deduplication ───
+// Tracks station UUIDs already played in this session. Reset on game reset via resetSessionSeen().
+const sessionSeenUUIDs = new Set();
+export function resetSessionSeen() { sessionSeenUUIDs.clear(); }
+
+// ─── Layer 1 + Layer 3: Random offset + Sort order diversity ───
+export async function fetchStation(targetCountry = null) {
   for (let i = 0; i < 5; i++) {
     try {
-      const country = COUNTRY_POOL[Math.floor(Math.random() * COUNTRY_POOL.length)];
+      const country = targetCountry || COUNTRY_POOL[Math.floor(Math.random() * COUNTRY_POOL.length)];
+
+      // Layer 1: Random offset within the known station pool for this country.
+      // Cap at 60% of total count to keep reasonable stream quality.
+      const totalCount = COUNTRY_STATION_COUNTS[country] || 20;
+      const maxOffset = Math.max(0, Math.floor(totalCount * 0.6) - 20);
+      const offset = maxOffset > 0 ? Math.floor(Math.random() * maxOffset) : 0;
+
+      // Layer 3: Sort order diversity
+      const roll = Math.random();
+      let order, reverse;
+      if (roll < 0.60) {
+        order = 'votes'; reverse = 'true';    // 60% — quality-biased
+      } else if (roll < 0.85) {
+        order = 'random'; reverse = 'false';  // 25% — full randomness
+      } else {
+        order = 'clicktrend'; reverse = 'true'; // 15% — recently popular
+      }
+
       const searchParamsObj = {
-        limit: 10, order: 'votes', reverse: 'true', hidebroken: 'true',
+        limit: 20,
+        offset,
+        order,
+        reverse,
+        hidebroken: 'true',
         has_geo_info: 'true',
-        countrycode: country, _: Date.now(),
+        countrycode: country,
+        _: Date.now(),
       };
 
-      // Try to enforce a meaningful genre tag for the first 3 attempts
-      // This prevents random ambience stations and gets music or talk shows
-      if (i < 3) {
+      // Still enforce a genre tag on votes-sorted fetches for the first 3 attempts
+      // to avoid low-quality ambience/test stations.
+      if (i < 3 && order === 'votes') {
         searchParamsObj.tag = VALID_TAGS[Math.floor(Math.random() * VALID_TAGS.length)];
       }
 
       const params = new URLSearchParams(searchParamsObj);
       const res = await fetch(`${API}/json/stations/search?${params}`);
       const list = await res.json();
+
+      // Shuffle the returned batch so we don't always take the first result
+      for (let j = list.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1));
+        [list[j], list[k]] = [list[k], list[j]];
+      }
+
       for (const s of list) {
+        // Layer 4: Skip already-played stations
+        if (sessionSeenUUIDs.has(s.stationuuid)) continue;
+
         const lat = parseFloat(s.geo_lat), lng = parseFloat(s.geo_long);
         const url = s.url_resolved || s.url;
-        if (!url.startsWith('https')) continue
+        if (!url || !url.startsWith('https')) continue;
         if (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) continue;
-        if (!url) continue;
+
+        sessionSeenUUIDs.add(s.stationuuid);
         return {
           name: s.name || 'Unknown Station', url,
           country: s.country || '', countrycode: s.countrycode || '',
@@ -131,9 +209,8 @@ export async function fetchStation() {
         };
       }
     } catch (err) {
-      console.warn('Station fetch attempt failed, retrying...', err)
+      console.warn('Station fetch attempt failed, retrying...', err);
     }
   }
   throw new Error('No station found');
 }
-

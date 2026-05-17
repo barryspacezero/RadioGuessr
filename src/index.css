@@ -82,8 +82,4 @@ body,
   pointer-events: none !important;
 }
 
-/* Base Cloud Animation */
-@keyframes float-cloud {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100vw); }
-}
+

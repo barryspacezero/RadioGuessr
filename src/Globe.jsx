@@ -49,7 +49,7 @@ export default forwardRef(function GlobeView({ onGuess, theme = 'default', showB
         <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; pointer-events: auto;">
           <div style="position: absolute; width: 32px; height: 32px; border-radius: 50%; background-color: ${color}; opacity: 0.5; animation: ping 1.5s cubic-bezier(0,0,0.2,1) infinite; pointer-events: none;"></div>
           <div style="width: 16px; height: 16px; border-radius: 50%; background-color: ${color}; border: 2px solid #000; box-shadow: 2px 2px 0px rgba(0,0,0,1); position: relative; z-index: 1;"></div>
-          <div style="position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: #fdfdfd; border: 2px solid #000; color: #000; padding: 2px 10px; font-weight: 700; font-size: 12px; box-shadow: 3px 3px 0px rgba(0,0,0,1); border-radius: 3px; pointer-events: none;">
+          <div style="position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: #ffffff; border: 2px solid #000; color: #000; padding: 4px 10px; font-weight: 700; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 12px; box-shadow: 3px 3px 0px #000; pointer-events: none;">
             ${label}
           </div>
         </div>
@@ -85,7 +85,7 @@ export default forwardRef(function GlobeView({ onGuess, theme = 'default', showB
           .polygonCapColor(() => 'rgba(255, 255, 255, 0)') // Transparent fill
           .polygonSideColor(() => 'rgba(255, 255, 255, 1)')
           .polygonStrokeColor(() => showBorders ? 'rgba(255, 255, 255, 1)' : 'rgba(0,0,0,0)')
-          .polygonLabel(d => showNames ? `<div style="background: white; border: 2px solid black; color: black; padding: 6px 10px; font-weight: 800; font-family: system-ui, -apple-system, sans-serif; font-size: 12px; pointer-events: none;">${d.properties.NAME}</div>` : null)
+          .polygonLabel(d => showNames ? `<div style="background: #ffffff; border: 2px solid #000; color: #000; padding: 6px 10px; font-weight: 700; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 12px; box-shadow: 3px 3px 0px #000; pointer-events: none; white-space: nowrap;">${d.properties.NAME}</div>` : null)
           .onPolygonClick((polygon, event, { lat, lng }) => {
             if (!active.current) return;
             g.current.htmlElementsData([{ lat, lng, c: '#ff5252', l: 'Your Guess' }])

@@ -1,22 +1,11 @@
 import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Volume2, VolumeX, Trophy, ChevronUp, ChevronDown } from 'lucide-react'
+import { Play, Volume2, VolumeX, Trophy, ChevronUp, ChevronDown, RefreshCw, Pause } from 'lucide-react'
 import Globe from './Globe.jsx'
-
-const CloudSvg = ({ className, style }) => (
-  <svg
-    viewBox="0 0 100 50"
-    className={`fill-white/90 blur-[3px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)] ${className}`}
-    style={style}
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M75.3 19.5a18.3 18.3 0 0 0-35-5.5 13.8 13.8 0 0 0-21.7 8.3 11 11 0 0 0 2.2 21.7h59.6a16.5 16.5 0 0 0-5.1-24.5z" />
-  </svg>
-);
 
 const DiscordIcon = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36" className={className}>
-    <path fill="currentColor" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.09,53,91.08,65.69,84.69,65.69Z"/>
+    <path fill="currentColor" d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.2,46,96.09,53,91.08,65.69,84.69,65.69Z" />
   </svg>
 );
 
@@ -32,15 +21,8 @@ function AnimatedCard({ children, className = "", delay = 0, persistentMobileCon
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20, transition: { delay: 0 } }}
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
-      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-[#7dd3fc] border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000] md:shadow-[6px_6px_0_#000] rounded-t-3xl md:rounded-none ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
+      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000] md:shadow-[6px_6px_0_#000] rounded-t-3xl md:rounded-none ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
     >
-      {/* Animated Sky Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden rounded-t-3xl md:rounded-none pointer-events-none">
-        <CloudSvg className="absolute top-4 -left-16 w-16" style={{ animation: 'float-cloud 30s linear infinite 0s' }} />
-        <CloudSvg className="absolute top-14 -left-20 w-24" style={{ animation: 'float-cloud 45s linear infinite 15s' }} />
-        <CloudSvg className="absolute -bottom-2 -left-32 w-32" style={{ animation: 'float-cloud 60s linear infinite 5s' }} />
-        <CloudSvg className="absolute top-28 -left-12 w-12" style={{ animation: 'float-cloud 25s linear infinite 20s' }} />
-      </div>
 
       <div
         className="w-full flex justify-center items-center h-[36px] md:hidden cursor-pointer relative z-10 shrink-0 border-b-2 border-black/10 bg-white/20 backdrop-blur-sm"
@@ -73,9 +55,10 @@ function AnimatedCard({ children, className = "", delay = 0, persistentMobileCon
     </motion.div>
   )
 }
-import { fetchStation, COUNTRY_TO_REGION } from './api.js'
-import { playAudio, stopAudio, setVolume } from './audio.js'
+import { fetchStation, COUNTRY_TO_REGION, resetSessionSeen } from './api.js'
+import { playAudio, stopAudio, setVolume, pauseAudio, resumeAudio, getAudioState } from './audio.js'
 import { calcScore } from './score.js'
+import { logEvent } from './analytics.js'
 
 export default function App() {
   const clickSound = new Audio('/click.mp3')
@@ -95,14 +78,31 @@ export default function App() {
   const [hintCredits, setHintCredits] = useState(5);
   const [roundHints, setRoundHints] = useState({ language: false, city: false, region: false });
   const [history, setHistory] = useState([])
+  const [isAudioPlaying, setIsAudioPlaying] = useState(true)
 
   async function startRound() {
     if (round >= 5) {
       setPhase('final')
+      logEvent('game_complete', {
+        total_score: totalScore,
+        countries_visited: history.map(h => h.country).join(', ')
+      })
       return
     }
 
-    setRound(prev => prev + 1)
+    if (round === 0) {
+      logEvent('game_start', {
+        theme,
+        show_borders: showBorders,
+        show_names: showNames
+      })
+    }
+
+    setRound(prev => {
+      const nextRound = prev + 1;
+      logEvent('round_start', { round_number: nextRound });
+      return nextRound;
+    })
 
     stopAudio()
     setGuess(null)
@@ -133,16 +133,34 @@ export default function App() {
           onPlaying: () => {
             setIsAudioLoading(false)
             setError('')
+            setIsAudioPlaying(true)
             if (globe.current) globe.current.setGuessing(true)
+            logEvent('station_load_success', {
+              round_number: round + 1,
+              countrycode: s.countrycode,
+              region: COUNTRY_TO_REGION[s.countrycode] || 'Unknown',
+              language: s.language || 'Unknown'
+            })
           },
           onError: () => {
             setError('Stream failed. Trying again.')
             setPhase('loading')
+            logEvent('station_load_fail', {
+              round_number: round + 1,
+              error_type: 'playback_error',
+              retries_left: retriesLeft - 1
+            })
             fetchAndPlay(retriesLeft - 1)
           }
         })
       } catch (err) {
         console.warn('Station fetch failed, retrying...', err)
+        logEvent('station_load_fail', {
+          round_number: round + 1,
+          error_type: 'fetch_error',
+          error_message: err.message || '',
+          retries_left: retriesLeft - 1
+        })
         fetchAndPlay(retriesLeft - 1)
       }
     }
@@ -157,6 +175,87 @@ export default function App() {
     }, 6000)
   }
 
+  async function rerollCurrentStation() {
+    if (!station) return
+
+    stopAudio()
+
+    logEvent('station_reroll_requested', {
+      round_number: round,
+      countrycode: station.countrycode
+    })
+
+    // Maybe I should refund hints used in this round? idk. 
+    // const spentHints = Object.values(roundHints).filter(Boolean).length
+    // setHintCredits(prev => prev + spentHints)
+    // setRoundHints({ language: false, city: false, region: false })
+
+    setGuess(null)
+    setError('')
+    setIsAudioLoading(true)
+    if (globe.current) {
+      globe.current.reset()
+      globe.current.setGuessing(false)
+    }
+
+    async function fetchAndPlayReroll(retriesLeft = 3) {
+      if (retriesLeft === 0) {
+        setError('Could not find another working station for this country. You can try to guess or reroll again.')
+        setIsAudioLoading(false)
+        if (globe.current) globe.current.setGuessing(true)
+        logEvent('station_reroll_fail', {
+          round_number: round,
+          countrycode: station.countrycode,
+          error_message: 'Max retries exceeded'
+        })
+        return
+      }
+      try {
+        const s = await fetchStation(station.countrycode)
+        setStation(s)
+        setIsAudioLoading(true)
+        playAudio(s.url, {
+          onLoading: () => {
+            if (globe.current) globe.current.setGuessing(false)
+          },
+          onPlaying: () => {
+            setIsAudioLoading(false)
+            setError('')
+            setIsAudioPlaying(true)
+            if (globe.current) globe.current.setGuessing(true)
+            logEvent('station_reroll_success', {
+              round_number: round,
+              countrycode: s.countrycode,
+              region: COUNTRY_TO_REGION[s.countrycode] || 'Unknown'
+            })
+          },
+          onError: () => {
+            setError('Stream failed. Trying another.')
+            logEvent('station_reroll_fail', {
+              round_number: round,
+              countrycode: station.countrycode,
+              error_type: 'playback_error',
+              retries_left: retriesLeft - 1
+            })
+            fetchAndPlayReroll(retriesLeft - 1)
+          }
+        })
+      } catch (err) {
+        console.warn('Reroll station fetch failed, retrying...', err)
+        logEvent('station_reroll_fail', {
+          round_number: round,
+          countrycode: station.countrycode,
+          error_type: 'fetch_error',
+          error_message: err.message || '',
+          retries_left: retriesLeft - 1
+        })
+        fetchAndPlayReroll(retriesLeft - 1)
+      }
+    }
+
+    fetchAndPlayReroll(3)
+  }
+
   function resetGame() {
     setPhase('start')
     setHistory([])
@@ -169,17 +268,25 @@ export default function App() {
     setHintCredits(5)
     setRoundHints({ language: false, city: false, region: false })
     setIsAudioLoading(false)
+    resetSessionSeen() // Clear deduplication set for new game
+    logEvent('game_reset')
   }
 
   function useHint(type) {
     if (hintCredits > 0 && !roundHints[type]) {
       setHintCredits(prev => prev - 1);
       setRoundHints(prev => ({ ...prev, [type]: true }));
+      logEvent('hint_used', {
+        hint_type: type,
+        remaining_credits: hintCredits - 1,
+        round_number: round
+      })
     }
   }
 
   function submitGuess() {
-    stopAudio();
+    pauseAudio();
+    setIsAudioPlaying(false);
     globe.current.setGuessing(false);
     const { km, score } = calcScore(guess.lat, guess.lng, station.lat, station.lng);
     globe.current.reveal(station.lat, station.lng, guess.lat, guess.lng);
@@ -191,6 +298,33 @@ export default function App() {
       code: station.countrycode,
       score: score,
     }])
+
+    logEvent('guess_submitted', {
+      round_number: round,
+      distance_km: Math.round(km),
+      score_earned: score,
+      countrycode: station.countrycode,
+      region: COUNTRY_TO_REGION[station.countrycode] || 'Unknown'
+    })
+  }
+
+  function toggleResultAudio() {
+    const currentState = getAudioState()
+    if (currentState === 'playing') {
+      pauseAudio()
+      setIsAudioPlaying(false)
+      logEvent('station_paused', {
+        round_number: round,
+        station_name: station.name
+      })
+    } else {
+      resumeAudio()
+      setIsAudioPlaying(true)
+      logEvent('station_keep_listening', {
+        round_number: round,
+        station_name: station.name
+      })
+    }
   }
 
   const location = station
@@ -212,12 +346,12 @@ export default function App() {
           <div className="absolute top-4 right-4 md:top-8 md:right-8 z-40 flex items-start gap-3 md:gap-4 pointer-events-none">
             {/* Scoreboard Tooltip */}
             <div className="relative group pointer-events-auto" tabIndex="0">
-              <div className="bg-[#7dd3fc] border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">
+              <div className="bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">
                 <Trophy className="w-5 h-5 md:w-7 md:h-7 shrink-0" />
               </div>
 
               <div className="absolute top-full right-0 mt-3 md:mt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus:opacity-100 group-focus:visible transition-all duration-200 origin-top-right z-50">
-                <div className="bg-[#7dd3fc] border-2 border-black p-3 md:p-4 shadow-[4px_4px_0_#000] w-48 flex flex-col pointer-events-auto">
+                <div className="bg-white border-2 border-black p-3 md:p-4 shadow-[4px_4px_0_#000] w-48 flex flex-col pointer-events-auto">
                   <div className="flex flex-col gap-2">
                     {[1, 2, 3, 4, 5].map(r => {
                       const pastRound = history[r - 1];
@@ -255,7 +389,7 @@ export default function App() {
             </div>
 
             {/* Volume Control */}
-            <div className="hidden md:flex group bg-[#7dd3fc] border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center gap-0 hover:gap-3 transition-all cursor-pointer pointer-events-auto">
+            <div className="hidden md:flex group bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center gap-0 hover:gap-3 transition-all cursor-pointer pointer-events-auto">
               {volume === 0 ? <VolumeX className="w-7 h-7 shrink-0" /> : <Volume2 className="w-7 h-7 shrink-0" />}
               <div className="w-0 overflow-hidden group-hover:w-32 py-2 transition-all duration-300 ease-in-out flex items-center shrink-0">
                 <input
@@ -344,13 +478,13 @@ export default function App() {
             <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(); }}>
               <Play className="w-8 h-8 fill-current ml-1" />
             </button>
-            <span className="text-[13px] font-medium text-white/70">Game Version: 1.4</span>
+            <span className="text-[13px] font-medium text-white/70">Game Version: 1.5</span>
             <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">Sparsh</a></span>
-            
+
             {/* Discord Button */}
-            <a 
-              href="https://discord.gg/Vx3ckyrS6" 
-              target="_blank" 
+            <a
+              href="https://discord.gg/Vx3ckyrS6"
+              target="_blank"
               rel="noopener noreferrer"
               className="absolute bottom-6 right-6 md:bottom-8 md:right-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white px-4 py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
               title="Join our Discord"
@@ -371,7 +505,7 @@ export default function App() {
           >
             <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
             <span className="text-xl text-white font-bold text-center uppercase tracking-[1.2px]">Countries visited this session</span>
-            <div className="flex flex-wrap justify-center items-center bg-[#7dd3fc] p-4 md:p-6 gap-5 md:gap-8 border-2 border-black shadow-[6px_6px_0_#000]">
+            <div className="flex flex-wrap justify-center items-center bg-white p-4 md:p-6 gap-5 md:gap-8 border-2 border-black shadow-[6px_6px_0_#000]">
               {history.map((item, index) => (
                 <div key={index} tabIndex="0" className="relative group flex flex-col items-center cursor-pointer focus:outline-none">
                   {item.code && (
@@ -409,19 +543,26 @@ export default function App() {
 
         {phase === 'playing' && isAudioLoading && (
           <AnimatedCard key="loading-audio">
-            <div className="flex flex-col items-center gap-2.5 w-full animate-pulse min-w-[240px]">
-              <div className="h-6 bg-gray-200 w-32 rounded-sm mb-1" />
-              <div className="h-4 bg-gray-200 w-3/4 rounded-sm" />
-              <div className="h-3 bg-gray-200 w-20 rounded-sm" />
-              <div className="flex flex-col gap-2 w-full mt-2">
-                <div className="h-3 bg-gray-200 w-24 rounded-sm" />
-                <div className="flex gap-2 w-full h-[32px] mt-0.5">
-                  <div className="flex-1 bg-gray-200 rounded-sm" />
-                  <div className="flex-1 bg-gray-200 rounded-sm" />
-                  <div className="flex-1 bg-gray-200 rounded-sm" />
-                </div>
-              </div>
-              <div className="flex md:hidden w-full h-10 bg-gray-200 rounded-sm mt-4" />
+            <div className="flex flex-col items-center gap-2.5 w-full min-w-[240px]">
+              <div className="h-6 bg-gray-200 w-32 rounded-sm mb-1 animate-pulse" />
+              <div className="h-4 bg-gray-200 w-3/4 rounded-sm animate-pulse" />
+              <div className="h-3 bg-gray-200 w-20 rounded-sm animate-pulse" />
+
+              <div className="w-full border-t border-dashed border-black/10 my-2" />
+
+              <button
+                className="w-full text-[11px] py-2 font-bold uppercase border-2 border-black bg-white text-black hover:bg-black hover:text-white cursor-pointer transition-colors shadow-[2px_2px_0_#000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000] flex items-center justify-center gap-1.5"
+                onClick={() => { clickSound.currentTime = 0; clickSound.play(); rerollCurrentStation(); }}
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Reroll (Same Country)
+              </button>
+
+              {error && (
+                <span className="text-[12px] font-semibold text-red-600 text-center mt-1 animate-none">
+                  {error}
+                </span>
+              )}
             </div>
           </AnimatedCard>
         )}
@@ -491,6 +632,24 @@ export default function App() {
               )}
             </div>
 
+            <div className="flex flex-col gap-2 w-full mt-2">
+              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-black/60">
+                <span>Station Trouble?</span>
+              </div>
+              <button
+                className="w-full text-[11px] py-1.5 font-bold uppercase border-2 border-black bg-white text-black hover:bg-black hover:text-white cursor-pointer transition-colors shadow-[2px_2px_0_#000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000] flex items-center justify-center gap-1.5"
+                onClick={() => { clickSound.currentTime = 0; clickSound.play(); rerollCurrentStation(); }}
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                Reroll (Same Country)
+              </button>
+              {error && (
+                <span className="text-[12px] font-semibold text-red-600 text-center mt-1">
+                  {error}
+                </span>
+              )}
+            </div>
+
           </AnimatedCard>
         )}
 
@@ -501,8 +660,10 @@ export default function App() {
             className="!items-start gap-1.5 md:!min-w-[340px]"
             persistentMobileContent={
               <button disabled={phase !== 'result'} className="btn btn-primary w-full shadow-lg" onClick={() => {
-                if (round >= 5) setPhase('final')
-                else { clickSound.currentTime = 0; clickSound.play(); startRound() }
+                if (round >= 5) {
+                  stopAudio()
+                  setPhase('final')
+                } else { clickSound.currentTime = 0; clickSound.play(); startRound() }
               }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
             }
           >
@@ -520,14 +681,23 @@ export default function App() {
             <span className="text-[13px] text-black">
               {result.km < 1 ? 'Less than 1 km away' : `${result.km.toLocaleString()} km away`}
             </span>
+            <button
+              className="mt-3 w-full text-[11px] py-1.5 font-bold uppercase border-2 border-black bg-white text-black hover:bg-black hover:text-white cursor-pointer transition-colors shadow-[2px_2px_0_#000] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[0px_0px_0_#000] flex items-center justify-center gap-1.5"
+              onClick={toggleResultAudio}
+            >
+              {isAudioPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+              {isAudioPlaying ? "Pause Radio" : "Keep Listening"}
+            </button>
             <div className="my-3 border-t-2 border-black w-full" />
             <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Score</span>
             <span className="text-5xl md:text-[60px] font-bold leading-none tracking-[-2px] text-black">
               {result.score.toLocaleString()}
             </span>
             <button disabled={phase !== 'result'} className="hidden md:block btn btn-primary mt-4 w-full" onClick={() => {
-              if (round >= 5) setPhase('final')
-              else { clickSound.currentTime = 0; clickSound.play(); startRound() }
+              if (round >= 5) {
+                stopAudio()
+                setPhase('final')
+              } else { clickSound.currentTime = 0; clickSound.play(); startRound() }
             }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
           </AnimatedCard>
         )}
