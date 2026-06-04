@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
-import DiscordIcon from '../ui/DiscordIcon.jsx';
-
+import GithubIcon from '../ui/GithubIcon.jsx';
 export default function StartScreen({ theme, setTheme, showBorders, setShowBorders, showNames, setShowNames, error, startRound, clickSound }) {
   return (
     <motion.div
@@ -67,17 +66,17 @@ export default function StartScreen({ theme, setTheme, showBorders, setShowBorde
         <Play className="w-8 h-8 fill-current ml-1" />
       </button>
       <span className="text-[13px] font-medium text-white/70">Game Version: 1.5</span>
-      <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero">Sparsh</a></span>
+      <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero" className="hover:underline">Sparsh</a></span>
 
       <a
-        href="https://discord.gg/Vx3ckyrS6"
+        href="https://github.com/barryspacezero/RadioGuessr"
         target="_blank"
         rel="noopener noreferrer"
         className="absolute bottom-6 right-6 md:bottom-8 md:right-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white px-4 py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
-        title="Join our Discord"
+        title="Star on GitHub"
       >
-        <DiscordIcon className="w-6 h-6 opacity-90 group-hover:opacity-100" />
-        <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Join Discord</span>
+        <GithubIcon className="w-6 h-6 opacity-90 group-hover:opacity-100" />
+        <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Star on GitHub</span>
       </a>
     </motion.div>
   );

@@ -91,7 +91,12 @@ export default function App() {
             setIsAudioLoading(false)
             setError('')
             setIsAudioPlaying(true)
-            if (globe.current) globe.current.setGuessing(true)
+            setPhase(p => {
+              if ((p === 'playing' || p === 'loading') && globe.current) {
+                globe.current.setGuessing(true)
+              }
+              return p
+            })
             logEvent('station_load_success', {
               round_number: round + 1,
               countrycode: s.countrycode,
@@ -128,7 +133,12 @@ export default function App() {
     // let them guess anyway so they aren't stuck.
     setTimeout(() => {
       setIsAudioLoading(false)
-      if (globe.current) globe.current.setGuessing(true)
+      setPhase(p => {
+        if ((p === 'playing' || p === 'loading') && globe.current) {
+          globe.current.setGuessing(true)
+        }
+        return p
+      })
     }, 6000)
   }
 
@@ -159,7 +169,12 @@ export default function App() {
       if (retriesLeft === 0) {
         setError('Could not find another working station for this country. You can try to guess or reroll again.')
         setIsAudioLoading(false)
-        if (globe.current) globe.current.setGuessing(true)
+        setPhase(p => {
+          if ((p === 'playing' || p === 'loading') && globe.current) {
+            globe.current.setGuessing(true)
+          }
+          return p
+        })
         logEvent('station_reroll_fail', {
           round_number: round,
           countrycode: station.countrycode,
@@ -179,7 +194,12 @@ export default function App() {
             setIsAudioLoading(false)
             setError('')
             setIsAudioPlaying(true)
-            if (globe.current) globe.current.setGuessing(true)
+            setPhase(p => {
+              if ((p === 'playing' || p === 'loading') && globe.current) {
+                globe.current.setGuessing(true)
+              }
+              return p
+            })
             logEvent('station_reroll_success', {
               round_number: round,
               countrycode: s.countrycode,

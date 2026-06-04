@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import GithubIcon from '../ui/GithubIcon.jsx';
 
 export default function FinalScreen({ history, totalScore, resetGame, clickSound }) {
   return (
@@ -35,6 +36,17 @@ export default function FinalScreen({ history, totalScore, resetGame, clickSound
         Total Score: {totalScore}
       </p>
       <button className="btn " onClick={() => { clickSound.currentTime = 0; clickSound.play(); resetGame(); }}>Play Again</button>
+
+      <a
+        href="https://github.com/barryspacezero/RadioGuessr"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-6 right-6 md:bottom-8 md:right-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white px-4 py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+        title="Star on GitHub"
+      >
+        <GithubIcon className="w-6 h-6 opacity-90 group-hover:opacity-100" />
+        <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Star on GitHub</span>
+      </a>
     </motion.div>
   );
 }
