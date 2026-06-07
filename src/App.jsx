@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useGameStore } from './store/useGameStore.js';
 import Globe from './Globe.jsx';
 
@@ -14,6 +14,10 @@ import VolumeControl from './components/overlays/VolumeControl.jsx';
 export default function App() {
   const clickSound = new Audio('/click.mp3');
   const globe = useRef(null);
+
+  useEffect(() => {
+    useGameStore.setState({ globeRef: globe });
+  }, []);
 
   const phase = useGameStore((state) => state.phase);
   const theme = useGameStore((state) => state.theme);

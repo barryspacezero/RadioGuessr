@@ -8,6 +8,7 @@ import { useMultiplayerStore } from './useMultiplayerStore.js';
 
 export const useGameStore = create((set, get) => ({
   phase: 'start',
+  globeRef: null,
   volume: 0.85,
   theme: 'default',
   showBorders: false,
@@ -267,6 +268,7 @@ export const useGameStore = create((set, get) => ({
   },
 
   startMultiplayerRound: (station, roundNumber) => {
+    const { globeRef } = get();
     stopAudio();
     
     set({
@@ -280,13 +282,19 @@ export const useGameStore = create((set, get) => ({
       isAudioLoading: true
     });
 
+    if (globeRef?.current) globeRef.current.setGuessing(false);
+
     playAudio(station.url, {
-      onLoading: () => {},
+      onLoading: () => {
+        if (globeRef?.current) globeRef.current.setGuessing(false);
+      },
       onPlaying: () => {
         set({ isAudioLoading: false, error: '', isAudioPlaying: true });
+        if (globeRef?.current) globeRef.current.setGuessing(true);
       },
       onError: () => {
-        set({ error: 'Stream failed for peer.', isAudioLoading: false });
+        set({ error: 'Stream failed for peer. You can still guess!', isAudioLoading: false });
+        if (globeRef?.current) globeRef.current.setGuessing(true);
       }
     });
   },

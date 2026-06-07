@@ -23,7 +23,10 @@ export default function StartScreen({ clickSound, globeRef }) {
     const params = new URLSearchParams(window.location.search);
     const room = params.get('room');
     if (room) {
-      joinRoom(room);
+      const currentRoom = useMultiplayerStore.getState().roomId;
+      if (currentRoom !== room.trim().toUpperCase()) {
+        joinRoom(room.trim().toUpperCase());
+      }
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, [joinRoom]);

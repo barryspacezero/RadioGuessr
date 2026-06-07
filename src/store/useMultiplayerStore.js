@@ -13,8 +13,11 @@ export const useMultiplayerStore = create((set, get) => ({
   
   initUser: () => {
     if (!get().userId) {
+      const newUserId = typeof crypto.randomUUID === 'function' 
+        ? crypto.randomUUID() 
+        : Math.random().toString(36).substring(2) + Date.now().toString(36);
       set({ 
-        userId: crypto.randomUUID(),
+        userId: newUserId,
         userName: 'Player_' + Math.floor(Math.random() * 1000)
       });
     }
@@ -45,6 +48,7 @@ export const useMultiplayerStore = create((set, get) => ({
       console.warn("Supabase credentials missing. Multiplayer disabled.");
       return;
     }
+    const upperRoomId = roomId.trim().toUpperCase();
     get().initUser();
     const { userId, userName } = get();
     
@@ -54,10 +58,10 @@ export const useMultiplayerStore = create((set, get) => ({
       currentChannel.unsubscribe();
     }
 
-    set({ roomId, players: [], playerGuesses: {} });
+    set({ roomId: upperRoomId, players: [], playerGuesses: {} });
     useGameStore.getState().setPhase('lobby'); // switch phase to lobby
 
-    const channel = supabase.channel(`room:${roomId}`, {
+    const channel = supabase.channel(`room:${upperRoomId}`, {
       config: {
         presence: {
           key: userId,
@@ -161,6 +165,7 @@ export const useMultiplayerStore = create((set, get) => ({
         event: 'REVEAL_RESULTS',
         payload: {}
       });
+      useGameStore.getState().revealMultiplayerResults();
     }
   }
 }));
