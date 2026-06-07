@@ -3,6 +3,8 @@ import { useGameStore } from './store/useGameStore.js';
 import Globe from './Globe.jsx';
 
 import StartScreen from './components/phases/StartScreen.jsx';
+import LobbyScreen from './components/phases/LobbyScreen.jsx';
+import WaitingScreen from './components/phases/WaitingScreen.jsx';
 import FinalScreen from './components/phases/FinalScreen.jsx';
 import PlayingScreen from './components/phases/PlayingScreen.jsx';
 import ResultScreen from './components/phases/ResultScreen.jsx';
@@ -39,6 +41,8 @@ export default function App() {
       )}
 
       {phase === 'start' && <StartScreen clickSound={clickSound} globeRef={globe} />}
+      {phase === 'lobby' && <LobbyScreen globeRef={globe} />}
+      {phase === 'waiting' && <WaitingScreen />}
       {phase === 'final' && <FinalScreen clickSound={clickSound} />}
       {phase === 'playing' && <PlayingScreen clickSound={clickSound} globeRef={globe} />}
       {phase === 'result' && <ResultScreen clickSound={clickSound} globeRef={globe} />}

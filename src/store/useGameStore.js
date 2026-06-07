@@ -4,6 +4,7 @@ import { playAudio, stopAudio, pauseAudio, resumeAudio, getAudioState } from '..
 import { calcScore } from '../score.js';
 import { logEvent } from '../analytics.js';
 import { COUNTRY_TO_REGION } from '../data/constants.js';
+import { useMultiplayerStore } from './useMultiplayerStore.js';
 
 export const useGameStore = create((set, get) => ({
   phase: 'start',
@@ -77,6 +78,11 @@ export const useGameStore = create((set, get) => ({
         set({ station: s, phase: 'playing', isAudioLoading: true });
         if (globeRef?.current) globeRef.current.setGuessing(false);
         
+        const mp = useMultiplayerStore.getState();
+        if (mp.isHost && mp.channel) {
+          mp.broadcastStartRound(s, nextRound);
+        }
+
         playAudio(s.url, {
           onLoading: () => {
             if (globeRef?.current) globeRef.current.setGuessing(false);
@@ -228,13 +234,20 @@ export const useGameStore = create((set, get) => ({
     }
 
     const { km, score } = calcScore(guess.lat, guess.lng, station.lat, station.lng);
+    const result = { km, score };
     
+    const isMultiplayer = !!useMultiplayerStore.getState().roomId;
+
     set({
-      result: { km, score },
+      result,
       totalScore: totalScore + score,
-      phase: 'result',
+      phase: isMultiplayer ? 'waiting' : 'result',
       history: [...history, { country: station.country, code: station.countrycode, score: score }]
     });
+
+    if (isMultiplayer) {
+       useMultiplayerStore.getState().broadcastGuess(guess, result);
+    }
 
     logEvent('guess_submitted', { round_number: round, distance_km: Math.round(km), score_earned: score, countrycode: station.countrycode, region: COUNTRY_TO_REGION[station.countrycode] || 'Unknown' });
   },
@@ -251,5 +264,35 @@ export const useGameStore = create((set, get) => ({
       set({ isAudioPlaying: true });
       logEvent('station_keep_listening', { round_number: round, station_name: station?.name });
     }
+  },
+
+  startMultiplayerRound: (station, roundNumber) => {
+    stopAudio();
+    
+    set({
+      round: roundNumber,
+      guess: null,
+      result: null,
+      error: '',
+      phase: 'playing',
+      roundHints: { language: false, city: false, region: false },
+      station: station,
+      isAudioLoading: true
+    });
+
+    playAudio(station.url, {
+      onLoading: () => {},
+      onPlaying: () => {
+        set({ isAudioLoading: false, error: '', isAudioPlaying: true });
+      },
+      onError: () => {
+        set({ error: 'Stream failed for peer.', isAudioLoading: false });
+      }
+    });
+  },
+
+  revealMultiplayerResults: () => {
+    pauseAudio();
+    set({ isAudioPlaying: false, phase: 'result' });
   }
 }));

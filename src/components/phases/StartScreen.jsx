@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Play } from 'lucide-react';
+import { Play, Users } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
+import { useMultiplayerStore } from '../../store/useMultiplayerStore.js';
 
 export default function StartScreen({ clickSound, globeRef }) {
   const theme = useGameStore(state => state.theme);
@@ -12,6 +14,18 @@ export default function StartScreen({ clickSound, globeRef }) {
   const setShowNames = useGameStore(state => state.setShowNames);
   const error = useGameStore(state => state.error);
   const startRound = useGameStore(state => state.startRound);
+  const joinRoom = useMultiplayerStore(state => state.joinRoom);
+  const createRoom = useMultiplayerStore(state => state.createRoom);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('room');
+    if (room) {
+      joinRoom(room);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [joinRoom]);
+
   return (
     <motion.div
       key="start"
@@ -72,9 +86,15 @@ export default function StartScreen({ clickSound, globeRef }) {
       </div>
 
       {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
-      <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef); }}>
-        <Play className="w-8 h-8 fill-current ml-1" />
-      </button>
+      <div className="flex gap-4 items-center">
+        <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef); }}>
+          <Play className="w-8 h-8 fill-current ml-1" />
+        </button>
+        <button className="h-16 px-6 rounded-full bg-[#1db954] text-white flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95 font-bold" onClick={() => { clickSound.currentTime = 0; clickSound.play(); createRoom(); }}>
+          <Users className="w-6 h-6" />
+          Multiplayer
+        </button>
+      </div>
       <span className="text-[13px] font-medium text-white/70">Game Version: 1.5</span>
       <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero" className="hover:underline">Sparsh</a></span>
 

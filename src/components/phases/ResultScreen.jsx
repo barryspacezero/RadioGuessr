@@ -2,6 +2,7 @@ import { Play, Pause } from 'lucide-react';
 import AnimatedCard from '../ui/AnimatedCard.jsx';
 import { stopAudio } from '../../audio.js';
 import { useGameStore } from '../../store/useGameStore.js';
+import { useMultiplayerStore } from '../../store/useMultiplayerStore.js';
 
 export default function ResultScreen({ clickSound, globeRef }) {
   const result = useGameStore(state => state.result);
@@ -12,6 +13,20 @@ export default function ResultScreen({ clickSound, globeRef }) {
   const toggleResultAudio = useGameStore(state => state.toggleResultAudio);
   const isAudioPlaying = useGameStore(state => state.isAudioPlaying);
 
+  const roomId = useMultiplayerStore(state => state.roomId);
+  const isHost = useMultiplayerStore(state => state.isHost);
+  const players = useMultiplayerStore(state => state.players);
+  const playerGuesses = useMultiplayerStore(state => state.playerGuesses);
+  
+  const isMultiplayer = !!roomId;
+
+  const sortedGuesses = Object.entries(playerGuesses)
+    .map(([id, guessData]) => {
+       const p = players.find(p => p.userId === id);
+       return { ...guessData, userName: p?.userName || 'Unknown' };
+    })
+    .sort((a, b) => b.result.score - a.result.score);
+
   const location = station ? [station.state, station.country].filter(Boolean).join(', ') : '';
   if (!result || !station) return null;
 
@@ -21,12 +36,16 @@ export default function ResultScreen({ clickSound, globeRef }) {
       delay={2.2}
       className="!items-start gap-1.5 md:!min-w-[340px]"
       persistentMobileContent={
-        <button className="btn btn-primary w-full shadow-lg" onClick={() => {
-          if (round >= 5) {
-            stopAudio()
-            setPhase('final')
-          } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
-        }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
+        (!isMultiplayer || isHost) ? (
+          <button className="btn btn-primary w-full shadow-lg" onClick={() => {
+            if (round >= 5) {
+              stopAudio()
+              setPhase('final')
+            } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
+          }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
+        ) : (
+          <div className="w-full text-center text-white font-bold p-3">Waiting for Host...</div>
+        )
       }
     >
       <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Station</span>
@@ -51,16 +70,39 @@ export default function ResultScreen({ clickSound, globeRef }) {
         {isAudioPlaying ? "Pause Radio" : "Keep Listening"}
       </button>
       <div className="my-3 border-t-2 border-black w-full" />
-      <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Score</span>
-      <span className="text-5xl md:text-[60px] font-bold leading-none tracking-[-2px] text-black">
-        {result.score.toLocaleString()}
-      </span>
-      <button className="hidden md:block btn btn-primary mt-4 w-full" onClick={() => {
-        if (round >= 5) {
-          stopAudio()
-          setPhase('final')
-        } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
-      }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
+      {isMultiplayer ? (
+        <div className="w-full">
+           <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Leaderboard</span>
+           <ul className="mt-2 space-y-2">
+             {sortedGuesses.map((g, idx) => (
+               <li key={idx} className="flex justify-between items-center text-black text-sm">
+                 <span className="font-bold">{g.userName}</span>
+                 <div className="text-right leading-tight">
+                   <div className="font-bold">{g.result.score.toLocaleString()} pts</div>
+                   <div className="text-[10px] opacity-80">{Math.round(g.result.km).toLocaleString()} km</div>
+                 </div>
+               </li>
+             ))}
+           </ul>
+        </div>
+      ) : (
+        <>
+          <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Score</span>
+          <span className="text-5xl md:text-[60px] font-bold leading-none tracking-[-2px] text-black">
+            {result.score.toLocaleString()}
+          </span>
+        </>
+      )}
+      {(!isMultiplayer || isHost) ? (
+        <button className="hidden md:block btn btn-primary mt-4 w-full" onClick={() => {
+          if (round >= 5) {
+            stopAudio()
+            setPhase('final')
+          } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
+        }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
+      ) : (
+        <div className="hidden md:block text-black font-bold text-center mt-4 w-full">Waiting for Host...</div>
+      )}
     </AnimatedCard>
   );
 }
