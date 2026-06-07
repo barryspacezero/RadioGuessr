@@ -1,18 +1,18 @@
 import { Play, Pause } from 'lucide-react';
 import AnimatedCard from '../ui/AnimatedCard.jsx';
 import { stopAudio } from '../../audio.js';
+import { useGameStore } from '../../store/useGameStore.js';
 
-export default function ResultScreen({ 
-  result, 
-  station, 
-  round, 
-  setPhase, 
-  startRound, 
-  clickSound, 
-  toggleResultAudio, 
-  isAudioPlaying, 
-  location 
-}) {
+export default function ResultScreen({ clickSound, globeRef }) {
+  const result = useGameStore(state => state.result);
+  const station = useGameStore(state => state.station);
+  const round = useGameStore(state => state.round);
+  const setPhase = useGameStore(state => state.setPhase);
+  const startRound = useGameStore(state => state.startRound);
+  const toggleResultAudio = useGameStore(state => state.toggleResultAudio);
+  const isAudioPlaying = useGameStore(state => state.isAudioPlaying);
+
+  const location = station ? [station.state, station.country].filter(Boolean).join(', ') : '';
   if (!result || !station) return null;
 
   return (
@@ -25,7 +25,7 @@ export default function ResultScreen({
           if (round >= 5) {
             stopAudio()
             setPhase('final')
-          } else { clickSound.currentTime = 0; clickSound.play(); startRound() }
+          } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
         }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
       }
     >
@@ -59,7 +59,7 @@ export default function ResultScreen({
         if (round >= 5) {
           stopAudio()
           setPhase('final')
-        } else { clickSound.currentTime = 0; clickSound.play(); startRound() }
+        } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
       }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
     </AnimatedCard>
   );

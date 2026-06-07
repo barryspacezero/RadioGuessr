@@ -1,7 +1,17 @@
 import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
-export default function StartScreen({ theme, setTheme, showBorders, setShowBorders, showNames, setShowNames, error, startRound, clickSound }) {
+import { useGameStore } from '../../store/useGameStore.js';
+
+export default function StartScreen({ clickSound, globeRef }) {
+  const theme = useGameStore(state => state.theme);
+  const setTheme = useGameStore(state => state.setTheme);
+  const showBorders = useGameStore(state => state.showBorders);
+  const setShowBorders = useGameStore(state => state.setShowBorders);
+  const showNames = useGameStore(state => state.showNames);
+  const setShowNames = useGameStore(state => state.setShowNames);
+  const error = useGameStore(state => state.error);
+  const startRound = useGameStore(state => state.startRound);
   return (
     <motion.div
       key="start"
@@ -62,7 +72,7 @@ export default function StartScreen({ theme, setTheme, showBorders, setShowBorde
       </div>
 
       {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
-      <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(); }}>
+      <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef); }}>
         <Play className="w-8 h-8 fill-current ml-1" />
       </button>
       <span className="text-[13px] font-medium text-white/70">Game Version: 1.5</span>

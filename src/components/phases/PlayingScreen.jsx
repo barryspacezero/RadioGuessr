@@ -2,20 +2,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw } from 'lucide-react';
 import AnimatedCard from '../ui/AnimatedCard.jsx';
 import { COUNTRY_TO_REGION } from '../../data/constants.js';
+import { useGameStore } from '../../store/useGameStore.js';
 
-export default function PlayingScreen({ 
-  isAudioLoading, 
-  error, 
-  rerollCurrentStation, 
-  clickSound, 
-  guess, 
-  submitGuess, 
-  round, 
-  hintCredits, 
-  roundHints, 
-  station, 
-  useHint 
-}) {
+export default function PlayingScreen({ clickSound, globeRef }) {
+  const isAudioLoading = useGameStore(state => state.isAudioLoading);
+  const error = useGameStore(state => state.error);
+  const rerollCurrentStation = useGameStore(state => state.rerollCurrentStation);
+  const guess = useGameStore(state => state.guess);
+  const submitGuess = useGameStore(state => state.submitGuess);
+  const round = useGameStore(state => state.round);
+  const hintCredits = useGameStore(state => state.hintCredits);
+  const roundHints = useGameStore(state => state.roundHints);
+  const station = useGameStore(state => state.station);
+  const useHint = useGameStore(state => state.useHint);
   return (
     <>
       <AnimatePresence mode="wait">
@@ -50,7 +49,7 @@ export default function PlayingScreen({
             key="playing"
             persistentMobileContent={
               <div className="flex flex-col items-center gap-2 w-full">
-                <button className="btn btn-primary w-full shadow-lg" disabled={!guess} onClick={submitGuess}>
+                <button className="btn btn-primary w-full shadow-lg" disabled={!guess} onClick={() => submitGuess(globeRef)}>
                   Submit Guess
                 </button>
                 {!guess && (
@@ -139,7 +138,7 @@ export default function PlayingScreen({
           className="hidden md:flex absolute bottom-16 left-1/2 -translate-x-1/2 w-auto z-10 flex-col items-center gap-2.5 pointer-events-none"
         >
           <div className="pointer-events-auto flex flex-col items-center gap-2.5">
-            <button className="btn btn-primary shadow-xl" disabled={!guess} onClick={submitGuess}>
+            <button className="btn btn-primary shadow-xl" disabled={!guess} onClick={() => submitGuess(globeRef)}>
               Submit Guess
             </button>
             {!guess && (

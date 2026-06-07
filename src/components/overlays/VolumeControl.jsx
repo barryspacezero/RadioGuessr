@@ -1,6 +1,10 @@
 import { Volume2, VolumeX } from 'lucide-react';
+import { useGameStore } from '../../store/useGameStore.js';
+import { setVolume } from '../../audio.js';
 
-export default function VolumeControl({ volume, setVolumeState, setVolume, clickSound }) {
+export default function VolumeControl({ clickSound }) {
+  const volume = useGameStore(state => state.volume);
+  const setVolumeState = useGameStore(state => state.setVolumeState);
   return (
     <div className="hidden md:flex group bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center gap-0 hover:gap-3 transition-all cursor-pointer pointer-events-auto">
       {volume === 0 ? <VolumeX className="w-7 h-7 shrink-0" /> : <Volume2 className="w-7 h-7 shrink-0" />}

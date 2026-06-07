@@ -1,6 +1,10 @@
 import { Trophy } from 'lucide-react';
+import { useGameStore } from '../../store/useGameStore.js';
 
-export default function ScoreboardTooltip({ history, round, totalScore }) {
+export default function ScoreboardTooltip() {
+  const history = useGameStore(state => state.history);
+  const round = useGameStore(state => state.round);
+  const totalScore = useGameStore(state => state.totalScore);
   return (
     <div className="relative group pointer-events-auto" tabIndex="0">
       <div className="bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">

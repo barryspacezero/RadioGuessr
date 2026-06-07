@@ -1,7 +1,11 @@
 import { motion } from 'framer-motion';
 import GithubIcon from '../ui/GithubIcon.jsx';
+import { useGameStore } from '../../store/useGameStore.js';
 
-export default function FinalScreen({ history, totalScore, resetGame, clickSound }) {
+export default function FinalScreen({ clickSound }) {
+  const history = useGameStore(state => state.history);
+  const totalScore = useGameStore(state => state.totalScore);
+  const resetGame = useGameStore(state => state.resetGame);
   return (
     <motion.div
       key="final"
