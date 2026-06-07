@@ -41,6 +41,10 @@ export const useMultiplayerStore = create((set, get) => ({
   },
 
   joinRoom: (roomId) => {
+    if (!supabase) {
+      console.warn("Supabase credentials missing. Multiplayer disabled.");
+      return;
+    }
     get().initUser();
     const { userId, userName } = get();
     

@@ -4,6 +4,7 @@ import { Play, Users } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
 import { useMultiplayerStore } from '../../store/useMultiplayerStore.js';
+import { supabase } from '../../lib/supabase.js';
 
 export default function StartScreen({ clickSound, globeRef }) {
   const theme = useGameStore(state => state.theme);
@@ -18,6 +19,7 @@ export default function StartScreen({ clickSound, globeRef }) {
   const createRoom = useMultiplayerStore(state => state.createRoom);
 
   useEffect(() => {
+    if (!supabase) return;
     const params = new URLSearchParams(window.location.search);
     const room = params.get('room');
     if (room) {
@@ -90,10 +92,12 @@ export default function StartScreen({ clickSound, globeRef }) {
         <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef); }}>
           <Play className="w-8 h-8 fill-current ml-1" />
         </button>
-        <button className="h-16 px-6 rounded-full bg-[#1db954] text-white flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95 font-bold" onClick={() => { clickSound.currentTime = 0; clickSound.play(); createRoom(); }}>
-          <Users className="w-6 h-6" />
-          Multiplayer
-        </button>
+        {supabase && (
+          <button className="h-16 px-6 rounded-full bg-[#1db954] text-white flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95 font-bold" onClick={() => { clickSound.currentTime = 0; clickSound.play(); createRoom(); }}>
+            <Users className="w-6 h-6" />
+            Multiplayer
+          </button>
+        )}
       </div>
       <span className="text-[13px] font-medium text-white/70">Game Version: 1.5</span>
       <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero" className="hover:underline">Sparsh</a></span>
