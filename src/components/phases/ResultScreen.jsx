@@ -40,7 +40,8 @@ export default function ResultScreen({ clickSound, globeRef }) {
           <button className="btn btn-primary w-full shadow-lg" onClick={() => {
             if (round >= 5) {
               stopAudio()
-              setPhase('final')
+              if (isMultiplayer) useMultiplayerStore.getState().broadcastEndGame();
+              else setPhase('final')
             } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
           }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
         ) : (
@@ -97,7 +98,8 @@ export default function ResultScreen({ clickSound, globeRef }) {
         <button className="hidden md:block btn btn-primary mt-4 w-full" onClick={() => {
           if (round >= 5) {
             stopAudio()
-            setPhase('final')
+            if (isMultiplayer) useMultiplayerStore.getState().broadcastEndGame();
+            else setPhase('final')
           } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
         }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
       ) : (

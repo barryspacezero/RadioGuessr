@@ -25,13 +25,28 @@ export const useMultiplayerStore = create((set, get) => ({
 
   setUserName: (name) => {
     set({ userName: name });
-    const { channel, userId, isHost } = get();
+    const { channel, userId, isHost, players } = get();
+    
+    const playerObj = {
+      userId,
+      userName: name,
+      isHost,
+      joinedAt: new Date().toISOString()
+    };
+
+    const newPlayers = [...players];
+    const idx = newPlayers.findIndex(p => p.userId === userId);
+    if (idx >= 0) newPlayers[idx] = playerObj;
+    else newPlayers.push(playerObj);
+    newPlayers.sort((a, b) => (b.isHost ? 1 : 0) - (a.isHost ? 1 : 0));
+    set({ players: newPlayers });
+
     if (channel) {
-      channel.track({
-        userId,
-        userName: name,
-        isHost,
-        joinedAt: new Date().toISOString()
+      channel.track(playerObj).catch(() => {});
+      channel.send({
+        type: 'broadcast',
+        event: 'SYNC_PLAYER',
+        payload: { player: playerObj, requestReply: false }
       });
     }
   },
@@ -63,6 +78,7 @@ export const useMultiplayerStore = create((set, get) => ({
 
     const channel = supabase.channel(`room:${upperRoomId}`, {
       config: {
+        broadcast: { self: true },
         presence: {
           key: userId,
         },
@@ -72,10 +88,35 @@ export const useMultiplayerStore = create((set, get) => ({
     channel
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState();
-        const players = Object.values(state).map(p => p[0]);
-        // Sort players so host is first
-        players.sort((a, b) => (b.isHost ? 1 : 0) - (a.isHost ? 1 : 0));
-        set({ players });
+        if (Object.keys(state).length > 0) {
+          const presencePlayers = Object.values(state).map(p => p[0]);
+          const merged = [...get().players];
+          presencePlayers.forEach(p => {
+             const idx = merged.findIndex(existing => existing.userId === p.userId);
+             if (idx >= 0) merged[idx] = p;
+             else merged.push(p);
+          });
+          merged.sort((a, b) => (b.isHost ? 1 : 0) - (a.isHost ? 1 : 0));
+          set({ players: merged });
+        }
+      })
+      .on('broadcast', { event: 'SYNC_PLAYER' }, (payload) => {
+        const { player, requestReply } = payload.payload;
+        if (!player) return;
+        const newPlayers = [...get().players];
+        const idx = newPlayers.findIndex(p => p.userId === player.userId);
+        if (idx >= 0) newPlayers[idx] = player;
+        else newPlayers.push(player);
+        newPlayers.sort((a, b) => (b.isHost ? 1 : 0) - (a.isHost ? 1 : 0));
+        set({ players: newPlayers });
+
+        if (requestReply && get().isHost) {
+          get().channel.send({
+            type: 'broadcast',
+            event: 'SYNC_PLAYER',
+            payload: { player: { userId: get().userId, userName: get().userName, isHost: true }, requestReply: false }
+          });
+        }
       })
       .on('broadcast', { event: 'START_ROUND' }, (payload) => {
         if (!get().isHost) {
@@ -98,13 +139,39 @@ export const useMultiplayerStore = create((set, get) => ({
            useGameStore.getState().revealMultiplayerResults();
         }
       })
+      .on('broadcast', { event: 'END_GAME' }, () => {
+        if (!get().isHost) {
+          useGameStore.getState().stopAudio?.();
+          useGameStore.getState().setPhase('final');
+        }
+      })
+      .on('broadcast', { event: 'PLAY_AGAIN' }, () => {
+        if (!get().isHost) {
+          useGameStore.getState().resetGame();
+          useGameStore.getState().setPhase('lobby');
+        }
+      })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
-          await channel.track({
-            userId,
+          const playerObj = {
+            userId: get().userId,
             userName: get().userName,
             isHost: get().isHost,
             joinedAt: new Date().toISOString()
+          };
+
+          const newPlayers = [...get().players];
+          if (!newPlayers.find(p => p.userId === playerObj.userId)) {
+            newPlayers.push(playerObj);
+            newPlayers.sort((a, b) => (b.isHost ? 1 : 0) - (a.isHost ? 1 : 0));
+            set({ players: newPlayers });
+          }
+
+          channel.track(playerObj).catch(() => {});
+          channel.send({
+            type: 'broadcast',
+            event: 'SYNC_PLAYER',
+            payload: { player: playerObj, requestReply: !get().isHost }
           });
         }
       });
@@ -166,6 +233,31 @@ export const useMultiplayerStore = create((set, get) => ({
         payload: {}
       });
       useGameStore.getState().revealMultiplayerResults();
+    }
+  },
+
+  broadcastEndGame: () => {
+    const { channel, isHost } = get();
+    if (channel && isHost) {
+      channel.send({
+        type: 'broadcast',
+        event: 'END_GAME',
+        payload: {}
+      });
+      useGameStore.getState().setPhase('final');
+    }
+  },
+
+  broadcastPlayAgain: () => {
+    const { channel, isHost } = get();
+    if (channel && isHost) {
+      channel.send({
+        type: 'broadcast',
+        event: 'PLAY_AGAIN',
+        payload: {}
+      });
+      useGameStore.getState().resetGame();
+      useGameStore.getState().setPhase('lobby');
     }
   }
 }));

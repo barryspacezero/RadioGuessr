@@ -1,11 +1,17 @@
 import { motion } from 'framer-motion';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
+import { useMultiplayerStore } from '../../store/useMultiplayerStore.js';
 
 export default function FinalScreen({ clickSound }) {
   const history = useGameStore(state => state.history);
   const totalScore = useGameStore(state => state.totalScore);
   const resetGame = useGameStore(state => state.resetGame);
+  
+  const isMultiplayer = !!useMultiplayerStore(state => state.roomId);
+  const isHost = useMultiplayerStore(state => state.isHost);
+  const leaveRoom = useMultiplayerStore(state => state.leaveRoom);
+
   return (
     <motion.div
       key="final"
@@ -39,7 +45,28 @@ export default function FinalScreen({ clickSound }) {
       <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
         Total Score: {totalScore}
       </p>
-      <button className="btn " onClick={() => { clickSound.currentTime = 0; clickSound.play(); resetGame(); }}>Play Again</button>
+      
+      <div className="flex flex-col gap-3 w-full max-w-[200px]">
+        {(!isMultiplayer || isHost) ? (
+          <button className="btn w-full" onClick={() => { 
+            clickSound.currentTime = 0; clickSound.play(); 
+            if (isMultiplayer) {
+              useMultiplayerStore.getState().broadcastPlayAgain();
+            } else {
+              resetGame();
+            }
+          }}>Play Again</button>
+        ) : (
+          <div className="text-white text-center font-bold text-sm bg-black/50 py-3 rounded-md">Waiting for Host...</div>
+        )}
+
+        {isMultiplayer && (
+          <button className="btn !bg-red-600 !text-white !border-red-800 hover:!bg-red-700 w-full" onClick={() => { 
+            clickSound.currentTime = 0; clickSound.play(); 
+            leaveRoom();
+          }}>Leave Room</button>
+        )}
+      </div>
 
       <a
         href="https://github.com/barryspacezero/RadioGuessr"

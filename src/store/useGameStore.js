@@ -164,6 +164,11 @@ export const useGameStore = create((set, get) => ({
         const s = await fetchStation(station.countrycode);
         set({ station: s, isAudioLoading: true });
         
+        const mp = useMultiplayerStore.getState();
+        if (mp.isHost && mp.channel) {
+          mp.broadcastStartRound(s, round);
+        }
+
         playAudio(s.url, {
           onLoading: () => {
             if (globeRef?.current) globeRef.current.setGuessing(false);
