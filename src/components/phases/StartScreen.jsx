@@ -5,6 +5,16 @@ import GithubIcon from '../ui/GithubIcon.jsx';
 import LeaderboardModal from '../ui/LeaderboardModal.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
 
+const TooltipInfo = ({ text }) => (
+  <div tabIndex="0" className="group/tooltip relative flex items-center outline-none">
+    <Info className="w-3.5 h-3.5 text-white/50 hover:text-white cursor-help transition-colors" />
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/95 border border-white/20 text-white text-[11px] leading-snug rounded-lg shadow-xl opacity-0 pointer-events-none group-hover/tooltip:opacity-100 group-focus/tooltip:opacity-100 transition-opacity z-[100] text-center normal-case font-medium tracking-normal">
+      {text}
+      <div className="absolute left-1/2 -bottom-[5px] w-2 h-2 bg-black/95 border-r border-b border-white/20 rotate-45 -translate-x-1/2" />
+    </div>
+  </div>
+);
+
 export default function StartScreen({ clickSound, globeRef }) {
   const theme = useGameStore(state => state.theme);
   const setTheme = useGameStore(state => state.setTheme);
@@ -51,8 +61,8 @@ export default function StartScreen({ clickSound, globeRef }) {
 
       <div className="flex flex-row items-center justify-center gap-6 mt-4">
         <div className="flex flex-col items-center gap-1">
-          <label htmlFor="theme" className="text-[10px] text-white/70 uppercase tracking-widest font-bold">
-            Globe Style
+          <label htmlFor="theme" className="flex items-center gap-1.5 text-[10px] text-white/70 uppercase tracking-widest font-bold">
+            Globe Style <TooltipInfo text="Changes the visual satellite aesthetic of the 3D globe." />
           </label>
           <select
             id="theme"
@@ -68,8 +78,8 @@ export default function StartScreen({ clickSound, globeRef }) {
         </div>
 
         <div className="flex flex-col items-center gap-1">
-          <label htmlFor="rounds" className="text-[10px] text-white/70 uppercase tracking-widest font-bold">
-            Total Rounds
+          <label htmlFor="rounds" className="flex items-center gap-1.5 text-[10px] text-white/70 uppercase tracking-widest font-bold">
+            Total Rounds <TooltipInfo text="Number of stations per game. More rounds grant more hint credits!" />
           </label>
           <select
             id="rounds"
@@ -96,7 +106,9 @@ export default function StartScreen({ clickSound, globeRef }) {
             />
             {showBorders && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
           </div>
-          <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Borders</span>
+          <span className="flex items-center gap-1.5 text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">
+            Borders <TooltipInfo text="Draws interactive country borders directly onto the 3D globe." />
+          </span>
         </label>
 
         <label className="flex items-center gap-2 cursor-pointer group">
@@ -109,29 +121,25 @@ export default function StartScreen({ clickSound, globeRef }) {
             />
             {showNames && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
           </div>
-          <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Country Labels</span>
+          <span className="flex items-center gap-1.5 text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">
+            Country Labels <TooltipInfo text="Displays floating country names when hovering over the globe." />
+          </span>
         </label>
 
-        <div className="flex items-center gap-2">
-          <label className="flex items-center gap-2 cursor-pointer group">
-            <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
-              <input
-                type="checkbox"
-                className="opacity-0 absolute w-full h-full cursor-pointer"
-                checked={talkMode}
-                onChange={(e) => setTalkMode(e.target.checked)}
-              />
-              {talkMode && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
-            </div>
-            <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Talk Mode</span>
-          </label>
-          <div className="group relative flex items-center">
-            <Info className="w-4 h-4 text-white/60 hover:text-white cursor-help transition-colors" />
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/90 text-white text-[10px] rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
-              Filters out music stations to help you hear spoken language for easier guessing.
-            </div>
+        <label className="flex items-center gap-2 cursor-pointer group">
+          <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
+            <input
+              type="checkbox"
+              className="opacity-0 absolute w-full h-full cursor-pointer"
+              checked={talkMode}
+              onChange={(e) => setTalkMode(e.target.checked)}
+            />
+            {talkMode && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
           </div>
-        </div>
+          <span className="flex items-center gap-1.5 text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">
+            Talk Mode <TooltipInfo text="Automatically filters out music stations to help you hear spoken languages for easier guessing." />
+          </span>
+        </label>
       </div>
 
       {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
