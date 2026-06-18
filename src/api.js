@@ -8,7 +8,11 @@ import {
   VALID_TAGS 
 } from './data/constants.js';
 
-const API = 'https://de1.api.radio-browser.info';
+const API_NODES = [
+  'https://de1.api.radio-browser.info',
+  'https://at1.api.radio-browser.info',
+  'https://nl1.api.radio-browser.info'
+];
 
 // ─── Layer 4: Session-level deduplication ───
 // Tracks station UUIDs already played in this session. Reset on game reset via resetSessionSeen().
@@ -58,7 +62,13 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
       }
 
       const params = new URLSearchParams(searchParamsObj);
-      const res = await fetch(`${API}/json/stations/search?${params}`);
+      
+      // Randomly select an API node to avoid relying on a single overloaded server (fixes 503 errors)
+      const apiNode = API_NODES[Math.floor(Math.random() * API_NODES.length)];
+      const res = await fetch(`${apiNode}/json/stations/search?${params}`);
+      
+      if (!res.ok) throw new Error(`API Node ${apiNode} failed with status ${res.status}`);
+      
       const stations = await res.json();
 
       let list = stations;

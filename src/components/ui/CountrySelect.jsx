@@ -31,7 +31,7 @@ export default function CountrySelect({ selectedCountry, setSelectedCountry }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between bg-white text-black font-semibold text-lg py-3 px-4 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] hover:translate-x-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+        className="w-full flex items-center justify-between bg-white text-black font-semibold text-sm py-2 px-3 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
       >
         <div className="flex items-center gap-2">
           {selectedCountry && (
@@ -69,7 +69,7 @@ export default function CountrySelect({ selectedCountry, setSelectedCountry }) {
               />
             </div>
             
-            <div className="max-h-48 overflow-y-auto">
+            <div className="max-h-48 overflow-y-auto custom-scrollbar-light">
               <button
                 type="button"
                 onClick={() => {

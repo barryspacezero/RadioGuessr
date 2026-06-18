@@ -138,26 +138,26 @@ export default function StartScreen({ clickSound, globeRef }) {
       <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef); }}>
         <Play className="w-8 h-8 fill-current ml-1" />
       </button>
-      <span className="text-[13px] font-medium text-white/70">Game Version: 2.0</span>
+      <span className="text-[13px] font-medium text-white/70">Game Version: 2.1</span>
       <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero" className="hover:underline">Sparsh</a></span>
 
       <a
         href="https://github.com/barryspacezero/RadioGuessr"
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-6 right-6 md:bottom-8 md:right-8 group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white px-4 py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+        className="absolute bottom-12 right-6 md:bottom-8 md:right-8 group flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
         title="Star on GitHub"
       >
-        <GithubIcon className="w-6 h-6 opacity-90 group-hover:opacity-100" />
+        <GithubIcon className="w-6 h-6 shrink-0 opacity-90 group-hover:opacity-100" />
         <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Star on GitHub</span>
       </a>
 
       <button
         onClick={() => { clickSound.currentTime = 0; clickSound.play(); setIsLeaderboardOpen(true); }}
-        className="absolute bottom-6 left-6 md:bottom-8 md:left-8 group flex items-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 backdrop-blur-md border-2 border-amber-500/30 text-amber-500 px-4 py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+        className="absolute bottom-12 left-6 md:bottom-8 md:left-8 group flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 backdrop-blur-md border-2 border-amber-500/30 text-amber-500 p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
         title="View Leaderboard"
       >
-        <Trophy className="w-6 h-6 opacity-90 group-hover:opacity-100" />
+        <Trophy className="w-6 h-6 shrink-0 opacity-90 group-hover:opacity-100" />
         <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Leaderboard</span>
       </button>
 

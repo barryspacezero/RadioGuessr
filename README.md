@@ -22,6 +22,8 @@ A GeoGuessr-style game where you tune into live radio streams from around the wo
 - **Customizable Rounds (v2.0)**: Choose to play 3, 5, 10, or 20 rounds per session, with hints automatically scaling to your chosen round length.
 - **Stream Pooling & Silent Fallbacks (v2.0)**: The engine intelligently fetches pools of up to 100 stations at once. If a stream is broken or blocked by CORS, it silently skips to the next working station in the pool without interrupting your gameplay.
 - **Global Leaderboard (v2.0)**: Powered by Supabase, compete globally for the highest scores. Filter top players based on the specific round length you are playing.
+- **Lifetime Passport Stamps (v2.1)**: Your session history is now a persistent, global "Passport" stored locally. Every country you ever discover is permanently stamped into your profile across sessions!
+- **Auto-Failover API Load Balancer (v2.1)**: The engine now utilizes a dynamic array of global Radio Browser servers, acting as its own load-balancer to completely eliminate game crashes and 503 errors.
 
 ## 🛠️ Tech Stack
 
@@ -84,4 +86,4 @@ Ensure you have [Node.js](https://nodejs.org/) installed along with standard pac
 
 ---
 
-*Game Version: 2.0*
+*Game Version: 2.1*

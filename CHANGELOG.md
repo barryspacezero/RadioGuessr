@@ -2,6 +2,15 @@
 
 All notable changes to the **RadioGuessr** project will be documented in this file.
 
+## [2.1.0] - 2026-06-18
+### Added
+- **Lifetime Passport Stamps**: Upgraded the session history into a persistent, global "Passport" using `localStorage`. Every country you ever discover is now permanently stamped into your profile.
+- **Embedded Leaderboard UX**: The global leaderboard is now beautifully embedded directly into the final screen without modals. It features smart auto-scrolling that instantly drops you to your exact projected rank position so you can type your name seamlessly.
+- **API Load Balancer & Auto-Failover**: Replaced the hardcoded Radio Browser API node with a dynamic array of official global servers (`de1`, `at1`, `nl1`). The engine acts as its own load-balancer, randomly picking nodes to completely eliminate game crashes caused by 503 Service Unavailable errors or CORS blocks on overloaded nodes.
+### Changed
+- **Mobile UI Polish**: Increased bottom margins for floating action buttons on mobile devices to prevent them from colliding with browser toolbars or phone screen curves.
+- **Aesthetic Refinements**: Re-aligned the final screen action buttons (Passport, Play Again, GitHub) into a sleek, centralized row and gracefully scaled down massive text headers for a more premium, less clunky layout.
+
 ## [2.0.0] - 2026-06-18
 ### Added
 - **Global Leaderboard**: Integrated Supabase to power a real-time, global leaderboard. Players can submit their arcade-style names after playing and filter top scores globally based on their chosen round length.

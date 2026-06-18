@@ -1,11 +1,14 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { fetchStation, resetSessionSeen } from '../api.js';
 import { playAudio, stopAudio, pauseAudio, resumeAudio, getAudioState } from '../audio.js';
 import { calcScore } from '../score.js';
 import { logEvent } from '../analytics.js';
 import { COUNTRY_TO_REGION } from '../data/constants.js';
 
-export const useGameStore = create((set, get) => ({
+export const useGameStore = create(
+  persist(
+    (set, get) => ({
   phase: 'start',
   volume: 0.85,
   theme: 'default',
@@ -21,6 +24,7 @@ export const useGameStore = create((set, get) => ({
   hintCredits: 5,
   roundHints: { language: false, city: false, region: false },
   history: [],
+  allTimeHistory: [],
   isAudioPlaying: true,
   talkMode: false,
   totalRounds: 5,
@@ -273,7 +277,8 @@ export const useGameStore = create((set, get) => ({
       result: { km, score },
       totalScore: totalScore + score,
       phase: 'result',
-      history: [...history, { country: station.country, code: station.countrycode, score: score }]
+      history: [...history, { country: station.country, code: station.countrycode, score: score }],
+      allTimeHistory: [...get().allTimeHistory, { country: station.country, code: station.countrycode, score: score }]
     });
 
     logEvent('guess_submitted', { round_number: round, distance_km: Math.round(km), score_earned: score, countrycode: station.countrycode, region: COUNTRY_TO_REGION[station.countrycode] || 'Unknown' });
@@ -292,4 +297,9 @@ export const useGameStore = create((set, get) => ({
       logEvent('station_keep_listening', { round_number: round, station_name: station?.name });
     }
   }
-}));
+}),
+  {
+    name: 'radioguessr-storage',
+    partialize: (state) => ({ allTimeHistory: state.allTimeHistory }),
+  }
+));
