@@ -2,8 +2,9 @@
 
 All notable changes to the **RadioGuessr** project will be documented in this file.
 
-## [1.6.0] - 2026-06-18
+## [2.0.0] - 2026-06-18
 ### Added
+- **Global Leaderboard**: Integrated Supabase to power a real-time, global leaderboard. Players can submit their arcade-style names after playing and filter top scores globally based on their chosen round length.
 - **Talk Mode**: Added a new toggle that automatically filters out music stations in favor of news, talk, and public radio to make language guessing easier.
 - **Customizable Rounds**: Players can now select between 3, 5, 10, or 20 rounds per session, with hint credits scaling appropriately.
 - **Stream Pooling & Silent Fallbacks**: The engine now intelligently fetches pools of up to 100 stations at once. If a stream is broken or blocked by CORS, it silently skips to the next working station in the pool without interrupting the player's game or depleting retries.

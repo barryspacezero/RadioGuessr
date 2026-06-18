@@ -1,11 +1,54 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
+import { supabase } from '../../supabase.js';
 
 export default function FinalScreen({ clickSound }) {
   const history = useGameStore(state => state.history);
   const totalScore = useGameStore(state => state.totalScore);
+  const totalRounds = useGameStore(state => state.totalRounds);
   const resetGame = useGameStore(state => state.resetGame);
+
+  const [playerName, setPlayerName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const handleSubmitScore = async () => {
+    if (!playerName.trim()) {
+      setSubmitError('Please enter a name.');
+      return;
+    }
+    if (!supabase) {
+      setSubmitError('Leaderboard is not configured.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const { error } = await supabase.from('leaderboard').insert([
+        {
+          player_name: playerName.trim(),
+          score: totalScore,
+          rounds: totalRounds,
+        }
+      ]);
+
+      if (error) throw error;
+      
+      setSubmitSuccess(true);
+    } catch (err) {
+      console.error(err);
+      setSubmitError('Failed to submit score. Try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <motion.div
       key="final"
@@ -39,7 +82,39 @@ export default function FinalScreen({ clickSound }) {
       <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
         Total Score: {totalScore}
       </p>
-      <button className="btn " onClick={() => { clickSound.currentTime = 0; clickSound.play(); resetGame(); }}>Play Again</button>
+
+      {/* Leaderboard Submission */}
+      <div className="flex flex-col items-center gap-3 mt-2 mb-2 w-full max-w-[280px]">
+        {submitSuccess ? (
+          <div className="bg-green-500/20 border-2 border-green-500/50 text-green-100 font-bold px-4 py-2 text-sm text-center w-full">
+            Score submitted! Check the leaderboard on the start screen.
+          </div>
+        ) : (
+          <>
+            <div className="flex w-full gap-2">
+              <input 
+                type="text" 
+                placeholder="Enter your name" 
+                maxLength={20}
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                className="flex-1 bg-black/50 border-2 border-white/30 text-white px-3 py-2 text-sm font-bold placeholder-white/40 focus:outline-none focus:border-amber-400 transition-colors"
+                disabled={isSubmitting}
+              />
+              <button 
+                onClick={handleSubmitScore}
+                disabled={isSubmitting}
+                className="bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 text-sm uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[90px]"
+              >
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit'}
+              </button>
+            </div>
+            {submitError && <span className="text-red-400 text-xs font-bold">{submitError}</span>}
+          </>
+        )}
+      </div>
+
+      <button className="btn mt-2" onClick={() => { clickSound.currentTime = 0; clickSound.play(); resetGame(); }}>Play Again</button>
 
       <a
         href="https://github.com/barryspacezero/RadioGuessr"

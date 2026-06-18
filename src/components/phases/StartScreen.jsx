@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Info } from 'lucide-react';
+import { Play, Info, Trophy } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
+import LeaderboardModal from '../ui/LeaderboardModal.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
 
 export default function StartScreen({ clickSound, globeRef }) {
@@ -16,8 +18,12 @@ export default function StartScreen({ clickSound, globeRef }) {
   const setTotalRounds = useGameStore(state => state.setTotalRounds);
   const error = useGameStore(state => state.error);
   const startRound = useGameStore(state => state.startRound);
+  
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+
   return (
-    <motion.div
+    <>
+      <motion.div
       key="start"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -118,7 +124,7 @@ export default function StartScreen({ clickSound, globeRef }) {
       <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef); }}>
         <Play className="w-8 h-8 fill-current ml-1" />
       </button>
-      <span className="text-[13px] font-medium text-white/70">Game Version: 1.6</span>
+      <span className="text-[13px] font-medium text-white/70">Game Version: 2.0</span>
       <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero" className="hover:underline">Sparsh</a></span>
 
       <a
@@ -131,6 +137,18 @@ export default function StartScreen({ clickSound, globeRef }) {
         <GithubIcon className="w-6 h-6 opacity-90 group-hover:opacity-100" />
         <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Star on GitHub</span>
       </a>
+
+      <button
+        onClick={() => { clickSound.currentTime = 0; clickSound.play(); setIsLeaderboardOpen(true); }}
+        className="absolute bottom-6 left-6 md:bottom-8 md:left-8 group flex items-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 backdrop-blur-md border-2 border-amber-500/30 text-amber-500 px-4 py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+        title="View Leaderboard"
+      >
+        <Trophy className="w-6 h-6 opacity-90 group-hover:opacity-100" />
+        <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Leaderboard</span>
+      </button>
+
     </motion.div>
+    <LeaderboardModal isOpen={isLeaderboardOpen} onClose={() => { clickSound.currentTime = 0; clickSound.play(); setIsLeaderboardOpen(false); }} />
+    </>
   );
 }
