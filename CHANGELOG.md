@@ -2,6 +2,14 @@
 
 All notable changes to the **RadioGuessr** project will be documented in this file.
 
+## [1.6.0] - 2026-06-18
+### Added
+- **Talk Mode**: Added a new toggle that automatically filters out music stations in favor of news, talk, and public radio to make language guessing easier.
+- **Customizable Rounds**: Players can now select between 3, 5, 10, or 20 rounds per session, with hint credits scaling appropriately.
+- **Stream Pooling & Silent Fallbacks**: The engine now intelligently fetches pools of up to 100 stations at once. If a stream is broken or blocked by CORS, it silently skips to the next working station in the pool without interrupting the player's game or depleting retries.
+### Changed
+- **Start Screen UI**: Refactored the settings layout to use a much cleaner horizontal grid, making the screen less vertically cluttered.
+
 ## [1.5.0] - 2026-05-17
 ### Added
 - **Intelligent Same-Country Rerolls**: Designed and built the "Reroll (Same Country)" gameplay escape hatch inside loading placeholders and active playing panels to cleanly fetch alternative stations from the same country when encountering broken, silent, or slow streams. Includes in-memory seen station tracking to guarantee a fresh station.
