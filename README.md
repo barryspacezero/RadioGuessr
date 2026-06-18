@@ -18,9 +18,10 @@ A GeoGuessr-style game where you tune into live radio streams from around the wo
 - **Keep Listening**: Submitting a guess automatically pauses the stream, letting you **keep listening** to your current station, or click to switch to a new one from the same country.
 - **Enhanced Mobile UI**: A highly refined, animated interface built with Tailwind CSS and Framer Motion, featuring smart collapsing cards and persistently pinned buttons for a flawless mobile guessing experience.
 - **Session History Summary**: At the end of your game, review the countries you've "visited", complete with country flags seamlessly pulled from FlagCDN with custom styled tooltips.
-- **Talk Mode (v1.6)**: Automatically filters out music stations in favor of news, talk, and public radio to make language guessing easier.
-- **Customizable Rounds (v1.6)**: Choose to play 3, 5, 10, or 20 rounds per session, with hints automatically scaling to your chosen round length.
-- **Stream Pooling & Silent Fallbacks (v1.6)**: The engine intelligently fetches pools of up to 100 stations at once. If a stream is broken or blocked by CORS, it silently skips to the next working station in the pool without interrupting your gameplay.
+- **Talk Mode (v2.0)**: Automatically filters out music stations in favor of news, talk, and public radio to make language guessing easier.
+- **Customizable Rounds (v2.0)**: Choose to play 3, 5, 10, or 20 rounds per session, with hints automatically scaling to your chosen round length.
+- **Stream Pooling & Silent Fallbacks (v2.0)**: The engine intelligently fetches pools of up to 100 stations at once. If a stream is broken or blocked by CORS, it silently skips to the next working station in the pool without interrupting your gameplay.
+- **Global Leaderboard (v2.0)**: Powered by Supabase, compete globally for the highest scores. Filter top players based on the specific round length you are playing.
 
 ## 🛠️ Tech Stack
 
@@ -83,4 +84,4 @@ Ensure you have [Node.js](https://nodejs.org/) installed along with standard pac
 
 ---
 
-*Game Version: 1.6*
+*Game Version: 2.0*

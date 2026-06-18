@@ -10,6 +10,7 @@ All notable changes to the **RadioGuessr** project will be documented in this fi
 - **Stream Pooling & Silent Fallbacks**: The engine now intelligently fetches pools of up to 100 stations at once. If a stream is broken or blocked by CORS, it silently skips to the next working station in the pool without interrupting the player's game or depleting retries.
 ### Changed
 - **Start Screen UI**: Refactored the settings layout to use a much cleaner horizontal grid, making the screen less vertically cluttered.
+- **Retro Aesthetic**: Added a bouncing, pulsing "2.0!" tag to the main logo using the 'Press Start 2P' 8-bit font, heavily inspired by the classic Minecraft splash text.
 
 ## [1.5.0] - 2026-05-17
 ### Added
