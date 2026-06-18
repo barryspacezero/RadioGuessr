@@ -12,6 +12,8 @@ export default function StartScreen({ clickSound, globeRef }) {
   const setShowNames = useGameStore(state => state.setShowNames);
   const talkMode = useGameStore(state => state.talkMode);
   const setTalkMode = useGameStore(state => state.setTalkMode);
+  const totalRounds = useGameStore(state => state.totalRounds);
+  const setTotalRounds = useGameStore(state => state.setTotalRounds);
   const error = useGameStore(state => state.error);
   const startRound = useGameStore(state => state.startRound);
   return (
@@ -27,25 +29,43 @@ export default function StartScreen({ clickSound, globeRef }) {
         A GeoGuessr-style game where you listen to live radio streams from around the world and guess their location on a 3D globe.
       </p>
 
-      <div className="flex flex-col items-center gap-1 mt-2">
-        <label htmlFor="theme" className="text-[10px] text-white/70 uppercase tracking-widest font-bold">
-          Globe Style
-        </label>
-        <select
-          id="theme"
-          value={theme}
-          onChange={(e) => setTheme(e.target.value)}
-          className="bg-transparent border-2 border-white/30 text-white text-sm font-medium px-3 py-1.5 outline-none cursor-pointer hover:border-white/60 transition-colors [&>option]:bg-black"
-        >
-          <option value="default">Blue Marble</option>
-          {/* <option value="dark">Dark Map</option> */}
-          <option value="day">Day Map</option>
-          <option value="water">Water Map</option>
-          <option value="night">Night Map</option>
-        </select>
+      <div className="flex flex-row items-center justify-center gap-6 mt-4">
+        <div className="flex flex-col items-center gap-1">
+          <label htmlFor="theme" className="text-[10px] text-white/70 uppercase tracking-widest font-bold">
+            Globe Style
+          </label>
+          <select
+            id="theme"
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            className="bg-transparent border-2 border-white/30 text-white text-sm font-medium px-3 py-1.5 outline-none cursor-pointer hover:border-white/60 transition-colors [&>option]:bg-black"
+          >
+            <option value="default">Blue Marble</option>
+            <option value="day">Day Map</option>
+            <option value="water">Water Map</option>
+            <option value="night">Night Map</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col items-center gap-1">
+          <label htmlFor="rounds" className="text-[10px] text-white/70 uppercase tracking-widest font-bold">
+            Total Rounds
+          </label>
+          <select
+            id="rounds"
+            value={totalRounds}
+            onChange={(e) => setTotalRounds(parseInt(e.target.value))}
+            className="bg-transparent border-2 border-white/30 text-white text-sm font-medium px-3 py-1.5 outline-none cursor-pointer hover:border-white/60 transition-colors [&>option]:bg-black"
+          >
+            <option value="3">3 Rounds</option>
+            <option value="5">5 Rounds</option>
+            <option value="10">10 Rounds</option>
+            <option value="20">20 Rounds</option>
+          </select>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4 mt-1">
+      <div className="flex flex-wrap items-center justify-center gap-6 mt-4 mb-2">
         <label className="flex items-center gap-2 cursor-pointer group">
           <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
             <input
@@ -71,9 +91,7 @@ export default function StartScreen({ clickSound, globeRef }) {
           </div>
           <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Country Labels</span>
         </label>
-      </div>
 
-      <div className="flex items-center gap-4 mt-1">
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-2 cursor-pointer group">
             <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
@@ -100,7 +118,7 @@ export default function StartScreen({ clickSound, globeRef }) {
       <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef); }}>
         <Play className="w-8 h-8 fill-current ml-1" />
       </button>
-      <span className="text-[13px] font-medium text-white/70">Game Version: 1.5</span>
+      <span className="text-[13px] font-medium text-white/70">Game Version: 1.6</span>
       <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero" className="hover:underline">Sparsh</a></span>
 
       <a

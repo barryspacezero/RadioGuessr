@@ -11,6 +11,7 @@ export default function PlayingScreen({ clickSound, globeRef }) {
   const guess = useGameStore(state => state.guess);
   const submitGuess = useGameStore(state => state.submitGuess);
   const round = useGameStore(state => state.round);
+  const totalRounds = useGameStore(state => state.totalRounds);
   const hintCredits = useGameStore(state => state.hintCredits);
   const roundHints = useGameStore(state => state.roundHints);
   const station = useGameStore(state => state.station);
@@ -69,7 +70,7 @@ export default function PlayingScreen({ clickSound, globeRef }) {
               </div>
               <span className="text-[16px] font-bold uppercase tracking-[1.2px] leading-none mt-0.5">Now Playing</span>
             </div>
-            <span className="text-[13px] font-medium text-black">Round {round}/5</span>
+            <span className="text-[13px] font-medium text-black">Round {round}/{totalRounds}</span>
             <div className="flex flex-col gap-2 w-full mt-2">
               <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-black">
                 <span>Hints ({hintCredits} left)</span>

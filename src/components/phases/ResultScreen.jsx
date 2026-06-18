@@ -7,6 +7,7 @@ export default function ResultScreen({ clickSound, globeRef }) {
   const result = useGameStore(state => state.result);
   const station = useGameStore(state => state.station);
   const round = useGameStore(state => state.round);
+  const totalRounds = useGameStore(state => state.totalRounds);
   const setPhase = useGameStore(state => state.setPhase);
   const startRound = useGameStore(state => state.startRound);
   const toggleResultAudio = useGameStore(state => state.toggleResultAudio);
@@ -22,11 +23,11 @@ export default function ResultScreen({ clickSound, globeRef }) {
       className="!items-start gap-1.5 md:!min-w-[340px]"
       persistentMobileContent={
         <button className="btn btn-primary w-full shadow-lg" onClick={() => {
-          if (round >= 5) {
+          if (round >= totalRounds) {
             stopAudio()
             setPhase('final')
           } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
-        }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
+        }}>{round === totalRounds ? 'Final Score' : 'Next Round'}</button>
       }
     >
       <span className="text-[10px] font-bold uppercase tracking-[1.2px] text-black">Station</span>
@@ -56,11 +57,11 @@ export default function ResultScreen({ clickSound, globeRef }) {
         {result.score.toLocaleString()}
       </span>
       <button className="hidden md:block btn btn-primary mt-4 w-full" onClick={() => {
-        if (round >= 5) {
+        if (round >= totalRounds) {
           stopAudio()
           setPhase('final')
         } else { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef) }
-      }}>{round === 5 ? 'Final Score' : 'Next Round'}</button>
+      }}>{round === totalRounds ? 'Final Score' : 'Next Round'}</button>
     </AnimatedCard>
   );
 }

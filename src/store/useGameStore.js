@@ -23,6 +23,7 @@ export const useGameStore = create((set, get) => ({
   history: [],
   isAudioPlaying: true,
   talkMode: false,
+  totalRounds: 5,
   stationPool: [],
 
   // Simple Setters
@@ -33,12 +34,13 @@ export const useGameStore = create((set, get) => ({
   setShowNames: (showNames) => set({ showNames }),
   setGuess: (guess) => set({ guess }),
   setTalkMode: (talkMode) => set({ talkMode }),
+  setTotalRounds: (totalRounds) => set({ totalRounds, hintCredits: totalRounds }),
 
   // Actions
   startRound: async (globeRef) => {
-    const { round, totalScore, history, theme, showBorders, showNames } = get();
+    const { round, totalScore, history, theme, showBorders, showNames, totalRounds } = get();
     
-    if (round >= 5) {
+    if (round >= totalRounds) {
       set({ phase: 'final' });
       logEvent('game_complete', {
         total_score: totalScore,
@@ -224,7 +226,7 @@ export const useGameStore = create((set, get) => ({
   },
 
   resetGame: () => {
-    set({
+    set((state) => ({
       phase: 'start',
       history: [],
       totalScore: 0,
@@ -233,11 +235,11 @@ export const useGameStore = create((set, get) => ({
       guess: null,
       result: null,
       error: '',
-      hintCredits: 5,
+      hintCredits: state.totalRounds,
       roundHints: { language: false, city: false, region: false },
       isAudioLoading: false,
       stationPool: [] // Reset on new game
-    });
+    }));
     resetSessionSeen();
     logEvent('game_reset');
   },
