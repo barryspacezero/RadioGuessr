@@ -30,7 +30,21 @@ export default function StartScreen({ clickSound, globeRef }) {
       exit={{ opacity: 0, scale: 0.95 }}
       className="absolute bg-black/40 backdrop-blur-sm inset-0 z-50 flex flex-col items-center justify-center gap-5"
     >
-      <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
+      <div className="relative inline-block mt-2">
+        <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
+        <motion.span 
+          initial={{ scale: 0.9, rotate: -20 }}
+          animate={{ scale: [0.9, 1.15, 0.9], rotate: 12 }}
+          transition={{ 
+            scale: { duration: 1.5, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
+            rotate: { type: "spring", stiffness: 260, damping: 20, delay: 0.2 }
+          }}
+          style={{ fontFamily: '"Press Start 2P", monospace' }}
+          className="absolute -top-4 -right-10 text-amber-400 text-lg drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] origin-center"
+        >
+          2.0!
+        </motion.span>
+      </div>
       <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
         A GeoGuessr-style game where you listen to live radio streams from around the world and guess their location on a 3D globe.
       </p>
