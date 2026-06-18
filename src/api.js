@@ -49,12 +49,12 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
         _: Date.now(),
       };
 
-      if (talkMode) {
+      if (talkMode && i < 3) {
         searchParamsObj.tag = 'news';
-      } else if (i < 3 && order === 'votes') {
-        // Still enforce a genre tag on votes-sorted fetches for the first 3 attempts
-        // to avoid low-quality ambience/test stations.
+        searchParamsObj.offset = 0; // Avoid overshooting smaller tagged pools
+      } else if (!talkMode && i < 3 && order === 'votes') {
         searchParamsObj.tag = VALID_TAGS[Math.floor(Math.random() * VALID_TAGS.length)];
+        searchParamsObj.offset = 0; // Avoid overshooting smaller tagged pools
       }
 
       const params = new URLSearchParams(searchParamsObj);

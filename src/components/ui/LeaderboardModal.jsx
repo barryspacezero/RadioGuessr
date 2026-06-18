@@ -125,7 +125,7 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                         'bg-white/5 border-white/10 text-white/90'
                       }`}
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
                         <span className={`text-lg font-black w-6 text-center ${
                           idx === 0 ? 'text-amber-400' :
                           idx === 1 ? 'text-zinc-300' :
@@ -134,7 +134,14 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                         }`}>
                           #{idx + 1}
                         </span>
-                        <span className="font-bold text-base truncate max-w-[150px] md:max-w-[200px]">
+                        {entry.country_code && (
+                          <img 
+                            src={`https://flagcdn.com/${entry.country_code.toLowerCase()}.svg`} 
+                            className="w-5 h-auto shadow-sm border border-white/20 rounded-[1px]" 
+                            alt={entry.country_code} 
+                          />
+                        )}
+                        <span className="font-bold text-base truncate max-w-[130px] md:max-w-[180px]">
                           {entry.player_name || 'Anonymous'}
                         </span>
                       </div>

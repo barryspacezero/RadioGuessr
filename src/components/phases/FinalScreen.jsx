@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
 import { supabase } from '../../supabase.js';
+import CountrySelect from '../ui/CountrySelect.jsx';
 
 export default function FinalScreen({ clickSound }) {
   const history = useGameStore(state => state.history);
@@ -15,6 +16,7 @@ export default function FinalScreen({ clickSound }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   const handleSubmitScore = async () => {
     if (!playerName.trim()) {
@@ -35,6 +37,7 @@ export default function FinalScreen({ clickSound }) {
           player_name: playerName.trim(),
           score: totalScore,
           rounds: totalRounds,
+          country_code: selectedCountry
         }
       ]);
 
@@ -91,6 +94,7 @@ export default function FinalScreen({ clickSound }) {
           </div>
         ) : (
           <>
+            <CountrySelect selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} />
             <div className="flex w-full gap-2">
               <input 
                 type="text" 
