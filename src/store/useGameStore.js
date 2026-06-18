@@ -22,6 +22,8 @@ export const useGameStore = create((set, get) => ({
   roundHints: { language: false, city: false, region: false },
   history: [],
   isAudioPlaying: true,
+  talkMode: false,
+  stationPool: [],
 
   // Simple Setters
   setPhase: (phase) => set({ phase }),
@@ -30,6 +32,7 @@ export const useGameStore = create((set, get) => ({
   setShowBorders: (showBorders) => set({ showBorders }),
   setShowNames: (showNames) => set({ showNames }),
   setGuess: (guess) => set({ guess }),
+  setTalkMode: (talkMode) => set({ talkMode }),
 
   // Actions
   startRound: async (globeRef) => {
@@ -60,11 +63,12 @@ export const useGameStore = create((set, get) => ({
       result: null,
       error: '',
       phase: 'loading',
-      roundHints: { language: false, city: false, region: false }
+      roundHints: { language: false, city: false, region: false },
+      stationPool: [] // Reset pool for new round
     });
 
     const fetchAndPlay = async (retriesLeft = 3) => {
-      if (retriesLeft === 0) {
+      if (retriesLeft <= 0) {
         set((state) => ({
           error: 'Could not find a working station. Please check your internet connection and try again.',
           phase: 'start',
@@ -72,16 +76,44 @@ export const useGameStore = create((set, get) => ({
         }));
         return;
       }
+      let timeoutId = null;
       try {
-        const s = await fetchStation();
-        set({ station: s, phase: 'playing', isAudioLoading: true });
+        const { talkMode, stationPool } = get();
+        let pool = stationPool;
+        if (pool.length === 0) {
+          pool = await fetchStation(null, talkMode);
+        }
+        
+        if (pool.length === 0) {
+          throw new Error('Pool is empty');
+        }
+
+        const s = pool[0];
+        const remainingPool = pool.slice(1);
+
+        set({ station: s, stationPool: remainingPool, phase: 'playing', isAudioLoading: true });
         if (globeRef?.current) globeRef.current.setGuessing(false);
         
+        const fallbackNext = () => {
+          console.warn('Stream failed or timed out, trying next in pool');
+          clearTimeout(timeoutId);
+          set({ error: 'Stream failed. Trying next...', phase: 'loading' });
+          fetchAndPlay(remainingPool.length > 0 ? retriesLeft : retriesLeft - 1);
+        };
+
+        timeoutId = setTimeout(() => {
+          if (get().isAudioLoading) {
+            stopAudio();
+            fallbackNext();
+          }
+        }, 8000);
+
         playAudio(s.url, {
           onLoading: () => {
             if (globeRef?.current) globeRef.current.setGuessing(false);
           },
           onPlaying: () => {
+            clearTimeout(timeoutId);
             set((state) => {
               if ((state.phase === 'playing' || state.phase === 'loading') && globeRef?.current) {
                 globeRef.current.setGuessing(true);
@@ -96,37 +128,18 @@ export const useGameStore = create((set, get) => ({
             });
           },
           onError: () => {
-            set({ error: 'Stream failed. Trying again.', phase: 'loading' });
-            logEvent('station_load_fail', {
-              round_number: nextRound,
-              error_type: 'playback_error',
-              retries_left: retriesLeft - 1
-            });
-            fetchAndPlay(retriesLeft - 1);
+            fallbackNext();
           }
         });
       } catch (err) {
+        clearTimeout(timeoutId);
         console.warn('Station fetch failed, retrying...', err);
-        logEvent('station_load_fail', {
-          round_number: nextRound,
-          error_type: 'fetch_error',
-          error_message: err.message || '',
-          retries_left: retriesLeft - 1
-        });
+        set({ stationPool: [] }); // Clear pool on error
         fetchAndPlay(retriesLeft - 1);
       }
     };
 
     fetchAndPlay(3);
-
-    setTimeout(() => {
-      set((state) => {
-        if ((state.phase === 'playing' || state.phase === 'loading') && globeRef?.current) {
-          globeRef.current.setGuessing(true);
-        }
-        return { isAudioLoading: false };
-      });
-    }, 6000);
   },
 
   rerollCurrentStation: async (globeRef) => {
@@ -143,25 +156,50 @@ export const useGameStore = create((set, get) => ({
     }
 
     const fetchAndPlayReroll = async (retriesLeft = 3) => {
-      if (retriesLeft === 0) {
+      if (retriesLeft <= 0) {
         set((state) => {
           if ((state.phase === 'playing' || state.phase === 'loading') && globeRef?.current) {
             globeRef.current.setGuessing(true);
           }
           return { error: 'Could not find another working station for this country. You can try to guess or reroll again.', isAudioLoading: false };
         });
-        logEvent('station_reroll_fail', { round_number: round, countrycode: station.countrycode, error_message: 'Max retries exceeded' });
         return;
       }
+      let timeoutId = null;
       try {
-        const s = await fetchStation(station.countrycode);
-        set({ station: s, isAudioLoading: true });
+        const { talkMode, stationPool } = get();
+        let pool = stationPool;
+        if (pool.length === 0) {
+          pool = await fetchStation(station.countrycode, talkMode);
+        }
+        if (pool.length === 0) {
+          throw new Error('Pool is empty');
+        }
+
+        const s = pool[0];
+        const remainingPool = pool.slice(1);
+
+        set({ station: s, stationPool: remainingPool, isAudioLoading: true });
         
+        const fallbackNext = () => {
+          clearTimeout(timeoutId);
+          set({ error: 'Stream failed. Trying another.' });
+          fetchAndPlayReroll(remainingPool.length > 0 ? retriesLeft : retriesLeft - 1);
+        };
+
+        timeoutId = setTimeout(() => {
+          if (get().isAudioLoading) {
+            stopAudio();
+            fallbackNext();
+          }
+        }, 8000);
+
         playAudio(s.url, {
           onLoading: () => {
             if (globeRef?.current) globeRef.current.setGuessing(false);
           },
           onPlaying: () => {
+            clearTimeout(timeoutId);
             set((state) => {
               if ((state.phase === 'playing' || state.phase === 'loading') && globeRef?.current) {
                 globeRef.current.setGuessing(true);
@@ -171,14 +209,13 @@ export const useGameStore = create((set, get) => ({
             logEvent('station_reroll_success', { round_number: round, countrycode: s.countrycode, region: COUNTRY_TO_REGION[s.countrycode] || 'Unknown' });
           },
           onError: () => {
-            set({ error: 'Stream failed. Trying another.' });
-            logEvent('station_reroll_fail', { round_number: round, countrycode: station.countrycode, error_type: 'playback_error', retries_left: retriesLeft - 1 });
-            fetchAndPlayReroll(retriesLeft - 1);
+            fallbackNext();
           }
         });
       } catch (err) {
+        clearTimeout(timeoutId);
         console.warn('Reroll station fetch failed, retrying...', err);
-        logEvent('station_reroll_fail', { round_number: round, countrycode: station.countrycode, error_type: 'fetch_error', error_message: err.message || '', retries_left: retriesLeft - 1 });
+        set({ stationPool: [] });
         fetchAndPlayReroll(retriesLeft - 1);
       }
     };
@@ -198,7 +235,8 @@ export const useGameStore = create((set, get) => ({
       error: '',
       hintCredits: 5,
       roundHints: { language: false, city: false, region: false },
-      isAudioLoading: false
+      isAudioLoading: false,
+      stationPool: [] // Reset on new game
     });
     resetSessionSeen();
     logEvent('game_reset');

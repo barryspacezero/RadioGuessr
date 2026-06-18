@@ -16,7 +16,7 @@ const sessionSeenUUIDs = new Set();
 export function resetSessionSeen() { sessionSeenUUIDs.clear(); }
 
 // ─── Layer 1 + Layer 3: Random offset + Sort order diversity ───
-export async function fetchStation(targetCountry = null) {
+export async function fetchStation(targetCountry = null, talkMode = false) {
   for (let i = 0; i < 5; i++) {
     try {
       const country = targetCountry || COUNTRY_POOL[Math.floor(Math.random() * COUNTRY_POOL.length)];
@@ -24,7 +24,7 @@ export async function fetchStation(targetCountry = null) {
       // Layer 1: Random offset within the known station pool for this country.
       // Cap at 60% of total count to keep reasonable stream quality.
       const totalCount = COUNTRY_STATION_COUNTS[country] || 20;
-      const maxOffset = Math.max(0, Math.floor(totalCount * 0.6) - 20);
+      const maxOffset = Math.max(0, Math.floor(totalCount * 0.6) - 100);
       const offset = maxOffset > 0 ? Math.floor(Math.random() * maxOffset) : 0;
 
       // Layer 3: Sort order diversity
@@ -39,7 +39,7 @@ export async function fetchStation(targetCountry = null) {
       }
 
       const searchParamsObj = {
-        limit: 20,
+        limit: 100,
         offset,
         order,
         reverse,
@@ -49,15 +49,45 @@ export async function fetchStation(targetCountry = null) {
         _: Date.now(),
       };
 
-      // Still enforce a genre tag on votes-sorted fetches for the first 3 attempts
-      // to avoid low-quality ambience/test stations.
-      if (i < 3 && order === 'votes') {
+      if (talkMode) {
+        searchParamsObj.tag = 'news';
+      } else if (i < 3 && order === 'votes') {
+        // Still enforce a genre tag on votes-sorted fetches for the first 3 attempts
+        // to avoid low-quality ambience/test stations.
         searchParamsObj.tag = VALID_TAGS[Math.floor(Math.random() * VALID_TAGS.length)];
       }
 
       const params = new URLSearchParams(searchParamsObj);
       const res = await fetch(`${API}/json/stations/search?${params}`);
-      const list = await res.json();
+      const stations = await res.json();
+
+      let list = stations;
+
+      if (talkMode && list.length > 0) {
+        const SPEECH_WORDS = [
+          'news','talk','info','actualit','noticias','nachrichten','информ','nouvelles',
+          'radio nacional','public radio','npr','bbc','rfi','dw',
+          'actualidad','periodico','journal','noticia','talkback','all news',
+          'sport news','business','politics','government','parliament'
+        ];
+        const MUSIC_WORDS = [
+          'music','hits','fm 10','top 40','pop','rock','jazz','classic','oldies',
+          'country','dance','techno','house','rnb','r&b','hip hop','lounge',
+          'smooth','gold','mix','chart','playlist','beat','groove','sound',
+          'easy','adult contemporary','soft','wave','flow'
+        ];
+        
+        const scored = list.map(s => {
+          const text = ((s.name||'') + ' ' + (s.tags||'')).toLowerCase();
+          let score = 0;
+          SPEECH_WORDS.forEach(w => { if (text.includes(w)) score += 2; });
+          MUSIC_WORDS.forEach(w => { if (text.includes(w)) score -= 3; });
+          return { s, score };
+        });
+
+        const talkOnly = scored.filter(x => x.score > 0).sort((a,b) => b.score - a.score).map(x => x.s);
+        if (talkOnly.length >= 3) list = talkOnly;
+      }
 
       // Shuffle the returned batch so we don't always take the first result
       for (let j = list.length - 1; j > 0; j--) {
@@ -65,6 +95,7 @@ export async function fetchStation(targetCountry = null) {
         [list[j], list[k]] = [list[k], list[j]];
       }
 
+      const validStations = [];
       for (const s of list) {
         // Layer 4: Skip already-played stations
         if (sessionSeenUUIDs.has(s.stationuuid)) continue;
@@ -74,13 +105,18 @@ export async function fetchStation(targetCountry = null) {
         if (!url || !url.startsWith('https')) continue;
         if (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) continue;
 
-        sessionSeenUUIDs.add(s.stationuuid);
-        return {
+        validStations.push({
+          stationuuid: s.stationuuid,
           name: s.name || 'Unknown Station', url,
           country: s.country || '', countrycode: s.countrycode || '',
           state: s.state || COUNTRY_TO_CITY[s.countrycode] || '', lat, lng,
           language: s.language || COUNTRY_TO_LANGUAGE[s.countrycode] || 'Unknown',
-        };
+        });
+      }
+      
+      if (validStations.length > 0) {
+        validStations.forEach(s => sessionSeenUUIDs.add(s.stationuuid));
+        return validStations;
       }
     } catch (err) {
       console.warn('Station fetch attempt failed, retrying...', err);

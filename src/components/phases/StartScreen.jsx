@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Play } from 'lucide-react';
+import { Play, Info } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
 
@@ -10,6 +10,8 @@ export default function StartScreen({ clickSound, globeRef }) {
   const setShowBorders = useGameStore(state => state.setShowBorders);
   const showNames = useGameStore(state => state.showNames);
   const setShowNames = useGameStore(state => state.setShowNames);
+  const talkMode = useGameStore(state => state.talkMode);
+  const setTalkMode = useGameStore(state => state.setTalkMode);
   const error = useGameStore(state => state.error);
   const startRound = useGameStore(state => state.startRound);
   return (
@@ -69,6 +71,29 @@ export default function StartScreen({ clickSound, globeRef }) {
           </div>
           <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Country Labels</span>
         </label>
+      </div>
+
+      <div className="flex items-center gap-4 mt-1">
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer group">
+            <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
+              <input
+                type="checkbox"
+                className="opacity-0 absolute w-full h-full cursor-pointer"
+                checked={talkMode}
+                onChange={(e) => setTalkMode(e.target.checked)}
+              />
+              {talkMode && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
+            </div>
+            <span className="text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">Talk Mode</span>
+          </label>
+          <div className="group relative flex items-center">
+            <Info className="w-4 h-4 text-white/60 hover:text-white cursor-help transition-colors" />
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black/90 text-white text-[10px] rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
+              Filters out music stations to help you hear spoken language for easier guessing.
+            </div>
+          </div>
+        </div>
       </div>
 
       {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
