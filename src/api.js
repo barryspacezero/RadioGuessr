@@ -8,11 +8,38 @@ import {
   VALID_TAGS 
 } from './data/constants.js';
 
-const API_NODES = [
-  'https://de1.api.radio-browser.info',
-  'https://at1.api.radio-browser.info',
-  'https://nl1.api.radio-browser.info'
-];
+let cachedApiNodes = null;
+
+export async function getApiNodes() {
+  if (cachedApiNodes && cachedApiNodes.length > 0) return cachedApiNodes;
+  try {
+    // Dynamic node discovery
+    const res = await fetch('https://all.api.radio-browser.info/json/servers', {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(3000)
+    });
+    if (res.ok) {
+      const servers = await res.json();
+      const nodes = servers.map(s => `https://${s.name}`);
+      cachedApiNodes = [...new Set(nodes)];
+      
+      // Ensure all.api is in the list as a final fallback
+      if (!cachedApiNodes.includes('https://all.api.radio-browser.info')) {
+        cachedApiNodes.push('https://all.api.radio-browser.info');
+      }
+      return cachedApiNodes;
+    }
+  } catch (err) {
+    console.warn("Dynamic node discovery failed:", err);
+  }
+  
+  // Fallback if discovery fails
+  cachedApiNodes = [
+    'https://de1.api.radio-browser.info',
+    'https://all.api.radio-browser.info'
+  ];
+  return cachedApiNodes;
+}
 
 // ─── Layer 4: Session-level deduplication ───
 // Tracks station UUIDs already played in this session. Reset on game reset via resetSessionSeen().
@@ -21,6 +48,8 @@ export function resetSessionSeen() { sessionSeenUUIDs.clear(); }
 
 // ─── Layer 1 + Layer 3: Random offset + Sort order diversity ───
 export async function fetchStation(targetCountry = null, talkMode = false) {
+  const nodes = await getApiNodes();
+  
   for (let i = 0; i < 5; i++) {
     try {
       const country = targetCountry || COUNTRY_POOL[Math.floor(Math.random() * COUNTRY_POOL.length)];
@@ -63,8 +92,8 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
 
       const params = new URLSearchParams(searchParamsObj);
       
-      // Randomly select an API node to avoid relying on a single overloaded server (fixes 503 errors)
-      const apiNode = API_NODES[Math.floor(Math.random() * API_NODES.length)];
+      // Try nodes sequentially instead of randomly, ensuring we don't get stuck on one broken node
+      const apiNode = nodes[i % nodes.length];
       const res = await fetch(`${apiNode}/json/stations/search?${params}`);
       
       if (!res.ok) throw new Error(`API Node ${apiNode} failed with status ${res.status}`);
@@ -129,8 +158,10 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
         return validStations;
       }
     } catch (err) {
-      console.warn('Station fetch attempt failed, retrying...', err);
+      console.warn(`Station fetch attempt ${i + 1} failed:`, err);
+      // Wait before retrying to allow network to recover (especially for 429/503 errors)
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
-  throw new Error('No station found');
+  throw new Error('No station found after multiple attempts');
 }
