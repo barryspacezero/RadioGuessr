@@ -392,7 +392,19 @@ export const useGameStore = create(
       totalScore: totalScore + score,
       phase: 'result',
       history: [...history, { country: station.country, code: station.countrycode, score: score }],
-      allTimeHistory: [...get().allTimeHistory, { country: station.country, code: station.countrycode, score: score }]
+      allTimeHistory: (() => {
+        const currentAllTime = get().allTimeHistory;
+        const existingIndex = currentAllTime.findIndex(h => h.code === station.countrycode);
+        if (existingIndex !== -1) {
+          if (score > currentAllTime[existingIndex].score) {
+            const updated = [...currentAllTime];
+            updated[existingIndex] = { ...updated[existingIndex], score: score };
+            return updated;
+          }
+          return currentAllTime;
+        }
+        return [...currentAllTime, { country: station.country, code: station.countrycode, score: score }];
+      })()
     });
 
     logEvent('guess_submitted', { round_number: round, distance_km: Math.round(km), score_earned: score, countrycode: station.countrycode, region: COUNTRY_TO_REGION[station.countrycode] || 'Unknown' });

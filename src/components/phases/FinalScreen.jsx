@@ -290,11 +290,23 @@ export default function FinalScreen({ clickSound }) {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-6 pb-8 pt-12 md:px-8 md:pb-10 md:pt-16 custom-scrollbar-light flex flex-wrap justify-center items-center gap-x-6 gap-y-10">
-                {allTimeHistory.length === 0 ? (
-                  <span className="text-black/50 font-bold tracking-widest uppercase">No stamps yet.</span>
-                ) : (
-                  allTimeHistory.map((item, index) => {
+              <div className="flex-1 overflow-y-auto px-4 py-6 md:px-6 md:py-8 custom-scrollbar-light flex flex-wrap justify-center items-center gap-x-6 gap-y-10">
+                {(() => {
+                  const uniqueStampsMap = new Map();
+                  allTimeHistory.forEach(item => {
+                    if (!uniqueStampsMap.has(item.code)) {
+                      uniqueStampsMap.set(item.code, item);
+                    } else if (item.score > uniqueStampsMap.get(item.code).score) {
+                      uniqueStampsMap.get(item.code).score = item.score;
+                    }
+                  });
+                  const uniqueStamps = Array.from(uniqueStampsMap.values());
+
+                  if (uniqueStamps.length === 0) {
+                    return <span className="text-black/50 font-bold tracking-widest uppercase">No stamps yet.</span>;
+                  }
+
+                  return uniqueStamps.map((item, index) => {
                   const rotation = index % 3 === 0 ? '-rotate-2' : index % 3 === 1 ? 'rotate-3' : 'rotate-1';
                   return (
                     <div key={index} tabIndex="0" className={`relative group flex flex-col items-center cursor-pointer focus:outline-none ${rotation} hover:rotate-0 transition-all duration-300`}>
@@ -306,20 +318,21 @@ export default function FinalScreen({ clickSound }) {
                       </div>
 
                       {item.code && (
-                        <div className="relative">
+                        <div className="flex flex-col items-center border-[3px] border-black/70 p-2 mix-blend-multiply opacity-80 filter contrast-125 saturate-[0.6] sepia-[0.2] group-hover:opacity-100 group-hover:saturate-100 group-hover:sepia-0 group-hover:border-black transition-all">
                           <img
                             src={`https://flagcdn.com/${item.code.toLowerCase()}.svg`}
                             alt={item.country}
-                            className="h-12 md:h-16 w-auto border-[3px] border-black shadow-[3px_3px_0_rgba(0,0,0,0.15)] group-hover:shadow-[5px_5px_0_rgba(0,0,0,0.25)] transition-shadow object-cover"
+                            className="h-10 md:h-12 w-auto border-2 border-black/70 object-cover"
                           />
+                          <div className="mt-2 pt-1 border-t-2 border-black/70 w-full text-center">
+                            <span className="text-[11px] font-black tracking-widest text-black/80">{item.score.toLocaleString()}</span>
+                          </div>
                         </div>
                       )}
-                      <div className="mt-3 bg-black text-white px-2 py-0.5 -rotate-1 border border-black shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
-                        <span className="text-[11px] font-black tracking-widest">{item.score.toLocaleString()}</span>
-                      </div>
                     </div>
-                  )
-                }))}
+                  );
+                });
+              })()}
               </div>
             </motion.div>
           </motion.div>
