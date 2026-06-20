@@ -2,8 +2,17 @@
 
 All notable changes to the **RadioGuessr** project will be documented in this file.
 
-## [2.1.0] - 2026-06-18
+## [2.2.0] - 2026-06-20
 ### Added
+- **Zero-Latency Preloading Engine**: Decoupled network requests from user interaction by silently buffering stations in the background while users view the Start Screen or Results panel, dropping the perceived loading time to 0.
+- **Circuit Breaker System**: Implemented a global `localStorage` lock that actively detects API rate-limiting (`429` or `503` bans) and instantly short-circuits network calls to prevent the app from endlessly bombarding dead servers, allowing IPs to gracefully cool down.
+- **Graceful Audio Reroll Fallback**: Added a robust safety net for the "Reroll" feature. If a country has absolutely zero unplayed stations remaining in its pool, the game gracefully resumes the previously playing station stream instead of locking the user in silence.
+### Changed
+- **Audio Lifecycles**: Completely decoupled HTML5 `<audio>` instances from the React component tree and moved them into a pure JS singleton to solve memory leaks and prevent "phantom audio" from playing across unmounts.
+- **Optimized Stream Tracking**: Reprogrammed the internal session history so stations are only marked as "seen" at the exact millisecond they begin emitting sound, rather than when they are fetched, completely restoring small countries' reroll pools.
+- **Streamlined Gameplay Modes**: Removed the excessively long "20 Round" mode from all leaderboards and menus to better fit the casual pace of play.
+
+## [2.1.0] - 2026-06-18
 - **Lifetime Passport Stamps**: Upgraded the session history into a persistent, global "Passport" using `localStorage`. Every country you ever discover is now permanently stamped into your profile.
 - **Embedded Leaderboard UX**: The global leaderboard is now beautifully embedded directly into the final screen without modals. It features smart auto-scrolling that instantly drops you to your exact projected rank position so you can type your name seamlessly.
 - **API Load Balancer & Auto-Failover**: Replaced the hardcoded Radio Browser API node with a dynamic array of official global servers (`de1`, `at1`, `nl1`). The engine acts as its own load-balancer, randomly picking nodes to completely eliminate game crashes caused by 503 Service Unavailable errors or CORS blocks on overloaded nodes.
