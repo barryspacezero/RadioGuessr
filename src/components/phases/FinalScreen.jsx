@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Book, X } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
+import { logEvent } from '../../analytics.js';
 import { supabase } from '../../supabase.js';
 import CountrySelect from '../ui/CountrySelect.jsx';
 
@@ -98,6 +99,10 @@ export default function FinalScreen({ clickSound }) {
     }
   };
 
+  const userProjectedRank = scores.length > 0 
+    ? (scores.findIndex(s => totalScore >= s.score) === -1 ? scores.length + 1 : scores.findIndex(s => totalScore >= s.score) + 1) 
+    : 1;
+
   return (
     <>
       <motion.div
@@ -128,19 +133,18 @@ export default function FinalScreen({ clickSound }) {
             ) : (
               <>
                 {scores.map((entry, idx) => {
-                  const projectedRank = scores.length > 0 ? (scores.findIndex(s => totalScore >= s.score) === -1 ? scores.length + 1 : scores.findIndex(s => totalScore >= s.score) + 1) : 1;
-                  const isFormHere = !submitSuccess && projectedRank === idx + 1;
+                  const isFormHere = !submitSuccess && userProjectedRank === idx + 1;
                   return (
-                    <Fragment key={entry.id || idx}>
-                      {isFormHere && (
-                        <div ref={userRowRef} className="flex flex-col gap-2 p-2.5 rounded-lg border-2 border-amber-400 bg-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
-                          <div className="flex items-center gap-2">
-                            <span className="text-base font-black w-6 text-center text-amber-400">#{projectedRank}</span>
-                            <div className="flex-1">
-                              <CountrySelect selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} />
+                      <Fragment key={entry.id || idx}>
+                        {isFormHere && (
+                          <div ref={userRowRef} className="flex flex-col gap-2 p-2.5 rounded-lg border-2 border-amber-400 bg-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                            <div className="flex items-center gap-2">
+                              <span className="text-base font-black w-6 text-center text-amber-400">#{userProjectedRank}</span>
+                              <div className="flex-1">
+                                <CountrySelect selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} />
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex w-full gap-2">
+                            <div className="flex w-full gap-2">
                             <input
                               type="text"
                               placeholder="Enter your name"
@@ -194,7 +198,7 @@ export default function FinalScreen({ clickSound }) {
                     </Fragment>
                   );
                 })}
-                {!submitSuccess && (scores.length === 0 || (scores.length > 0 && (scores.findIndex(s => totalScore >= s.score) === -1 ? scores.length + 1 : scores.findIndex(s => totalScore >= s.score) + 1) > scores.length)) && (
+                {!submitSuccess && (scores.length === 0 || userProjectedRank > scores.length) && (
                   <div ref={userRowRef} className="flex flex-col gap-2 p-2.5 rounded-lg border-2 border-amber-400 bg-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
                     <div className="flex items-center gap-2">
                       <span className="text-base font-black w-6 text-center text-amber-400">#{scores.length + 1}</span>
@@ -230,7 +234,7 @@ export default function FinalScreen({ clickSound }) {
 
         <div className="flex items-center justify-center gap-4 mt-6 flex-wrap">
           <button
-            onClick={() => { clickSound.currentTime = 0; clickSound.play(); setIsHistoryOpen(true); }}
+            onClick={() => { clickSound.currentTime = 0; clickSound.play(); logEvent('passport_opened'); setIsHistoryOpen(true); }}
             className="group flex items-center justify-center gap-2 bg-sky-500/10 hover:bg-sky-500/20 backdrop-blur-md border-2 border-sky-500/30 text-sky-400 p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
             title="View Passport"
           >
@@ -246,6 +250,7 @@ export default function FinalScreen({ clickSound }) {
             href="https://github.com/barryspacezero/RadioGuessr"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => logEvent('social_click', { platform: 'github' })}
             className="group flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
             title="Star on GitHub"
           >

@@ -83,7 +83,7 @@ export default function LeaderboardModal({ isOpen, onClose }) {
 
             {/* Filters */}
             <div className="p-4 border-b-2 border-white/10 flex justify-center gap-2 bg-zinc-900/50">
-              {[3, 5, 10, 20].map((rounds) => (
+              {[3, 5, 10].map((rounds) => (
                 <button
                   key={rounds}
                   onClick={() => setRoundFilter(rounds)}

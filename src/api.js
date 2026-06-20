@@ -36,6 +36,8 @@ export async function getApiNodes() {
   // Fallback if discovery fails
   cachedApiNodes = [
     'https://de1.api.radio-browser.info',
+    'https://nl1.api.radio-browser.info',
+    'https://at1.api.radio-browser.info',
     'https://all.api.radio-browser.info'
   ];
   return cachedApiNodes;
@@ -45,9 +47,15 @@ export async function getApiNodes() {
 // Tracks station UUIDs already played in this session. Reset on game reset via resetSessionSeen().
 const sessionSeenUUIDs = new Set();
 export function resetSessionSeen() { sessionSeenUUIDs.clear(); }
+export function markSessionSeen(uuid) { sessionSeenUUIDs.add(uuid); }
 
 // ─── Layer 1 + Layer 3: Random offset + Sort order diversity ───
 export async function fetchStation(targetCountry = null, talkMode = false) {
+  const banUntil = parseInt(localStorage.getItem('radio_rate_limit') || '0', 10);
+  if (banUntil > Date.now()) {
+    throw new Error('Rate limited');
+  }
+
   const nodes = await getApiNodes();
   
   for (let i = 0; i < 5; i++) {
@@ -63,12 +71,10 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
       // Layer 3: Sort order diversity
       const roll = Math.random();
       let order, reverse;
-      if (roll < 0.60) {
-        order = 'votes'; reverse = 'true';    // 60% — quality-biased
-      } else if (roll < 0.85) {
-        order = 'random'; reverse = 'false';  // 25% — full randomness
+      if (roll < 0.75) {
+        order = 'votes'; reverse = 'true';    // 75% — quality-biased
       } else {
-        order = 'clicktrend'; reverse = 'true'; // 15% — recently popular
+        order = 'clicktrend'; reverse = 'true'; // 25% — recently popular
       }
 
       const searchParamsObj = {
@@ -82,23 +88,42 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
         _: Date.now(),
       };
 
-      if (talkMode && i < 3) {
+      if (talkMode && !targetCountry && i < 3) {
         searchParamsObj.tag = 'news';
         searchParamsObj.offset = 0; // Avoid overshooting smaller tagged pools
-      } else if (!talkMode && i < 3 && order === 'votes') {
+      } else if (!talkMode && !targetCountry && i < 3 && order === 'votes') {
         searchParamsObj.tag = VALID_TAGS[Math.floor(Math.random() * VALID_TAGS.length)];
         searchParamsObj.offset = 0; // Avoid overshooting smaller tagged pools
       }
 
       const params = new URLSearchParams(searchParamsObj);
       
-      // Try nodes sequentially instead of randomly, ensuring we don't get stuck on one broken node
-      const apiNode = nodes[i % nodes.length];
-      const res = await fetch(`${apiNode}/json/stations/search?${params}`);
+      // Concurrent fetching across all nodes (Happy Eyeballs)
+      const controller = new AbortController();
+      // Ensure we don't hang forever on unresponsive APIs
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const fetchPromises = nodes.map(apiNode => 
+        fetch(`${apiNode}/json/stations/search?${params}`, {
+          signal: controller.signal
+        }).then(async res => {
+          if (!res.ok) {
+            if (res.status === 429 || res.status === 503) {
+              throw new Error('Rate limited');
+            }
+            throw new Error(`Node ${apiNode} failed with status ${res.status}`);
+          }
+          return res.json();
+        })
+      );
       
-      if (!res.ok) throw new Error(`API Node ${apiNode} failed with status ${res.status}`);
-      
-      const stations = await res.json();
+      let stations;
+      try {
+        stations = await Promise.any(fetchPromises);
+      } finally {
+        clearTimeout(timeoutId);
+        controller.abort(); // Cancel the slower parallel requests
+      }
 
       let list = stations;
 
@@ -154,10 +179,13 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
       }
       
       if (validStations.length > 0) {
-        validStations.forEach(s => sessionSeenUUIDs.add(s.stationuuid));
         return validStations;
       }
     } catch (err) {
+      if (err instanceof AggregateError && err.errors.some(e => e.message === 'Rate limited')) {
+        localStorage.setItem('radio_rate_limit', Date.now() + 15000); // 15s ban
+        throw new Error('Rate limited');
+      }
       console.warn(`Station fetch attempt ${i + 1} failed:`, err);
       // Wait before retrying to allow network to recover (especially for 429/503 errors)
       await new Promise(resolve => setTimeout(resolve, 1000));

@@ -5,6 +5,7 @@ export default function ScoreboardTooltip() {
   const history = useGameStore(state => state.history);
   const round = useGameStore(state => state.round);
   const totalScore = useGameStore(state => state.totalScore);
+  const totalRounds = useGameStore(state => state.totalRounds);
   return (
     <div className="relative group pointer-events-auto" tabIndex="0">
       <div className="bg-white border-2 border-black p-3 shadow-[4px_4px_0_#000] items-center cursor-pointer transition-transform group-hover:-translate-y-0.5 group-focus:-translate-y-0.5">
@@ -13,8 +14,8 @@ export default function ScoreboardTooltip() {
 
       <div className="absolute top-full right-0 mt-3 md:mt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus:opacity-100 group-focus:visible transition-all duration-200 origin-top-right z-50">
         <div className="bg-white border-2 border-black p-3 md:p-4 shadow-[4px_4px_0_#000] w-48 flex flex-col pointer-events-auto">
-          <div className="flex flex-col gap-2">
-            {[1, 2, 3, 4, 5].map(r => {
+          <div className="flex flex-col gap-2 max-h-[40vh] overflow-y-auto custom-scrollbar pr-1">
+            {Array.from({ length: totalRounds }, (_, i) => i + 1).map(r => {
               const pastRound = history[r - 1];
               const isCurrent = !pastRound && r === round;
 

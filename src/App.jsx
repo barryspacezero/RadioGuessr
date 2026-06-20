@@ -1,5 +1,6 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useGameStore } from './store/useGameStore.js';
+import { setAnalyticsContext } from './analytics.js';
 import Globe from './Globe.jsx';
 
 import StartScreen from './components/phases/StartScreen.jsx';
@@ -12,6 +13,36 @@ import VolumeControl from './components/overlays/VolumeControl.jsx';
 export default function App() {
   const clickSound = new Audio('/click.mp3');
   const globe = useRef(null);
+
+  useEffect(() => {
+    // Sync critical game state with GA4 context
+    const unsub = useGameStore.subscribe((state) => {
+      setAnalyticsContext({
+        phase: state.phase,
+        theme: state.theme,
+        talk_mode: state.talkMode,
+        total_rounds: state.totalRounds,
+        current_round: state.round,
+        show_borders: state.showBorders,
+        show_names: state.showNames
+      });
+    });
+    // Initial sync
+    setAnalyticsContext({
+      phase: useGameStore.getState().phase,
+      theme: useGameStore.getState().theme,
+      talk_mode: useGameStore.getState().talkMode,
+      total_rounds: useGameStore.getState().totalRounds,
+      current_round: useGameStore.getState().round,
+      show_borders: useGameStore.getState().showBorders,
+      show_names: useGameStore.getState().showNames
+    });
+    
+    // Kick off initial background preload
+    useGameStore.getState().preloadNextStation();
+
+    return unsub;
+  }, []);
 
   const phase = useGameStore((state) => state.phase);
   const theme = useGameStore((state) => state.theme);

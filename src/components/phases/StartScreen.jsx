@@ -4,6 +4,7 @@ import { Play, Info, Trophy } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import LeaderboardModal from '../ui/LeaderboardModal.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
+import { logEvent } from '../../analytics.js';
 
 const TooltipInfo = ({ text }) => (
   <div tabIndex="0" className="group/tooltip relative flex items-center outline-none">
@@ -90,7 +91,6 @@ export default function StartScreen({ clickSound, globeRef }) {
             <option value="3">3 Rounds</option>
             <option value="5">5 Rounds</option>
             <option value="10">10 Rounds</option>
-            <option value="20">20 Rounds</option>
           </select>
         </div>
       </div>
@@ -153,6 +153,7 @@ export default function StartScreen({ clickSound, globeRef }) {
         href="https://github.com/barryspacezero/RadioGuessr"
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => logEvent('social_click', { platform: 'github' })}
         className="absolute bottom-12 right-6 md:bottom-8 md:right-8 group flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
         title="Star on GitHub"
       >
@@ -161,7 +162,7 @@ export default function StartScreen({ clickSound, globeRef }) {
       </a>
 
       <button
-        onClick={() => { clickSound.currentTime = 0; clickSound.play(); setIsLeaderboardOpen(true); }}
+        onClick={() => { clickSound.currentTime = 0; clickSound.play(); logEvent('leaderboard_opened'); setIsLeaderboardOpen(true); }}
         className="absolute bottom-12 left-6 md:bottom-8 md:left-8 group flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 backdrop-blur-md border-2 border-amber-500/30 text-amber-500 p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
         title="View Leaderboard"
       >

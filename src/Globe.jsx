@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Globe from 'globe.gl';
+import * as topojson from 'topojson-client';
 
 const BUMP = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
 const SKY = 'https://unpkg.com/three-globe/example/img/night-sky.png';
@@ -19,9 +20,12 @@ export default forwardRef(function GlobeView({ onGuess, theme = 'default', showB
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
+    fetch('/countries-110m.json')
       .then(res => res.json())
-      .then(data => setCountries(data.features))
+      .then(data => {
+        const geojson = topojson.feature(data, data.objects.countries);
+        setCountries(geojson.features);
+      })
       .catch(err => console.error("Error loading countries data", err));
   }, []);
 
@@ -65,9 +69,13 @@ export default forwardRef(function GlobeView({ onGuess, theme = 'default', showB
       onGuess({ lat, lng });
     });
 
-    window.addEventListener('resize', () =>
-      globe.width(window.innerWidth).height(window.innerHeight));
+    const handleResize = () => {
+      globe.width(window.innerWidth).height(window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
     g.current = globe;
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []); // eslint-disable-line
 
   useEffect(() => {
@@ -85,7 +93,7 @@ export default forwardRef(function GlobeView({ onGuess, theme = 'default', showB
           .polygonCapColor(() => 'rgba(255, 255, 255, 0)') // Transparent fill
           .polygonSideColor(() => 'rgba(255, 255, 255, 1)')
           .polygonStrokeColor(() => showBorders ? 'rgba(255, 255, 255, 1)' : 'rgba(0,0,0,0)')
-          .polygonLabel(d => showNames ? `<div style="background: #ffffff; border: 2px solid #000; color: #000; padding: 6px 10px; font-weight: 700; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 12px; box-shadow: 3px 3px 0px #000; pointer-events: none; white-space: nowrap;">${d.properties.NAME}</div>` : null)
+          .polygonLabel(d => showNames && d.properties.name ? `<div style="background: #ffffff; border: 2px solid #000; color: #000; padding: 6px 10px; font-weight: 700; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 12px; box-shadow: 3px 3px 0px #000; pointer-events: none; white-space: nowrap;">${d.properties.name}</div>` : null)
           .onPolygonClick((polygon, event, { lat, lng }) => {
             if (!active.current) return;
             g.current.htmlElementsData([{ lat, lng, c: '#ff5252', l: 'Your Guess' }])
