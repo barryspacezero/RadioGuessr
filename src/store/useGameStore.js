@@ -231,7 +231,7 @@ export const useGameStore = create(
     const currentAttemptId = Date.now();
     set({ attemptId: currentAttemptId });
 
-    const fetchAndPlayReroll = async (retriesLeft = 3, existingPool = []) => {
+    const fetchAndPlayReroll = async (retriesLeft = 3, existingPool = get().stationPool) => {
       if (get().attemptId !== currentAttemptId) return;
 
       if (retriesLeft <= 0) {
@@ -284,7 +284,7 @@ export const useGameStore = create(
         const batch = pool.slice(0, 3);
         const remainingPool = pool.slice(batch.length);
 
-        set({ station: batch[0], isAudioLoading: true });
+        set({ station: batch[0], isAudioLoading: true, stationPool: remainingPool });
         
         const fallbackNext = () => {
           if (get().attemptId !== currentAttemptId) return;
@@ -391,6 +391,7 @@ export const useGameStore = create(
       result: { km, score },
       totalScore: totalScore + score,
       phase: 'result',
+      stationPool: [],
       history: [...history, { country: station.country, code: station.countrycode, score: score }],
       allTimeHistory: (() => {
         const currentAllTime = get().allTimeHistory;
