@@ -49,8 +49,8 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
   const shapes = [
     { type: 'circle', containerClass: 'w-28 h-28 md:w-40 md:h-40 rounded-full', innerRingClass: 'rounded-full border-[2px]', borderClass: 'border-[3px] md:border-[4px] border-dashed' },
     { type: 'rectangle', containerClass: 'w-36 h-24 md:w-48 md:h-36 rounded-md', innerRingClass: 'rounded-md border-[2px]', borderClass: 'border-[4px] md:border-[5px] border-double' },
-    { type: 'square', containerClass: 'w-28 h-28 md:w-40 md:h-40 rounded-2xl', innerRingClass: 'rounded-2xl border-[2px]', borderClass: 'border-[3px] md:border-[4px] border-solid' },
-    { type: 'vertical', containerClass: 'w-24 h-32 md:w-36 md:h-48 rounded-lg', innerRingClass: 'rounded-lg border-[2px]', borderClass: 'border-[2px] md:border-[3px] border-solid' }
+    { type: 'square', containerClass: 'w-28 h-28 md:w-40 md:h-40 rounded-sm', innerRingClass: 'rounded-sm border-[2px] border-dashed', borderClass: 'border-[3px] md:border-[4px] border-solid outline outline-[1.5px] outline-offset-2 outline-current' },
+    { type: 'vertical', containerClass: 'w-24 h-32 md:w-36 md:h-48 rounded-sm', innerRingClass: 'rounded-sm border-[2px]', borderClass: 'border-[3px] md:border-[4px] border-dotted outline outline-[1px] outline-offset-1 outline-current' }
   ];
 
   return (
@@ -209,27 +209,59 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
                                 <polygon points="50,15 85,88 15,88" fill="transparent" stroke="currentColor" strokeWidth="1.5" />
                               </svg>
                             )}
+
+                            {/* Postmark wavy lines for vertical stamps */}
+                            {shape.type === 'vertical' && (
+                               <svg className="absolute inset-0 w-full h-full text-current opacity-[0.35] pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                 <path d="M 0,35 Q 12.5,25 25,35 T 50,35 T 75,35 T 100,35" fill="none" stroke="currentColor" strokeWidth="2.5" />
+                                 <path d="M 0,45 Q 12.5,35 25,45 T 50,45 T 75,45 T 100,45" fill="none" stroke="currentColor" strokeWidth="2.5" />
+                                 <path d="M 0,55 Q 12.5,45 25,55 T 50,55 T 75,55 T 100,55" fill="none" stroke="currentColor" strokeWidth="2.5" />
+                                 <path d="M 0,65 Q 12.5,55 25,65 T 50,65 T 75,65 T 100,65" fill="none" stroke="currentColor" strokeWidth="2.5" />
+                               </svg>
+                            )}
                             
                             {/* Inner ring */}
                             {shape.type !== 'triangle' && <div className={`absolute inset-[3px] md:inset-[4px] ${shape.innerRingClass} ${theme.ring} pointer-events-none`} />}
                             
-                            {/* Top Text */}
-                            <span className="text-[10px] md:text-[15px] font-black uppercase tracking-widest leading-none mb-1 md:mb-2 opacity-90 relative z-10">{countryCode}</span>
-                            
-                            {/* Flag */}
-                            <img
-                              src={`https://flagcdn.com/${countryCode.toLowerCase()}.svg`}
-                              alt={countryCode}
-                              className={`w-12 h-8 md:w-16 md:h-12 object-cover opacity-[0.85] mix-blend-multiply filter contrast-125 saturate-50 ${theme.border} border-2 relative z-10`}
-                            />
-                            
-                            {/* Bottom Text */}
-                            <div className="mt-1 md:mt-2 flex flex-col items-center opacity-90 relative z-10">
-                              <span className="text-[7px] md:text-[10px] font-bold uppercase tracking-widest leading-none">
-                                {isTransit ? 'TRANSIT' : isGold ? 'RESIDENT' : 'TOURIST'}
-                              </span>
-                              <span className="text-[10px] md:text-[13px] font-black tracking-widest mt-1 md:mt-1.5">{stampData.score.toLocaleString()}</span>
-                            </div>
+                            {shape.type === 'rectangle' ? (
+                              <div className="flex flex-row items-center justify-center gap-2 md:gap-4 relative z-10 w-full px-2">
+                                {/* Left Side: Flag */}
+                                <img
+                                  src={`https://flagcdn.com/${countryCode.toLowerCase()}.svg`}
+                                  alt={countryCode}
+                                  className={`w-14 h-9 md:w-20 md:h-12 opacity-[0.85] mix-blend-multiply filter contrast-125 saturate-50 ${countryCode === 'NP' ? 'object-contain' : `object-cover ${theme.border} border-2`} shrink-0`}
+                                />
+                                
+                                {/* Right Side: Info */}
+                                <div className="flex flex-col items-start justify-center opacity-90 border-l-[1.5px] md:border-l-2 pl-2 md:pl-3 border-current py-1">
+                                  <span className="text-[12px] md:text-[16px] font-black uppercase tracking-widest leading-none mb-1 md:mb-1.5">{countryCode}</span>
+                                  <span className="text-[6px] md:text-[8px] font-bold uppercase tracking-widest leading-none mb-1 md:mb-1.5">
+                                    {isTransit ? 'TRANSIT' : isGold ? 'RESIDENT' : 'TOURIST'}
+                                  </span>
+                                  <span className="text-[9px] md:text-[12px] font-black tracking-widest leading-none">{stampData.score.toLocaleString()}</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                {/* Top Text */}
+                                <span className="text-[10px] md:text-[15px] font-black uppercase tracking-widest leading-none mb-1 md:mb-2 opacity-90 relative z-10">{countryCode}</span>
+                                
+                                {/* Flag */}
+                                <img
+                                  src={`https://flagcdn.com/${countryCode.toLowerCase()}.svg`}
+                                  alt={countryCode}
+                                  className={`w-12 h-8 md:w-16 md:h-12 opacity-[0.85] mix-blend-multiply filter contrast-125 saturate-50 ${countryCode === 'NP' ? 'object-contain' : `object-cover ${theme.border} border-2`} relative z-10`}
+                                />
+                                
+                                {/* Bottom Text */}
+                                <div className="mt-1 md:mt-2 flex flex-col items-center opacity-90 relative z-10">
+                                  <span className="text-[7px] md:text-[10px] font-bold uppercase tracking-widest leading-none">
+                                    {isTransit ? 'TRANSIT' : isGold ? 'RESIDENT' : 'TOURIST'}
+                                  </span>
+                                  <span className="text-[10px] md:text-[13px] font-black tracking-widest mt-1 md:mt-1.5">{stampData.score.toLocaleString()}</span>
+                                </div>
+                              </>
+                            )}
                             
                             {/* Subtle arc text simulation for circle only */}
                             {shape.type === 'circle' && (
