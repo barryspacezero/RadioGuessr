@@ -104,12 +104,15 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
                 <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
               </button>
 
-              <div className="flex flex-col items-center flex-1">
-                <span className="text-[8px] md:text-[9px] font-bold text-black/50 uppercase tracking-widest leading-none mb-1">Region</span>
-                <span className="text-xs md:text-sm font-black uppercase tracking-widest text-center text-black leading-none">{currentRegion}</span>
-                <span className="text-[8px] font-bold text-black/40 uppercase tracking-widest mt-0.5">
-                  Page {currentRegionIndex + 1} of {regionNames.length}
-                </span>
+              <div className="flex flex-col items-center">
+                <span className="text-[8px] md:text-[9px] font-bold text-black/40 uppercase tracking-widest leading-none mb-0.5">Region</span>
+                <span className="text-sm md:text-base font-black text-black uppercase tracking-widest leading-none">{currentRegion}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[8px] md:text-[10px] font-bold text-black/30 uppercase tracking-wider">Page {currentRegionIndex + 1} of {regionNames.length}</span>
+                  <span className="text-[8px] md:text-[9px] font-bold text-amber-600/80 uppercase tracking-widest animate-pulse hidden md:inline">|</span>
+                  <span className="text-[8px] md:text-[9px] font-bold text-amber-600/80 uppercase tracking-widest animate-pulse hidden md:inline">Click stamps for stats</span>
+                </div>
+                <span className="text-[8px] font-bold text-amber-600/80 uppercase tracking-widest animate-pulse mt-1 md:hidden">Tap stamps for stats</span>
               </div>
 
               <button
@@ -174,9 +177,14 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
                         className={`relative group flex flex-col items-center focus:outline-none transition-all duration-300 ${!isMissing ? 'cursor-pointer hover:scale-[1.15]' : ''} ${xOffset} ${yOffset} ${zIndex} -ml-1 md:-ml-2 hover:!z-[60]`}
                       >
                         {/* Custom Tooltip */}
-                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 group-focus:scale-100 transition-transform origin-bottom bg-black text-white text-xs md:text-sm font-bold px-3 py-1.5 md:px-4 md:py-2 border-2 border-white/20 whitespace-nowrap z-[100] pointer-events-none shadow-xl">
-                          {getCountryName(countryCode)}
-                          {isMissing && <span className="ml-2 text-white/50 text-[10px] md:text-xs">(Undiscovered)</span>}
+                        <div className="absolute -top-14 md:-top-16 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 group-focus:scale-100 transition-transform origin-bottom bg-black text-white text-xs md:text-sm font-bold px-3 py-1.5 md:px-4 md:py-2 border-2 border-white/20 whitespace-nowrap z-[100] pointer-events-none shadow-xl flex flex-col items-center">
+                          <div className="flex items-center">
+                            {getCountryName(countryCode)}
+                            {isMissing && <span className="ml-2 text-white/50 text-[10px] md:text-xs">(Undiscovered)</span>}
+                          </div>
+                          {!isMissing && (
+                            <span className="text-[8px] md:text-[9px] text-amber-400/90 font-medium tracking-widest uppercase mt-1">Click to view Visa Stats</span>
+                          )}
                           <div className="absolute left-1/2 -bottom-[5px] md:-bottom-[6px] w-2 h-2 md:w-3 md:h-3 bg-black border-r-2 border-b-2 border-white/20 rotate-45 -translate-x-1/2" />
                         </div>
 
