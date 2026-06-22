@@ -47,10 +47,10 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
   ];
 
   const shapes = [
-    { type: 'circle', containerClass: 'w-32 h-32 md:w-40 md:h-40 rounded-full', innerRingClass: 'rounded-full border-[2px]', borderClass: 'border-[4px] border-dashed' },
-    { type: 'rectangle', containerClass: 'w-40 h-28 md:w-48 md:h-36 rounded-md', innerRingClass: 'rounded-md border-[2px]', borderClass: 'border-[5px] border-double' },
-    { type: 'square', containerClass: 'w-32 h-32 md:w-40 md:h-40 rounded-2xl', innerRingClass: 'rounded-2xl border-[2px]', borderClass: 'border-[4px] border-solid' },
-    { type: 'vertical', containerClass: 'w-28 h-36 md:w-36 md:h-48 rounded-lg', innerRingClass: 'rounded-lg border-[2px]', borderClass: 'border-[3px] border-solid' }
+    { type: 'circle', containerClass: 'w-28 h-28 md:w-40 md:h-40 rounded-full', innerRingClass: 'rounded-full border-[2px]', borderClass: 'border-[3px] md:border-[4px] border-dashed' },
+    { type: 'rectangle', containerClass: 'w-36 h-24 md:w-48 md:h-36 rounded-md', innerRingClass: 'rounded-md border-[2px]', borderClass: 'border-[4px] md:border-[5px] border-double' },
+    { type: 'square', containerClass: 'w-28 h-28 md:w-40 md:h-40 rounded-2xl', innerRingClass: 'rounded-2xl border-[2px]', borderClass: 'border-[3px] md:border-[4px] border-solid' },
+    { type: 'vertical', containerClass: 'w-24 h-32 md:w-36 md:h-48 rounded-lg', innerRingClass: 'rounded-lg border-[2px]', borderClass: 'border-[2px] md:border-[3px] border-solid' }
   ];
 
   return (
@@ -132,7 +132,7 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 }}
-                  className="px-8 pt-16 pb-8 md:px-12 md:pt-20 md:pb-12 flex flex-wrap justify-center items-center gap-x-2 gap-y-6 md:gap-x-4 md:gap-y-8 w-full min-h-full"
+                  className="px-2 pt-16 pb-8 md:px-12 md:pt-20 md:pb-12 flex flex-wrap justify-center items-center gap-x-1 gap-y-6 md:gap-x-4 md:gap-y-8 w-full min-h-full"
                 >
                   {regionCountries.length === 0 && currentRegion === 'All Stamps' && (
                     <span className="text-black/50 font-bold tracking-widest uppercase text-center w-full mt-4">
@@ -143,7 +143,11 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
                     const stampData = uniqueStampsMap.get(countryCode);
                     const isMissing = !stampData;
                     
-                    const shape = shapes[index % shapes.length];
+                    let shape = shapes[index % shapes.length];
+                    if (countryCode === 'NP') {
+                      shape = { type: 'triangle', containerClass: 'w-32 h-32 md:w-44 md:h-44 pt-6 md:pt-8', innerRingClass: '', borderClass: '' };
+                    }
+                    
                     const rotation = index % 5 === 0 ? '-rotate-[10deg]' : index % 5 === 1 ? 'rotate-[6deg]' : index % 5 === 2 ? '-rotate-[4deg]' : index % 5 === 3 ? 'rotate-[12deg]' : '-rotate-[6deg]';
                     const fade = index % 2 === 0 ? 'opacity-80' : 'opacity-95';
                     const xOffset = index % 4 === 0 ? 'translate-x-1' : index % 4 === 1 ? '-translate-x-2' : index % 4 === 2 ? 'translate-x-3' : '-translate-x-1';
@@ -189,31 +193,42 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
                         </div>
 
                         {isMissing ? (
-                          <div className={`relative flex flex-col items-center justify-center ${shape.containerClass} border-2 border-dashed border-black/10 bg-black/5`}>
-                            <span className="text-4xl md:text-5xl font-black text-black/10 font-serif">?</span>
+                          <div className={`relative flex flex-col items-center justify-center ${shape.containerClass} ${shape.type === 'triangle' ? '' : 'border-2 border-dashed border-black/10 bg-black/5'}`}>
+                            {shape.type === 'triangle' && (
+                               <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                 <polygon points="50,5 95,95 5,95" fill="#000" stroke="#000" strokeWidth="2" strokeDasharray="4 4" />
+                               </svg>
+                            )}
+                            <span className="text-4xl md:text-5xl font-black text-black/10 font-serif relative z-10">?</span>
                           </div>
                         ) : (
                           <div className={`relative flex flex-col items-center justify-center ${shape.containerClass} ${shape.borderClass} p-2 mix-blend-multiply ${theme.border} ${theme.text} ${rotation} ${fade} filter ${isGold ? 'drop-shadow-[0_0_12px_rgba(234,179,8,0.6)] saturate-150' : 'hover:saturate-125'} hover:opacity-100 transition-all`}>
+                            {shape.type === 'triangle' && (
+                              <svg className="absolute inset-0 w-full h-full text-current pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <polygon points="50,5 95,95 5,95" fill="transparent" stroke="currentColor" strokeWidth="3" />
+                                <polygon points="50,15 85,88 15,88" fill="transparent" stroke="currentColor" strokeWidth="1.5" />
+                              </svg>
+                            )}
                             
                             {/* Inner ring */}
-                            <div className={`absolute inset-[3px] md:inset-[4px] ${shape.innerRingClass} ${theme.ring} pointer-events-none`} />
+                            {shape.type !== 'triangle' && <div className={`absolute inset-[3px] md:inset-[4px] ${shape.innerRingClass} ${theme.ring} pointer-events-none`} />}
                             
                             {/* Top Text */}
-                            <span className="text-[12px] md:text-[15px] font-black uppercase tracking-widest leading-none mb-1 md:mb-2 opacity-90 relative z-10">{countryCode}</span>
+                            <span className="text-[10px] md:text-[15px] font-black uppercase tracking-widest leading-none mb-1 md:mb-2 opacity-90 relative z-10">{countryCode}</span>
                             
                             {/* Flag */}
                             <img
                               src={`https://flagcdn.com/${countryCode.toLowerCase()}.svg`}
                               alt={countryCode}
-                              className={`w-14 h-10 md:w-16 md:h-12 object-cover opacity-[0.85] mix-blend-multiply filter contrast-125 saturate-50 ${theme.border} border-2 relative z-10`}
+                              className={`w-12 h-8 md:w-16 md:h-12 object-cover opacity-[0.85] mix-blend-multiply filter contrast-125 saturate-50 ${theme.border} border-2 relative z-10`}
                             />
                             
                             {/* Bottom Text */}
                             <div className="mt-1 md:mt-2 flex flex-col items-center opacity-90 relative z-10">
-                              <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest leading-none">
+                              <span className="text-[7px] md:text-[10px] font-bold uppercase tracking-widest leading-none">
                                 {isTransit ? 'TRANSIT' : isGold ? 'RESIDENT' : 'TOURIST'}
                               </span>
-                              <span className="text-[11px] md:text-[13px] font-black tracking-widest mt-1 md:mt-1.5">{stampData.score.toLocaleString()}</span>
+                              <span className="text-[10px] md:text-[13px] font-black tracking-widest mt-1 md:mt-1.5">{stampData.score.toLocaleString()}</span>
                             </div>
                             
                             {/* Subtle arc text simulation for circle only */}
@@ -229,17 +244,24 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
                             )}
 
                             {/* Linear border text for non-circles */}
-                            {shape.type !== 'circle' && (
+                            {shape.type !== 'circle' && shape.type !== 'triangle' && (
                                <div className="absolute inset-x-0 bottom-2 md:bottom-2.5 flex justify-center opacity-50 pointer-events-none">
                                  <span className="text-[6px] md:text-[8px] font-black uppercase tracking-widest leading-none">
                                    {isGold ? 'GOLD CLASS VISA' : isTransit ? 'TEMPORARY VISA' : 'RADIO GSSR OFFICIAL'}
                                  </span>
                                </div>
                             )}
-                            {shape.type !== 'circle' && (
+                            {shape.type !== 'circle' && shape.type !== 'triangle' && (
                                <div className="absolute inset-x-0 top-2 md:top-2.5 flex justify-center opacity-50 pointer-events-none">
                                  <span className="text-[6px] md:text-[8px] font-black uppercase tracking-widest leading-none">
                                    {isTransit ? 'DENIED ENTRY' : 'VISA APPROVED'}
+                                 </span>
+                               </div>
+                            )}
+                            {shape.type === 'triangle' && (
+                               <div className="absolute inset-x-0 bottom-[14px] md:bottom-[18px] flex justify-center opacity-50 pointer-events-none">
+                                 <span className="text-[5px] md:text-[6px] font-black uppercase tracking-widest leading-none">
+                                   {isGold ? 'GOLD CLASS VISA' : isTransit ? 'TEMPORARY VISA' : 'RADIO GSSR OFFICIAL'}
                                  </span>
                                </div>
                             )}
