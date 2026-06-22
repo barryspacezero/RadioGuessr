@@ -394,17 +394,18 @@ export const useGameStore = create(
       stationPool: [],
       history: [...history, { country: station.country, code: station.countrycode, score: score }],
       allTimeHistory: (() => {
-        const currentAllTime = get().allTimeHistory;
+        const currentAllTime = get().allTimeHistory || [];
         const existingIndex = currentAllTime.findIndex(h => h.code === station.countrycode);
         if (existingIndex !== -1) {
-          if (score > currentAllTime[existingIndex].score) {
-            const updated = [...currentAllTime];
-            updated[existingIndex] = { ...updated[existingIndex], score: score };
-            return updated;
-          }
-          return currentAllTime;
+          const updated = [...currentAllTime];
+          updated[existingIndex] = { 
+            ...updated[existingIndex], 
+            score: Math.max(updated[existingIndex].score || 0, score),
+            visits: (updated[existingIndex].visits || 1) + 1
+          };
+          return updated;
         }
-        return [...currentAllTime, { country: station.country, code: station.countrycode, score: score }];
+        return [...currentAllTime, { country: station.country, code: station.countrycode, score: score, visits: 1, firstDiscovered: Date.now() }];
       })()
     });
 

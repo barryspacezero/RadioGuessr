@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Info, Trophy } from 'lucide-react';
+import { Play, Info, Trophy, Book } from 'lucide-react';
 import GithubIcon from '../ui/GithubIcon.jsx';
 import LeaderboardModal from '../ui/LeaderboardModal.jsx';
+import PassportModal from '../ui/PassportModal.jsx';
 import { useGameStore } from '../../store/useGameStore.js';
 import { logEvent } from '../../analytics.js';
 
@@ -29,8 +30,10 @@ export default function StartScreen({ clickSound, globeRef }) {
   const setTotalRounds = useGameStore(state => state.setTotalRounds);
   const error = useGameStore(state => state.error);
   const startRound = useGameStore(state => state.startRound);
+  const allTimeHistory = useGameStore(state => state.allTimeHistory);
   
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isPassportOpen, setIsPassportOpen] = useState(false);
 
   return (
     <>
@@ -170,8 +173,18 @@ export default function StartScreen({ clickSound, globeRef }) {
         <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Leaderboard</span>
       </button>
 
+      <button
+        onClick={() => { clickSound.currentTime = 0; clickSound.play(); setIsPassportOpen(true); }}
+        className="absolute bottom-28 left-6 md:bottom-24 md:left-8 group flex items-center justify-center gap-2 bg-sky-500/10 hover:bg-sky-500/20 backdrop-blur-md border-2 border-sky-500/30 text-sky-400 p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+        title="View Passport"
+      >
+        <Book className="w-6 h-6 shrink-0 opacity-90 group-hover:opacity-100" />
+        <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Passport</span>
+      </button>
+
     </motion.div>
     <LeaderboardModal isOpen={isLeaderboardOpen} onClose={() => { clickSound.currentTime = 0; clickSound.play(); setIsLeaderboardOpen(false); }} />
+    <PassportModal isOpen={isPassportOpen} onClose={() => { clickSound.currentTime = 0; clickSound.play(); setIsPassportOpen(false); }} clickSound={clickSound} allTimeHistory={allTimeHistory} />
     </>
   );
 }

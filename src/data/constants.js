@@ -27,24 +27,24 @@ export const COUNTRY_STATION_COUNTS = {
 };
 
 export const REGIONS = {
-  'South Asia': ['IN', 'PK', 'BD', 'LK', 'NP', 'AF', 'MV'],
+  'South Asia': ['IN', 'PK', 'BD', 'LK', 'NP', 'AF', 'MV', 'BT'],
   'East Asia': ['JP', 'KR', 'CN', 'TW', 'MN', 'HK'],
   'Southeast Asia': ['ID', 'TH', 'VN', 'PH', 'MY', 'SG', 'MM', 'KH', 'LA', 'BN'],
   'Central Asia': ['KZ', 'UZ', 'TM', 'KG', 'TJ'],
   'Middle East': ['IR', 'IQ', 'SA', 'AE', 'YE', 'OM', 'QA', 'KW', 'BH', 'JO', 'SY', 'LB', 'IL', 'PS'],
   'Africa - North': ['EG', 'LY', 'TN', 'DZ', 'MA', 'SD', 'SS'],
   'Africa - West': ['NG', 'GH', 'SN', 'CI', 'ML', 'BF', 'NE', 'GN', 'TG', 'BJ', 'LR', 'SL', 'GM', 'GW', 'MR', 'CV'],
-  'Africa - East': ['KE', 'ET', 'TZ', 'UG', 'RW', 'BI', 'SO', 'DJ', 'ER', 'MG', 'MU', 'SC'],
+  'Africa - East': ['KE', 'ET', 'TZ', 'UG', 'RW', 'BI', 'SO', 'DJ', 'ER', 'MG', 'MU', 'SC', 'RE'],
   'Africa - Central': ['CM', 'TD', 'CF', 'CG', 'CD', 'GA', 'GQ', 'ST', 'AO'],
   'Africa - South': ['ZA', 'ZW', 'ZM', 'MW', 'MZ', 'BW', 'NA', 'SZ', 'LS'],
-  'Europe': ['DE', 'FR', 'ES', 'PT', 'IT', 'NL', 'BE', 'CH', 'AT', 'LU', 'IE', 'GB', 'SE', 'NO', 'DK', 'FI', 'IS', 'EE', 'LV', 'LT', 'PL', 'RO', 'UA', 'BY', 'RU', 'CZ', 'SK', 'HU', 'MD', 'GR', 'TR', 'RS', 'HR', 'BA', 'SI', 'MK', 'AL', 'ME', 'BG', 'CY', 'MT'],
+  'Europe': ['DE', 'FR', 'ES', 'PT', 'IT', 'NL', 'BE', 'CH', 'AT', 'LU', 'IE', 'GB', 'SE', 'NO', 'DK', 'FI', 'IS', 'EE', 'LV', 'LT', 'PL', 'RO', 'UA', 'BY', 'RU', 'CZ', 'SK', 'HU', 'MD', 'GR', 'TR', 'RS', 'HR', 'BA', 'SI', 'MK', 'AL', 'ME', 'BG', 'CY', 'MT', 'AD', 'FO', 'GI', 'MC', 'VA', 'XK'],
   'Caucasus': ['GE', 'AM', 'AZ'],
-  'North America': ['US', 'CA', 'MX'],
-  'Caribbean': ['CU', 'JM', 'HT', 'DO', 'PR', 'TT', 'BB', 'LC', 'VC', 'GD', 'AG', 'DM', 'KN', 'BS'],
+  'North America': ['US', 'CA', 'MX', 'BM', 'GL'],
+  'Caribbean': ['CU', 'JM', 'HT', 'DO', 'PR', 'TT', 'BB', 'LC', 'VC', 'GD', 'AG', 'DM', 'KN', 'BS', 'AI', 'AW', 'CW', 'GP', 'KY', 'MQ'],
   'Central America': ['GT', 'BZ', 'SV', 'HN', 'NI', 'CR', 'PA'],
   'South America': ['BR', 'AR', 'CO', 'VE', 'PE', 'CL', 'EC', 'BO', 'PY', 'UY', 'GY', 'SR', 'GF'],
   'Oceania': ['AU', 'NZ', 'PG', 'FJ', 'SB', 'VU', 'WS', 'TO', 'KI', 'FM', 'PW'],
-  'Pacific / Territories': ['NC', 'PF', 'GU', 'MP'],
+  'Pacific / Territories': ['NC', 'PF', 'GU', 'MP', 'AS'],
 };
 
 export const COUNTRY_TO_REGION = {};

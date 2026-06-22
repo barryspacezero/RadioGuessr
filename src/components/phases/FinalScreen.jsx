@@ -6,6 +6,7 @@ import { useGameStore } from '../../store/useGameStore.js';
 import { logEvent } from '../../analytics.js';
 import { supabase } from '../../supabase.js';
 import CountrySelect from '../ui/CountrySelect.jsx';
+import PassportModal from '../ui/PassportModal.jsx';
 
 export default function FinalScreen({ clickSound }) {
   const history = useGameStore(state => state.history);
@@ -261,83 +262,12 @@ export default function FinalScreen({ clickSound }) {
 
       </motion.div>
 
-      {/* Passport Modal */}
-      <AnimatePresence>
-        {isHistoryOpen && (
-          <motion.div
-            key="passport"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-[#FDFBF7] border-[3px] border-black w-[95%] max-w-xl flex flex-col max-h-[85vh] shadow-[8px_8px_0_#000]"
-            >
-              <div className="flex items-center justify-between p-4 md:p-5 border-b-[3px] border-black bg-white z-10 relative">
-                <div className="flex items-center gap-3">
-                  <Book className="w-6 h-6 text-black" />
-                  <h2 className="text-xl font-black text-black uppercase tracking-widest mt-1">Passport Stamps</h2>
-                </div>
-                <button
-                  onClick={() => { clickSound.currentTime = 0; clickSound.play(); setIsHistoryOpen(false); }}
-                  className="text-black hover:scale-110 active:scale-95 transition-transform"
-                >
-                  <X className="w-7 h-7 font-bold" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto px-4 py-6 md:px-6 md:py-8 custom-scrollbar-light flex flex-wrap justify-center items-center gap-x-6 gap-y-10">
-                {(() => {
-                  const uniqueStampsMap = new Map();
-                  allTimeHistory.forEach(item => {
-                    if (!uniqueStampsMap.has(item.code)) {
-                      uniqueStampsMap.set(item.code, item);
-                    } else if (item.score > uniqueStampsMap.get(item.code).score) {
-                      uniqueStampsMap.get(item.code).score = item.score;
-                    }
-                  });
-                  const uniqueStamps = Array.from(uniqueStampsMap.values());
-
-                  if (uniqueStamps.length === 0) {
-                    return <span className="text-black/50 font-bold tracking-widest uppercase">No stamps yet.</span>;
-                  }
-
-                  return uniqueStamps.map((item, index) => {
-                  const rotation = index % 3 === 0 ? '-rotate-2' : index % 3 === 1 ? 'rotate-3' : 'rotate-1';
-                  return (
-                    <div key={index} tabIndex="0" className={`relative group flex flex-col items-center cursor-pointer focus:outline-none ${rotation} hover:rotate-0 transition-all duration-300`}>
-
-                      {/* Custom Tooltip */}
-                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 scale-0 group-hover:scale-100 group-focus:scale-100 transition-transform origin-bottom bg-black text-white text-xs font-bold px-3 py-1.5 border-2 border-white/20 whitespace-nowrap z-50 pointer-events-none shadow-lg">
-                        {item.country}
-                        <div className="absolute left-1/2 -bottom-[5px] w-2 h-2 bg-black border-r-2 border-b-2 border-white/20 rotate-45 -translate-x-1/2" />
-                      </div>
-
-                      {item.code && (
-                        <div className="flex flex-col items-center border-[3px] border-black/70 p-2 mix-blend-multiply opacity-80 filter contrast-125 saturate-[0.6] sepia-[0.2] group-hover:opacity-100 group-hover:saturate-100 group-hover:sepia-0 group-hover:border-black transition-all">
-                          <img
-                            src={`https://flagcdn.com/${item.code.toLowerCase()}.svg`}
-                            alt={item.country}
-                            className="h-10 md:h-12 w-auto border-2 border-black/70 object-cover"
-                          />
-                          <div className="mt-2 pt-1 border-t-2 border-black/70 w-full text-center">
-                            <span className="text-[11px] font-black tracking-widest text-black/80">{item.score.toLocaleString()}</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                });
-              })()}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <PassportModal 
+        isOpen={isHistoryOpen} 
+        onClose={() => setIsHistoryOpen(false)} 
+        clickSound={clickSound} 
+        allTimeHistory={allTimeHistory} 
+      />
     </>
   );
 }
