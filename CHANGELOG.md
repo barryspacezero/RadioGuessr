@@ -2,6 +2,13 @@
 
 All notable changes to the **RadioGuessr** project will be documented in this file.
 
+## [2.3.0] - 2026-06-22
+### Added
+- **Passport Overhaul**: Completely transformed the session history into a beautifully chaotic, paginated passport mini-game. Stamps now overlap, rotate, and scale to mimic a real booklet.
+- **Regional Navigation**: The Passport is now categorized by continent (e.g., Europe, South Asia), allowing you to flip through pages.
+- **Missing Stamps Tracker**: Undiscovered countries now show up as faded "❓" dotted outlines, driving completionists to explore every region.
+- **Visa Tiers & Interactive Flips**: Stamps are dynamically color-coded with specific border shapes based on your score (e.g., Gold Class Resident for high scores, Temporary Transit for low scores). Click on any unlocked stamp to see exactly how many times you've visited and when you first discovered it!
+
 ## [2.2.0] - 2026-06-20
 ### Added
 - **Zero-Latency Preloading Engine**: Decoupled network requests from user interaction by silently buffering stations in the background while users view the Start Screen or Results panel, dropping the perceived loading time to 0.

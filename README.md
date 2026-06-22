@@ -24,6 +24,7 @@ A GeoGuessr-style game where you tune into live radio streams from around the wo
 - **Global Leaderboard (v2.0)**: Powered by Supabase, compete globally for the highest scores. Filter top players based on the specific round length you are playing.
 - **Lifetime Passport Stamps (v2.1)**: Your session history is now a persistent, global "Passport" stored locally. Every country you ever discover is permanently stamped into your profile across sessions!
 - **Auto-Failover API Load Balancer (v2.1)**: The engine now utilizes a dynamic array of global Radio Browser servers, acting as its own load-balancer to completely eliminate game crashes and 503 errors.
+- **Passport Mini-Game Overhaul (v2.3)**: Completely transformed the session history into a beautifully chaotic, paginated passport. Features overlapping stamps, regional pages, missing country silhouettes, and dynamic Visa tiers based on your score.
 
 ## 🛠️ Tech Stack
 
@@ -86,4 +87,4 @@ Ensure you have [Node.js](https://nodejs.org/) installed along with standard pac
 
 ---
 
-*Game Version: 2.1*
+*Game Version: 2.3*
