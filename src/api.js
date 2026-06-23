@@ -97,34 +97,28 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
       }
 
       const params = new URLSearchParams(searchParamsObj);
+      const apiNode = nodes[Math.floor(Math.random() * nodes.length)];
       
-      // Concurrent fetching across all nodes (Happy Eyeballs)
       const controller = new AbortController();
-      // Ensure we don't hang forever on unresponsive APIs
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const fetchPromises = nodes.map(apiNode => 
-        fetch(`${apiNode}/json/stations/search?${params}`, {
-          signal: controller.signal
-        }).then(async res => {
-          if (!res.ok) {
-            if (res.status === 429 || res.status === 503) {
-              throw new Error('Rate limited');
-            }
-            throw new Error(`Node ${apiNode} failed with status ${res.status}`);
-          }
-          return res.json();
-        })
-      );
-      
-      let stations;
+      let res;
       try {
-        stations = await Promise.any(fetchPromises);
+        res = await fetch(`${apiNode}/json/stations/search?${params}`, {
+          signal: controller.signal
+        });
       } finally {
         clearTimeout(timeoutId);
-        controller.abort(); // Cancel the slower parallel requests
       }
 
+      if (!res.ok) {
+        if (res.status === 429 || res.status === 503) {
+          throw new Error('Rate limited');
+        }
+        throw new Error(`Node ${apiNode} failed with status ${res.status}`);
+      }
+
+      let stations = await res.json();
       let list = stations;
 
       if (talkMode && list.length > 0) {
@@ -172,9 +166,9 @@ export async function fetchStation(targetCountry = null, talkMode = false) {
         validStations.push({
           stationuuid: s.stationuuid,
           name: s.name || 'Unknown Station', url,
-          country: s.country || '', countrycode: s.countrycode || '',
-          state: s.state || COUNTRY_TO_CITY[s.countrycode] || '', lat, lng,
-          language: s.language || COUNTRY_TO_LANGUAGE[s.countrycode] || 'Unknown',
+          country: s.country || '', countrycode: (s.countrycode || '').toUpperCase(),
+          state: s.state || COUNTRY_TO_CITY[s.countrycode?.toUpperCase()] || '', lat, lng,
+          language: s.language || COUNTRY_TO_LANGUAGE[s.countrycode?.toUpperCase()] || 'Unknown',
         });
       }
       

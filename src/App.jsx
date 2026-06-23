@@ -1,4 +1,13 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
+
+function checkWebGLSupport() {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+  } catch (e) {
+    return false;
+  }
+}
 import { useGameStore } from './store/useGameStore.js';
 import { setAnalyticsContext } from './analytics.js';
 import Globe from './Globe.jsx';
@@ -11,6 +20,12 @@ import ScoreboardTooltip from './components/overlays/ScoreboardTooltip.jsx';
 import VolumeControl from './components/overlays/VolumeControl.jsx';
 
 export default function App() {
+  const [webGLSupported, setWebGLSupported] = useState(true);
+
+  useEffect(() => {
+    setWebGLSupported(checkWebGLSupport());
+  }, []);
+
   const clickSound = new Audio('/click.mp3');
   const globe = useRef(null);
 
@@ -49,6 +64,27 @@ export default function App() {
   const showBorders = useGameStore((state) => state.showBorders);
   const showNames = useGameStore((state) => state.showNames);
   const setGuess = useGameStore((state) => state.setGuess);
+
+  if (!webGLSupported) {
+    return (
+      <div className="w-screen h-screen flex flex-col items-center justify-center bg-zinc-950 text-white p-6 text-center font-sans">
+        <div className="max-w-md w-full bg-zinc-900/80 backdrop-blur-sm rounded-3xl p-8 border border-zinc-800 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+          <div className="w-20 h-20 mx-auto bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold mb-4 text-white tracking-tight">WebGL Required</h1>
+          <p className="text-zinc-400 mb-8 leading-relaxed text-lg">
+            RadioGuessr uses a 3D globe which requires WebGL. It seems your browser doesn't support WebGL or it is disabled.
+          </p>
+          <div className="bg-zinc-800/50 rounded-xl p-5 text-sm text-zinc-300 border border-zinc-700/50 shadow-inner">
+            Please enable WebGL in your browser settings, or try using a different modern browser like Chrome, Firefox, or Safari.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">

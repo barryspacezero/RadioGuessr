@@ -401,7 +401,8 @@ export const useGameStore = create(
           updated[existingIndex] = { 
             ...updated[existingIndex], 
             score: Math.max(updated[existingIndex].score || 0, score),
-            visits: (updated[existingIndex].visits || 1) + 1
+            visits: (updated[existingIndex].visits || 1) + 1,
+            firstDiscovered: updated[existingIndex].firstDiscovered || Date.now()
           };
           return updated;
         }
