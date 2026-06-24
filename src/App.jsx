@@ -11,7 +11,7 @@ function checkWebGLSupport() {
 import { useGameStore } from './store/useGameStore.js';
 import { setAnalyticsContext } from './analytics.js';
 import Globe from './Globe.jsx';
-
+import MapLibreGlobe from './MapLibreGlobe.jsx';
 import StartScreen from './components/phases/StartScreen.jsx';
 import FinalScreen from './components/phases/FinalScreen.jsx';
 import PlayingScreen from './components/phases/PlayingScreen.jsx';
@@ -86,9 +86,15 @@ export default function App() {
     );
   }
 
+  const useMapLibre = import.meta.env.VITE_USE_MAPLIBRE !== 'false' && !!import.meta.env.VITE_MAPTILER_TOKEN;
+
   return (
     <div className="relative w-screen h-screen overflow-hidden">
-      <Globe ref={globe} onGuess={setGuess} theme={theme} showBorders={showBorders} showNames={showNames} />
+      {useMapLibre ? (
+        <MapLibreGlobe ref={globe} onGuess={setGuess} theme={theme} showBorders={showBorders} showNames={showNames} />
+      ) : (
+        <Globe ref={globe} onGuess={setGuess} theme={theme} showBorders={showBorders} showNames={showNames} />
+      )}
 
       {phase !== 'start' && (
         <>
