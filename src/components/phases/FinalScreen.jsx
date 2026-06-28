@@ -104,6 +104,25 @@ export default function FinalScreen({ clickSound }) {
     ? (scores.findIndex(s => totalScore >= s.score) === -1 ? scores.length + 1 : scores.findIndex(s => totalScore >= s.score) + 1) 
     : 1;
 
+  const handlePlayAgain = () => {
+    clickSound.currentTime = 0;
+    clickSound.play();
+
+    // Auto-submit score if they entered a name but forgot to click submit
+    if (playerName.trim() && !submitSuccess && supabase) {
+      supabase.from('leaderboard').insert([
+        {
+          player_name: playerName.trim(),
+          score: totalScore,
+          rounds: totalRounds,
+          country_code: selectedCountry
+        }
+      ]).catch(console.error);
+    }
+
+    resetGame();
+  };
+
   return (
     <>
       <motion.div
@@ -129,10 +148,11 @@ export default function FinalScreen({ clickSound }) {
               </div>
             ) : scoresError ? (
               <span className="text-red-400 text-sm font-bold text-center p-2">{scoresError}</span>
-            ) : scores.length === 0 ? (
-              <span className="text-white/50 text-sm font-bold text-center uppercase p-2">No scores yet. Be the first!</span>
             ) : (
               <>
+                {scores.length === 0 && (
+                  <span className="text-white/50 text-sm font-bold text-center uppercase p-2">No scores yet. Be the first!</span>
+                )}
                 {scores.map((entry, idx) => {
                   const isFormHere = !submitSuccess && userProjectedRank === idx + 1;
                   return (
@@ -243,7 +263,7 @@ export default function FinalScreen({ clickSound }) {
             <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Passport</span>
           </button>
 
-          <button className="btn text-lg py-3 px-8 md:px-12 bg-amber-400 hover:bg-amber-300 text-black border-2 border-black transition-colors uppercase tracking-widest font-black shadow-[4px_4px_0_#000]" onClick={() => { clickSound.currentTime = 0; clickSound.play(); resetGame(); }}>
+          <button className="btn text-lg py-3 px-8 md:px-12 bg-amber-400 hover:bg-amber-300 text-black border-2 border-black transition-colors uppercase tracking-widest font-black shadow-[4px_4px_0_#000]" onClick={handlePlayAgain}>
             Play Again
           </button>
 
