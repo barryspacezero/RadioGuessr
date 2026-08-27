@@ -2,6 +2,11 @@
 
 All notable changes to the **RadioGuessr** project will be documented in this file.
 
+## [2.4.0] - 2026-08-27
+### Added
+- **Shareable Endgame Score Card**: Generate a shareable visual summary of your game, including total score, rounds played, global rank, and top collected stamps. Uses the native Web Share API with a seamless image download fallback.
+- **Optimized Rendering**: Replaced `html-to-image` with `html2canvas` for instantaneous card generation without freezing the browser.
+
 ## [2.3.0] - 2026-06-22
 ### Added
 - **Passport Overhaul**: Completely transformed the session history into a beautifully chaotic, paginated passport mini-game. Stamps now overlap, rotate, and scale to mimic a real booklet.

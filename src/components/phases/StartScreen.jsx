@@ -56,7 +56,7 @@ export default function StartScreen({ clickSound, globeRef }) {
           style={{ fontFamily: '"Press Start 2P", monospace' }}
           className="absolute -top-4 -right-10 text-amber-400 text-lg drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] origin-center"
         >
-          2.3!
+          2.4!
         </motion.span>
       </div>
       <p className="text-sm text-white text-center max-w-[260px] leading-relaxed">
@@ -149,7 +149,7 @@ export default function StartScreen({ clickSound, globeRef }) {
       <button className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-all shadow-lg hover:shadow-xl active:scale-95" onClick={() => { clickSound.currentTime = 0; clickSound.play(); startRound(globeRef); }}>
         <Play className="w-8 h-8 fill-current ml-1" />
       </button>
-      <span className="text-[13px] font-medium text-white/70">Game Version: 2.3</span>
+      <span className="text-[13px] font-medium text-white/70">Game Version: 2.4.0</span>
       <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero" className="hover:underline">Sparsh</a></span>
 
       <a
