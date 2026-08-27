@@ -275,17 +275,19 @@ export default function FinalScreen({ clickSound }) {
             Play Again
           </button>
 
-          <a
-            href="https://github.com/barryspacezero/RadioGuessr"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => logEvent('social_click', { platform: 'github' })}
-            className="group flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
-            title="Star on GitHub"
-          >
-            <GithubIcon className="w-6 h-6 shrink-0 opacity-90 group-hover:opacity-100" />
-            <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">GitHub</span>
-          </a>
+          {import.meta.env.VITE_PORTAL !== 'true' && (
+            <a
+              href="https://github.com/barryspacezero/RadioGuessr"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => logEvent('social_click', { platform: 'github' })}
+              className="group flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+              title="Star on GitHub"
+            >
+              <GithubIcon className="w-6 h-6 shrink-0 opacity-90 group-hover:opacity-100" />
+              <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">GitHub</span>
+            </a>
+          )}
         </div>
 
       </motion.div>

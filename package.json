@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:portal": "vite build --mode portal",
     "preview": "vite preview"
   },
   "devDependencies": {
