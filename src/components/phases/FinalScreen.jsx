@@ -7,6 +7,7 @@ import { logEvent } from '../../analytics.js';
 import { supabase } from '../../supabase.js';
 import CountrySelect from '../ui/CountrySelect.jsx';
 import PassportModal from '../ui/PassportModal.jsx';
+import ShareCard from '../ui/ShareCard.jsx';
 
 export default function FinalScreen({ clickSound }) {
   const history = useGameStore(state => state.history);
@@ -21,11 +22,12 @@ export default function FinalScreen({ clickSound }) {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(true);
 
   const [scores, setScores] = useState([]);
   const [loadingScores, setLoadingScores] = useState(true);
   const [scoresError, setScoresError] = useState(null);
-  
+
   const userRowRef = useRef(null);
 
   useEffect(() => {
@@ -100,8 +102,8 @@ export default function FinalScreen({ clickSound }) {
     }
   };
 
-  const userProjectedRank = scores.length > 0 
-    ? (scores.findIndex(s => totalScore >= s.score) === -1 ? scores.length + 1 : scores.findIndex(s => totalScore >= s.score) + 1) 
+  const userProjectedRank = scores.length > 0
+    ? (scores.findIndex(s => totalScore >= s.score) === -1 ? scores.length + 1 : scores.findIndex(s => totalScore >= s.score) + 1)
     : 1;
 
   const handlePlayAgain = () => {
@@ -125,6 +127,12 @@ export default function FinalScreen({ clickSound }) {
 
   return (
     <>
+      <AnimatePresence>
+        {showShareCard && (
+          <ShareCard key="share-card" onContinue={() => setShowShareCard(false)} rank={userProjectedRank} />
+        )}
+      </AnimatePresence>
+
       <motion.div
         key="final"
         initial={{ opacity: 0, scale: 0.95 }}
@@ -156,16 +164,16 @@ export default function FinalScreen({ clickSound }) {
                 {scores.map((entry, idx) => {
                   const isFormHere = !submitSuccess && userProjectedRank === idx + 1;
                   return (
-                      <Fragment key={entry.id || idx}>
-                        {isFormHere && (
-                          <div ref={userRowRef} className="flex flex-col gap-2 p-2.5 rounded-lg border-2 border-amber-400 bg-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
-                            <div className="flex items-center gap-2">
-                              <span className="text-base font-black w-6 text-center text-amber-400">#{userProjectedRank}</span>
-                              <div className="flex-1">
-                                <CountrySelect selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} />
-                              </div>
+                    <Fragment key={entry.id || idx}>
+                      {isFormHere && (
+                        <div ref={userRowRef} className="flex flex-col gap-2 p-2.5 rounded-lg border-2 border-amber-400 bg-amber-500/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+                          <div className="flex items-center gap-2">
+                            <span className="text-base font-black w-6 text-center text-amber-400">#{userProjectedRank}</span>
+                            <div className="flex-1">
+                              <CountrySelect selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry} />
                             </div>
-                            <div className="flex w-full gap-2">
+                          </div>
+                          <div className="flex w-full gap-2">
                             <input
                               type="text"
                               placeholder="Enter your name"
@@ -188,16 +196,16 @@ export default function FinalScreen({ clickSound }) {
                       )}
                       <div
                         className={`flex items-center justify-between p-3 rounded-lg border-2 ${idx === 0 ? 'bg-amber-500/10 border-amber-500/30 text-amber-100' :
-                            idx === 1 ? 'bg-zinc-300/10 border-zinc-300/30 text-zinc-100' :
-                              idx === 2 ? 'bg-orange-700/10 border-orange-700/30 text-orange-200' :
-                                'bg-white/5 border-white/10 text-white/90'
+                          idx === 1 ? 'bg-zinc-300/10 border-zinc-300/30 text-zinc-100' :
+                            idx === 2 ? 'bg-orange-700/10 border-orange-700/30 text-orange-200' :
+                              'bg-white/5 border-white/10 text-white/90'
                           }`}
                       >
                         <div className="flex items-center gap-3">
                           <span className={`text-base font-black w-6 text-center ${idx === 0 ? 'text-amber-400' :
-                              idx === 1 ? 'text-zinc-300' :
-                                idx === 2 ? 'text-orange-600' :
-                                  'text-white/40'
+                            idx === 1 ? 'text-zinc-300' :
+                              idx === 2 ? 'text-orange-600' :
+                                'text-white/40'
                             }`}>
                             #{idx + 1}
                           </span>
@@ -282,11 +290,11 @@ export default function FinalScreen({ clickSound }) {
 
       </motion.div>
 
-      <PassportModal 
-        isOpen={isHistoryOpen} 
-        onClose={() => setIsHistoryOpen(false)} 
-        clickSound={clickSound} 
-        allTimeHistory={allTimeHistory} 
+      <PassportModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        clickSound={clickSound}
+        allTimeHistory={allTimeHistory}
       />
     </>
   );

@@ -1,7 +1,7 @@
 {
   "name": "radioguessr",
   "private": true,
-  "version": "2.2.0",
+  "version": "2.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -19,6 +19,7 @@
     "framer-motion": "^12.38.0",
     "globe.gl": "^2.45.0",
     "hls.js": "^1.6.15",
+    "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "lucide-react": "^1.7.0",
     "react": "^19.2.4",
