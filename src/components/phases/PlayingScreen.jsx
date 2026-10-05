@@ -48,8 +48,8 @@ export default function PlayingScreen({ clickSound, globeRef }) {
         {isAudioLoading === false && (
           <AnimatedCard
             key="playing"
-            persistentMobileContent={
-              <div className="flex flex-col items-center gap-2 w-full">
+            persistentContent={
+              <div className="flex md:hidden flex-col items-center gap-2 w-full mt-2">
                 <button className="btn btn-primary w-full shadow-lg" disabled={!guess} onClick={() => submitGuess(globeRef)}>
                   Submit Guess
                 </button>
@@ -131,25 +131,19 @@ export default function PlayingScreen({ clickSound, globeRef }) {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="hidden md:flex absolute bottom-16 left-1/2 -translate-x-1/2 w-auto z-10 flex-col items-center gap-2.5 pointer-events-none"
-        >
-          <div className="pointer-events-auto flex flex-col items-center gap-2.5">
-            <button className="btn btn-primary shadow-xl" disabled={!guess} onClick={() => submitGuess(globeRef)}>
-              Submit Guess
-            </button>
-            {!guess && (
-              <span className="text-sm font-medium text-white bg-black px-3 py-1 rounded-sm shadow-md">
-                Click the globe to place your pin
-              </span>
-            )}
-          </div>
-        </motion.div>
-      </AnimatePresence>
+      {isAudioLoading === false && (
+        <div className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex-col items-center gap-2 w-[320px] pointer-events-auto">
+          <button className="btn btn-primary w-full shadow-[6px_6px_0_#000] text-lg py-4" disabled={!guess} onClick={() => submitGuess(globeRef)}>
+            Submit Guess
+          </button>
+          {!guess && (
+            <span className="text-[13px] font-bold text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] text-center">
+              Click the globe to place your pin
+            </span>
+          )}
+        </div>
+      )}
+
     </>
   );
 }

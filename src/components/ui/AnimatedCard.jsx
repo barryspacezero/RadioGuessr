@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
-export default function AnimatedCard({ children, className = "", delay = 0, persistentMobileContent }) {
+export default function AnimatedCard({ children, className = "", delay = 0, persistentContent }) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const isItemsStart = className.includes('!items-start') || className.includes('items-start');
@@ -14,7 +14,7 @@ export default function AnimatedCard({ children, className = "", delay = 0, pers
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20, transition: { delay: 0 } }}
       transition={{ duration: 0.25, ease: 'easeOut', delay }}
-      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000] md:shadow-[6px_6px_0_#000] rounded-t-3xl md:rounded-none ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
+      className={`fixed bottom-0 left-0 w-full md:w-auto md:min-w-[300px] md:max-w-sm md:absolute md:bottom-auto md:top-24 md:left-8 z-20 flex flex-col bg-white border-t-2 md:border-2 border-black shadow-[0_-6px_0_#000] md:shadow-[6px_6px_0_#000] rounded-t-3xl md:rounded-none pointer-events-auto ${className.replace('!items-start', '').replace('gap-1.5', '')}`}
     >
 
       <div
@@ -40,9 +40,9 @@ export default function AnimatedCard({ children, className = "", delay = 0, pers
         </div>
       </motion.div>
 
-      {persistentMobileContent && (
-        <div className="w-full md:hidden px-5 pt-1 pb-3 shrink-0 relative z-10 bg-white/40 backdrop-blur-sm">
-          {persistentMobileContent}
+      {persistentContent && (
+        <div className="w-full px-5 pt-1 pb-3 md:pb-5 shrink-0 relative z-10 bg-white/40 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none">
+          {persistentContent}
         </div>
       )}
     </motion.div>

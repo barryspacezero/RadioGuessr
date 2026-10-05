@@ -59,19 +59,19 @@ export default function LeaderboardModal({ isOpen, onClose }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 pointer-events-auto"
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-zinc-900 border-2 border-white/20 w-full max-w-lg rounded-xl overflow-hidden flex flex-col max-h-[85vh] shadow-2xl"
+            className="bg-zinc-900 border-2 border-white/20 w-full max-w-[1280px] h-[95%] max-h-[720px] rounded-xl overflow-hidden flex flex-col shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b-2 border-white/10 bg-zinc-950">
-              <div className="flex items-center gap-3">
-                <Trophy className="w-6 h-6 text-amber-400" />
-                <h2 className="text-xl font-bold text-white tracking-wide uppercase">Global Leaderboard</h2>
+            <div className="flex items-center justify-between p-6 border-b-2 border-white/10 bg-zinc-950">
+              <div className="flex items-center gap-4">
+                <Trophy className="w-8 h-8 text-amber-400" />
+                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-wide uppercase">Global Leaderboard</h2>
               </div>
               <button 
                 onClick={onClose}
@@ -82,12 +82,12 @@ export default function LeaderboardModal({ isOpen, onClose }) {
             </div>
 
             {/* Filters */}
-            <div className="p-4 border-b-2 border-white/10 flex justify-center gap-2 bg-zinc-900/50">
+            <div className="p-4 border-b-2 border-white/10 flex justify-center gap-3 bg-zinc-900/50">
               {[3, 5, 10].map((rounds) => (
                 <button
                   key={rounds}
                   onClick={() => setRoundFilter(rounds)}
-                  className={`px-4 py-1.5 text-xs font-bold uppercase tracking-widest rounded-full transition-all border-2 ${
+                  className={`px-6 py-2 text-sm font-bold uppercase tracking-widest rounded-full transition-all border-2 ${
                     roundFilter === rounds 
                       ? 'bg-white text-black border-white' 
                       : 'bg-transparent text-white/60 border-white/20 hover:border-white/50 hover:text-white'
@@ -118,15 +118,15 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                   {scores.map((entry, idx) => (
                     <div 
                       key={entry.id || idx} 
-                      className={`flex items-center justify-between p-3 rounded-lg border-2 ${
+                      className={`flex items-center justify-between p-4 rounded-lg border-2 ${
                         idx === 0 ? 'bg-amber-500/10 border-amber-500/30 text-amber-100' :
                         idx === 1 ? 'bg-zinc-300/10 border-zinc-300/30 text-zinc-100' :
                         idx === 2 ? 'bg-orange-700/10 border-orange-700/30 text-orange-200' :
                         'bg-white/5 border-white/10 text-white/90'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className={`text-lg font-black w-6 text-center ${
+                      <div className="flex items-center gap-4">
+                        <span className={`text-2xl font-black w-10 text-center ${
                           idx === 0 ? 'text-amber-400' :
                           idx === 1 ? 'text-zinc-300' :
                           idx === 2 ? 'text-orange-600' :
@@ -137,15 +137,15 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                         {entry.country_code && (
                           <img 
                             src={`https://flagcdn.com/${entry.country_code.toLowerCase()}.svg`} 
-                            className="w-5 h-auto shadow-sm border border-white/20 rounded-[1px]" 
+                            className="w-8 h-auto shadow-sm border border-white/20 rounded-[2px]" 
                             alt={entry.country_code} 
                           />
                         )}
-                        <span className="font-bold text-base truncate max-w-[130px] md:max-w-[180px]">
+                        <span className="font-bold text-xl truncate max-w-[200px] md:max-w-[400px]">
                           {entry.player_name || 'Anonymous'}
                         </span>
                       </div>
-                      <span className="font-black text-xl tracking-tighter">
+                      <span className="font-black text-3xl tracking-tighter">
                         {entry.score.toLocaleString()}
                       </span>
                     </div>

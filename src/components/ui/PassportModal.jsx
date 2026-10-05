@@ -61,13 +61,13 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 pointer-events-auto"
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-[#FDFBF7] border-[3px] border-black w-[95%] max-w-5xl flex flex-col max-h-[85vh] shadow-[8px_8px_0_#000] relative overflow-hidden"
+            className="bg-[#FDFBF7] border-[3px] border-black w-full max-w-[1280px] h-[95%] max-h-[720px] flex flex-col shadow-[8px_8px_0_#000] relative overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-2 md:p-3 border-b-[3px] border-black bg-white z-10 relative">
@@ -319,43 +319,43 @@ export default function PassportModal({ isOpen, onClose, clickSound, allTimeHist
                     initial={{ y: 20, scale: 0.9 }}
                     animate={{ y: 0, scale: 1 }}
                     exit={{ y: 20, scale: 0.9 }}
-                    className="bg-white border-[3px] border-black shadow-[8px_8px_0_#000] w-full max-w-sm flex flex-col p-6"
+                    className="bg-white border-[4px] border-black shadow-[12px_12px_0_#000] w-full max-w-lg flex flex-col p-8"
                   >
-                    <div className="flex justify-between items-start border-b-[3px] border-black pb-4 mb-4">
+                    <div className="flex justify-between items-start border-b-[3px] border-black pb-5 mb-5">
                       <div className="flex flex-col pr-4">
-                        <h3 className="text-2xl font-black uppercase tracking-widest leading-none text-black break-words">{selectedStamp.name}</h3>
-                        <span className="text-xs font-bold text-black/50 uppercase tracking-widest mt-1">Visa Details</span>
+                        <h3 className="text-3xl font-black uppercase tracking-widest leading-none text-black break-words">{selectedStamp.name}</h3>
+                        <span className="text-sm font-bold text-black/50 uppercase tracking-widest mt-2">Visa Details</span>
                       </div>
                       <button
                         onClick={() => { if (clickSound) clickSound.play(); setSelectedStamp(null); }}
-                        className="text-black hover:scale-110 active:scale-95 transition-transform p-1 bg-black/5 rounded-full shrink-0"
+                        className="text-black hover:scale-110 active:scale-95 transition-transform p-1.5 bg-black/5 rounded-full shrink-0"
                       >
-                        <X className="w-6 h-6" />
+                        <X className="w-8 h-8" />
                       </button>
                     </div>
 
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-4 bg-[#F5F1E6] p-4 border-2 border-black">
-                        <Award className={`w-8 h-8 ${selectedStamp.score >= 4000 ? 'text-yellow-600' : selectedStamp.score < 1000 ? 'text-red-600' : 'text-blue-600'}`} />
+                    <div className="flex flex-col gap-5">
+                      <div className="flex items-center gap-5 bg-[#F5F1E6] p-5 border-2 border-black">
+                        <Award className={`w-10 h-10 ${selectedStamp.score >= 4000 ? 'text-yellow-600' : selectedStamp.score < 1000 ? 'text-red-600' : 'text-blue-600'}`} />
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-black/60 uppercase tracking-widest leading-none">Best Score</span>
-                          <span className="text-2xl font-black leading-none mt-1 text-black">{selectedStamp.score.toLocaleString()}</span>
+                          <span className="text-sm font-bold text-black/60 uppercase tracking-widest leading-none">Best Score</span>
+                          <span className="text-3xl font-black leading-none mt-2 text-black">{selectedStamp.score.toLocaleString()}</span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4 bg-[#F5F1E6] p-4 border-2 border-black">
-                        <MapPin className="w-8 h-8 text-black/70" />
+                      <div className="flex items-center gap-5 bg-[#F5F1E6] p-5 border-2 border-black">
+                        <MapPin className="w-10 h-10 text-black/70" />
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-black/60 uppercase tracking-widest leading-none">Total Visits</span>
-                          <span className="text-2xl font-black leading-none mt-1 text-black">{selectedStamp.visits || 1}</span>
+                          <span className="text-sm font-bold text-black/60 uppercase tracking-widest leading-none">Total Visits</span>
+                          <span className="text-3xl font-black leading-none mt-2 text-black">{selectedStamp.visits || 1}</span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4 bg-[#F5F1E6] p-4 border-2 border-black">
-                        <Calendar className="w-8 h-8 text-black/70" />
+                      <div className="flex items-center gap-5 bg-[#F5F1E6] p-5 border-2 border-black">
+                        <Calendar className="w-10 h-10 text-black/70" />
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-black/60 uppercase tracking-widest leading-none">First Discovered</span>
-                          <span className="text-lg font-black leading-none mt-1 uppercase text-black">
+                          <span className="text-sm font-bold text-black/60 uppercase tracking-widest leading-none">First Discovered</span>
+                          <span className="text-xl font-black leading-none mt-2 uppercase text-black">
                             {selectedStamp.firstDiscovered ? new Date(selectedStamp.firstDiscovered).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Legacy'}
                           </span>
                         </div>

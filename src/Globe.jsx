@@ -20,7 +20,7 @@ export default forwardRef(function GlobeView({ onGuess, theme = 'default', showB
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    fetch('/countries-110m.json')
+    fetch('./countries-110m.json')
       .then(res => res.json())
       .then(data => {
         const geojson = topojson.feature(data, data.objects.countries);

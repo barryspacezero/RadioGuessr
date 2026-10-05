@@ -1,14 +1,22 @@
 import { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Radio, Download, ArrowRight, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Radio, Download, ArrowRight, Loader2, X } from 'lucide-react';
 import { useGameStore } from '../../store/useGameStore.js';
-import html2canvas from 'html2canvas';export default function ShareCard({ onContinue, rank }) {
+import html2canvas from 'html2canvas';
+
+export default function ShareCard({ onContinue, rank }) {
   const totalScore = useGameStore(state => state.totalScore);
   const totalRounds = useGameStore(state => state.totalRounds);
   const history = useGameStore(state => state.history);
 
   const [isSharing, setIsSharing] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState(null);
   const cardRef = useRef(null);
+
+  const getFlagEmoji = (countryCode) => {
+    if (!countryCode) return '';
+    return countryCode.toUpperCase().replace(/./g, char => String.fromCodePoint(char.charCodeAt(0) + 127397));
+  };
 
   const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -43,20 +51,20 @@ import html2canvas from 'html2canvas';export default function ShareCard({ onCont
       const file = new File([blob], `radioguessr-${totalScore}.jpg`, { type: 'image/jpeg' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: 'RadioGuessr Score',
-          text: `I scored ${totalScore} points in RadioGuessr!`,
-          files: [file]
-        });
+        try {
+          await navigator.share({
+            title: 'RadioGuessr Score',
+            text: `I scored ${totalScore} points in RadioGuessr!`,
+            files: [file]
+          });
+        } catch (shareErr) {
+          if (shareErr.name !== 'AbortError') {
+            console.warn('Share failed, falling back to manual save modal:', shareErr);
+            setGeneratedImage(URL.createObjectURL(blob));
+          }
+        }
       } else {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `radioguessr-${totalScore}.jpg`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        setGeneratedImage(URL.createObjectURL(blob));
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
@@ -87,105 +95,117 @@ import html2canvas from 'html2canvas';export default function ShareCard({ onCont
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="absolute inset-0 z-[60] flex flex-col items-center justify-center gap-6 p-4 bg-black/60 backdrop-blur-sm overflow-y-auto custom-scrollbar"
+      className="absolute inset-0 z-[60] flex flex-col items-center justify-center gap-6 p-4 bg-black/60 backdrop-blur-sm overflow-y-auto custom-scrollbar pointer-events-auto"
     >
+      {/* Wrapper to visually scale down on small screens without squishing the DOM elements */}
       <div 
-        ref={cardRef}
-        className="relative w-[700px] h-[366px] max-w-[90vw] shrink-0 bg-[#FDFBF7] border-[4px] border-black shadow-[12px_12px_0_#000] flex flex-col overflow-hidden"
-        style={{ transform: 'translateZ(0)' }} // Hardware acceleration hint for html-to-image
+        className="relative shrink-0"
+        style={{ 
+          width: 'min(700px, calc(100vw - 32px))',
+          height: 'min(366px, calc((100vw - 32px) * (366 / 700)))'
+        }}
       >
-        {/* Big Background Radio Icon */}
-        <div className="absolute -left-[10%] -bottom-[20%] rotate-[-15deg] opacity-[0.03] pointer-events-none text-black">
-          <Radio size={400} strokeWidth={1} />
-        </div>
-        
-        {/* Top Header */}
-        <div className="w-full h-16 shrink-0 bg-amber-400 border-b-[4px] border-black flex items-center px-6 z-10 relative">
-          <h2 className="text-black text-xl md:text-2xl mt-1 drop-shadow-[2px_2px_0_rgba(255,255,255,0.6)]" style={{ fontFamily: '"Press Start 2P", monospace' }}>
-            RadioGuessr
-          </h2>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-row items-stretch w-full relative z-10">
+        <div 
+          ref={cardRef}
+          className="absolute top-0 left-0 w-[700px] h-[366px] bg-[#FDFBF7] border-[4px] border-black shadow-[12px_12px_0_#000] flex flex-col overflow-hidden"
+          style={{ 
+            transform: `scale(min(1, calc((100vw - 32px) / 700)))`,
+            transformOrigin: 'top left',
+            transformStyle: 'preserve-3d'
+          }} 
+        >
+          {/* Big Background Radio Icon */}
+          <div className="absolute -left-[10%] -bottom-[20%] rotate-[-15deg] opacity-[0.03] pointer-events-none text-black">
+            <Radio size={400} strokeWidth={1} />
+          </div>
           
-          {/* Left Side: Score */}
-          <div className="w-[280px] shrink-0 flex flex-col items-center justify-center bg-white relative z-10 p-6 border-r-[4px] border-black">
-            <p className="text-black/50 text-sm uppercase tracking-[0.2em] font-black mb-1">Total Score</p>
-            <h1 
-              className="text-amber-400 text-[70px] leading-[0.9] font-black tracking-tighter relative"
-              style={{ textShadow: '4px 4px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000, 2px 2px 0px #000' }}
-            >
-              {totalScore.toLocaleString()}
-            </h1>
+          {/* Top Header */}
+          <div className="w-full h-16 shrink-0 bg-amber-400 border-b-[4px] border-black flex items-center px-6 z-10 relative">
+            <h2 className="text-black text-xl mt-1 drop-shadow-[2px_2px_0_rgba(255,255,255,0.6)]" style={{ fontFamily: '"Press Start 2P", monospace' }}>
+              RadioGuessr
+            </h2>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-row items-stretch w-full relative z-10">
             
-            <div className="mt-4 flex justify-between w-full border-t-2 border-black/10 pt-4">
-              <div className="flex flex-col items-center flex-1">
-                <span className="text-black font-black text-lg tracking-widest leading-none">
-                  {totalRounds}
-                </span>
-                <span className="text-black/40 text-[9px] uppercase tracking-widest font-black mt-1 text-center">
-                  Rounds
-                </span>
+            {/* Left Side: Score */}
+            <div className="w-[280px] shrink-0 flex flex-col items-center justify-center bg-white relative z-10 p-6 border-r-[4px] border-black">
+              <p className="text-black/50 text-sm uppercase tracking-[0.2em] font-black mb-1">Total Score</p>
+              <h1 
+                className="text-amber-400 text-[70px] leading-[0.9] font-black tracking-tighter relative"
+                style={{ textShadow: '4px 4px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000, 2px 2px 0px #000' }}
+              >
+                {totalScore.toLocaleString()}
+              </h1>
+              
+              <div className="mt-4 flex justify-between w-full border-t-2 border-black/10 pt-4">
+                <div className="flex flex-col items-center flex-1">
+                  <span className="text-black font-black text-lg tracking-widest leading-none">
+                    {totalRounds}
+                  </span>
+                  <span className="text-black/40 text-[9px] uppercase tracking-widest font-black mt-1 text-center">
+                    Rounds
+                  </span>
+                </div>
+                <div className="w-[2px] bg-black/10 h-10 mx-2 self-center" />
+                <div className="flex flex-col items-center flex-1">
+                  <span className="text-amber-500 font-black text-[14px] tracking-widest leading-none mt-1" style={{ fontFamily: '"Press Start 2P", monospace', textShadow: '1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000' }}>
+                    #{rank || '?'}
+                  </span>
+                  <span className="text-black/40 text-[9px] uppercase tracking-widest font-black mt-2 text-center">
+                    Global Rank
+                  </span>
+                </div>
               </div>
-              <div className="w-[2px] bg-black/10 h-10 mx-2 self-center" />
-              <div className="flex flex-col items-center flex-1">
-                <span className="text-amber-500 font-black text-[14px] tracking-widest leading-none mt-1" style={{ fontFamily: '"Press Start 2P", monospace', textShadow: '1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000' }}>
-                  #{rank || '?'}
-                </span>
-                <span className="text-black/40 text-[9px] uppercase tracking-widest font-black mt-2 text-center">
-                  Global Rank
-                </span>
+            </div>
+
+            {/* Right Side: Stamps */}
+            <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 relative z-10">
+              <h3 className="text-black/40 text-[10px] font-black uppercase tracking-widest mb-4">
+                {uniqueBestCountries.length > 0 ? "Stamps Collected" : "No Stamps Yet"}
+              </h3>
+              
+              <div className="flex flex-wrap items-center justify-center gap-4 w-full">
+                {uniqueBestCountries.map((entry, idx) => {
+                  const theme = stampThemes[idx % stampThemes.length];
+                  const shape = stampShapes[idx % stampShapes.length];
+                  const rotation = idx % 2 === 0 ? 'rotate-[6deg]' : 'rotate-[-8deg]';
+                  return (
+                    <div key={entry.code} className={`relative flex flex-col items-center justify-center w-24 h-24 ${shape} border-[3px] border-dashed bg-[#FDFBF7] p-1 shadow-sm ${theme.border} ${theme.text} ${rotation}`}>
+                      <div className={`absolute inset-[3px] ${shape} border-[2px] ${theme.ring} pointer-events-none`} />
+                      <span className="text-4xl leading-none mb-1 z-10 relative filter drop-shadow-sm border-[2px] border-black/10 bg-white/50 px-1 py-0.5 rounded">
+                        {getFlagEmoji(entry.code)}
+                      </span>
+                      <span className="text-[12px] font-black tracking-widest opacity-90 z-10 relative">{entry.score}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          {/* Right Side: Stamps */}
-          <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 relative z-10">
-            <h3 className="text-black/40 text-[10px] font-black uppercase tracking-widest mb-4">
-              {uniqueBestCountries.length > 0 ? "Stamps Collected" : "No Stamps Yet"}
-            </h3>
-            
-            <div className="flex flex-wrap items-center justify-center gap-4 w-full">
-              {uniqueBestCountries.map((entry, idx) => {
-                const theme = stampThemes[idx % stampThemes.length];
-                const shape = stampShapes[idx % stampShapes.length];
-                const rotation = idx % 2 === 0 ? 'rotate-[6deg]' : 'rotate-[-8deg]';
-                return (
-                  <div key={entry.code} className={`relative flex flex-col items-center justify-center w-20 h-20 md:w-24 md:h-24 ${shape} border-[3px] border-dashed bg-[#FDFBF7] p-1 shadow-sm ${theme.border} ${theme.text} ${rotation} hover:scale-110 transition-transform`}>
-                    <div className={`absolute inset-[3px] ${shape} border-[2px] ${theme.ring} pointer-events-none`} />
-                    <img 
-                      src={`https://flagcdn.com/w80/${entry.code.toLowerCase()}.png`} 
-                      crossOrigin="anonymous" 
-                      className="w-10 h-7 md:w-12 md:h-8 object-cover border-[2px] border-black/20 mb-1 z-10 relative" 
-                      alt={entry.code} 
-                    />
-                    <span className="text-[10px] md:text-[12px] font-black tracking-widest opacity-90 z-10 relative">{entry.score}</span>
-                  </div>
-                );
-              })}
-            </div>
+          {/* Footer info (bottom right) */}
+          <div className="absolute bottom-2 right-4 z-20">
+            <p className="text-black/30 text-[9px] font-black tracking-widest uppercase">
+              radioguessr.space · {dateStr}
+            </p>
           </div>
-        </div>
-
-        {/* Footer info (bottom right) */}
-        <div className="absolute bottom-2 right-4 z-20">
-          <p className="text-black/30 text-[9px] font-black tracking-widest uppercase">
-            radioguessr.space · {dateStr}
-          </p>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="flex items-center gap-4 flex-wrap justify-center mt-2 w-full max-w-[700px]">
-        <button 
-          onClick={handleShare}
-          disabled={isSharing}
-          className="group flex-1 min-w-[200px] flex items-center justify-center gap-2 bg-white text-black border-[3px] border-black px-6 py-4 transition-all shadow-[4px_4px_0_#000] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#000] active:translate-y-[4px] active:shadow-none disabled:opacity-50 font-black uppercase tracking-widest text-sm"
-        >
-          {isSharing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5 group-hover:text-amber-500 transition-colors" />}
-          <span>Share</span>
-        </button>
+        {import.meta.env.VITE_PORTAL !== 'true' && (
+          <button 
+            onClick={handleShare}
+            disabled={isSharing}
+            className="group flex-1 min-w-[200px] flex items-center justify-center gap-2 bg-white text-black border-[3px] border-black px-6 py-4 transition-all shadow-[4px_4px_0_#000] hover:translate-y-[2px] hover:shadow-[2px_2px_0_#000] active:translate-y-[4px] active:shadow-none disabled:opacity-50 font-black uppercase tracking-widest text-sm"
+          >
+            {isSharing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5 group-hover:text-amber-500 transition-colors" />}
+            <span>Share</span>
+          </button>
+        )}
         
         <button 
           onClick={onContinue}
@@ -195,6 +215,27 @@ import html2canvas from 'html2canvas';export default function ShareCard({ onCont
           <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
         </button>
       </div>
+      <AnimatePresence>
+        {generatedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/90 p-4 pointer-events-auto"
+          >
+            <p className="text-white text-base md:text-lg font-bold mb-6 uppercase tracking-widest text-center">
+              Long-press or Right-click the image to save!
+            </p>
+            <img src={generatedImage} alt="Your Score" className="max-w-full max-h-[60vh] border-4 border-white rounded-lg shadow-2xl mb-8" />
+            <button
+              onClick={() => { URL.revokeObjectURL(generatedImage); setGeneratedImage(null); }}
+              className="bg-white text-black font-bold uppercase tracking-widest px-8 py-3 rounded-full hover:scale-105 active:scale-95 transition-transform"
+            >
+              Close
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

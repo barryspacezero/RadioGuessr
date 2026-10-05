@@ -18,15 +18,17 @@ import PlayingScreen from './components/phases/PlayingScreen.jsx';
 import ResultScreen from './components/phases/ResultScreen.jsx';
 import ScoreboardTooltip from './components/overlays/ScoreboardTooltip.jsx';
 import VolumeControl from './components/overlays/VolumeControl.jsx';
+import { useUiScale } from './hooks/useUiScale.js';
 
 export default function App() {
   const [webGLSupported, setWebGLSupported] = useState(true);
+  const { scale: uiScale, isMobile } = useUiScale();
 
   useEffect(() => {
     setWebGLSupported(checkWebGLSupport());
   }, []);
 
-  const clickSound = new Audio('/click.mp3');
+  const clickSound = new Audio('./click.mp3');
   const globe = useRef(null);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function App() {
 
   if (!webGLSupported) {
     return (
-      <div className="w-screen h-screen flex flex-col items-center justify-center bg-zinc-950 text-white p-6 text-center font-sans">
+      <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 text-white p-6 text-center font-sans">
         <div className="max-w-md w-full bg-zinc-900/80 backdrop-blur-sm rounded-3xl p-8 border border-zinc-800 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
           <div className="w-20 h-20 mx-auto bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,28 +89,38 @@ export default function App() {
   }
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden">
       <Globe ref={globe} onGuess={setGuess} theme={theme} showBorders={showBorders} showNames={showNames} />
 
-      {phase !== 'start' && (
-        <>
-          <div className="absolute top-4 left-4 md:top-8 md:left-8 z-40 pointer-events-none">
-            <h1 className="text-2xl md:text-3xl text-white font-bold tracking-tight" style={{ textShadow: '2px 2px 0px #000' }}>
-              RadioGuessr
-            </h1>
-          </div>
+      <div 
+        className="absolute top-0 left-0 z-40 pointer-events-none"
+        style={{ 
+          width: isMobile ? '100%' : `${100 / uiScale}%`, 
+          height: isMobile ? '100%' : `${100 / uiScale}%`, 
+          transform: isMobile ? 'none' : `scale(${uiScale})`, 
+          transformOrigin: '0 0' 
+        }}
+      >
+        {phase !== 'start' && (
+          <>
+            <div className="absolute top-4 left-4 md:top-8 md:left-8 z-40 pointer-events-auto">
+              <h1 className="text-2xl md:text-3xl text-white font-bold tracking-tight" style={{ textShadow: '2px 2px 0px #000' }}>
+                RadioGuessr
+              </h1>
+            </div>
 
-          <div className="absolute top-4 right-4 md:top-8 md:right-8 z-40 flex items-start gap-3 md:gap-4 pointer-events-none">
-            <ScoreboardTooltip />
-            <VolumeControl clickSound={clickSound} />
-          </div>
-        </>
-      )}
+            <div className="absolute top-4 right-4 md:top-8 md:right-8 z-40 flex items-start gap-3 md:gap-4 pointer-events-auto">
+              <ScoreboardTooltip />
+              <VolumeControl clickSound={clickSound} />
+            </div>
+          </>
+        )}
 
-      {phase === 'start' && <StartScreen clickSound={clickSound} globeRef={globe} />}
-      {phase === 'final' && <FinalScreen clickSound={clickSound} />}
-      {phase === 'playing' && <PlayingScreen clickSound={clickSound} globeRef={globe} />}
-      {phase === 'result' && <ResultScreen clickSound={clickSound} globeRef={globe} />}
+        {phase === 'start' && <StartScreen clickSound={clickSound} globeRef={globe} />}
+        {phase === 'final' && <FinalScreen clickSound={clickSound} />}
+        {phase === 'playing' && <PlayingScreen clickSound={clickSound} globeRef={globe} />}
+        {phase === 'result' && <ResultScreen clickSound={clickSound} globeRef={globe} />}
+      </div>
     </div>
   );
 }

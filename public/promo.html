@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RadioGuessr - Guess the World by Sound</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+    }
+
+    /* Globe container fills the whole viewport, just like in App.jsx */
+    #globe-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* Scrim layer removed to show the globe fully */
+    #scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Dead-center hero, same layout as the StartScreen overlay */
+    #hero {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Main title — same font/weight as the in-game logo, just much bigger */
+    .logo {
+      font-size: clamp(72px, 13.5vw, 175px);
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.035em;
+      line-height: 1;
+      /* Matches exactly: textShadow: '2px 2px 0px #000' — scaled up */
+      text-shadow:
+        4px 4px 0px #000000,
+        8px 8px 0px rgba(0, 0, 0, 0.3);
+      white-space: nowrap;
+      animation: arrive 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .tagline {
+      margin-top: 16px;
+      font-size: clamp(14px, 1.5vw, 20px);
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.65);
+      letter-spacing: 0.01em;
+      text-align: center;
+      text-shadow: 1px 1px 0 #000;
+      animation: arrive 1s 0.12s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Press Start 2P amber chip — identical to the version badge in StartScreen */
+    .ver {
+      margin-top: 26px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(9px, 0.9vw, 12px);
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1.5px solid rgba(251, 191, 36, 0.45);
+      padding: 6px 14px;
+      letter-spacing: 0.05em;
+      box-shadow: 3px 3px 0 rgba(251, 191, 36, 0.25);
+      animation: arrive 1s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both,
+        wobble 2.5s 1.4s ease-in-out infinite;
+    }
+
+    .watermark {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.18);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    @keyframes arrive {
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes wobble {
+
+      0%,
+      100% {
+        transform: rotate(-4deg);
+      }
+
+      50% {
+        transform: rotate(6deg) scale(1.06);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="globe-container"></div>
+  <div id="scrim"></div>
+
+  <div id="hero">
+    <span class="logo">RadioGuessr</span>
+    <span class="tagline">Listen. Guess. Conquer the world.</span>
+    <span class="ver">v2.4</span>
+  </div>
+
+  <div class="watermark">radioguessr.space</div>
+
+  <!-- Same globe.gl version as in package.json -->
+  <script src="https://unpkg.com/globe.gl@2.45.0/dist/globe.gl.min.js"></script>
+  <script>
+    // Exact same setup as Globe.jsx
+    var GLOBE_IMAGE = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
+    var BUMP_IMAGE = 'https://unpkg.com/three-globe/example/img/earth-topology.png';
+    var SKY_IMAGE = 'https://unpkg.com/three-globe/example/img/night-sky.png';
+
+    var globe = Globe()
+      .globeImageUrl(GLOBE_IMAGE)
+      .bumpImageUrl(BUMP_IMAGE)
+      .backgroundImageUrl(SKY_IMAGE)
+      .showAtmosphere(true)
+      .atmosphereColor('#4fc3f7')
+      .atmosphereAltitude(0.18)
+      .width(window.innerWidth)
+      .height(window.innerHeight)
+      (document.getElementById('globe-container'));
+
+    // Same camera position and controls as Globe.jsx
+    globe.pointOfView({ lat: 20, lng: 0, altitude: 2.5 });
+
+    Object.assign(globe.controls(), {
+      autoRotate: true,
+      autoRotateSpeed: 0.4,
+      enableDamping: true,
+      dampingFactor: 0.08,
+      minDistance: 140,
+      maxDistance: 600,
+      enableZoom: true,
+      enablePan: false,
+    });
+
+    // Enable mouse interaction so you can frame the perfect screenshot
+    globe.controls().enableRotate = true;
+
+    window.addEventListener('resize', function () {
+      globe.width(window.innerWidth).height(window.innerHeight);
+    });
+  </script>
+</body>
+
+</html>

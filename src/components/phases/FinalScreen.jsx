@@ -22,7 +22,9 @@ export default function FinalScreen({ clickSound }) {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [showShareCard, setShowShareCard] = useState(true);
+  // Disable ShareCard completely on the portal build, and on mobile devices where it breaks layout.
+  const shouldShowShareCard = import.meta.env.VITE_PORTAL !== 'true' && window.innerWidth >= 768;
+  const [showShareCard, setShowShareCard] = useState(shouldShowShareCard);
 
   const [scores, setScores] = useState([]);
   const [loadingScores, setLoadingScores] = useState(true);
@@ -138,7 +140,7 @@ export default function FinalScreen({ clickSound }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="absolute bg-black/60 backdrop-blur-md inset-0 z-50 flex flex-col items-center justify-center gap-2 overflow-y-auto custom-scrollbar py-12 px-4"
+        className="absolute bg-black/60 backdrop-blur-md inset-0 z-50 flex flex-col items-center justify-center gap-2 overflow-y-auto custom-scrollbar py-12 px-4 pointer-events-auto"
       >
         <h1 className="text-3xl md:text-4xl text-white font-black tracking-tighter mb-2 text-center drop-shadow-md">RadioGuessr</h1>
         <div className="flex flex-col items-center gap-1 mb-4">

@@ -42,7 +42,7 @@ export default function StartScreen({ clickSound, globeRef }) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="absolute bg-black/40 backdrop-blur-sm inset-0 z-50 flex flex-col items-center justify-center gap-5"
+      className="absolute bg-black/40 backdrop-blur-sm inset-0 z-50 flex flex-col items-center justify-center gap-4 pointer-events-auto"
     >
       <div className="relative inline-block mt-2">
         <h1 className="text-4xl text-white font-bold tracking-tight">RadioGuessr</h1>
@@ -99,50 +99,41 @@ export default function StartScreen({ clickSound, globeRef }) {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-6 mt-4 mb-2">
-        <label className="flex items-center gap-2 cursor-pointer group">
+        <div 
+          className="flex items-center gap-2 cursor-pointer group"
+          onClick={() => setShowBorders(!showBorders)}
+        >
           <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
-            <input
-              type="checkbox"
-              className="opacity-0 absolute w-full h-full cursor-pointer"
-              checked={showBorders}
-              onChange={(e) => setShowBorders(e.target.checked)}
-            />
             {showBorders && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
           </div>
           <span className="flex items-center gap-1.5 text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">
             Borders <TooltipInfo text="Draws interactive country borders directly onto the 3D globe." />
           </span>
-        </label>
+        </div>
 
-        <label className="flex items-center gap-2 cursor-pointer group">
+        <div 
+          className="flex items-center gap-2 cursor-pointer group"
+          onClick={() => setShowNames(!showNames)}
+        >
           <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
-            <input
-              type="checkbox"
-              className="opacity-0 absolute w-full h-full cursor-pointer"
-              checked={showNames}
-              onChange={(e) => setShowNames(e.target.checked)}
-            />
             {showNames && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
           </div>
           <span className="flex items-center gap-1.5 text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">
             Country Labels <TooltipInfo text="Displays floating country names when hovering over the globe." />
           </span>
-        </label>
+        </div>
 
-        <label className="flex items-center gap-2 cursor-pointer group">
+        <div 
+          className="flex items-center gap-2 cursor-pointer group"
+          onClick={() => setTalkMode(!talkMode)}
+        >
           <div className="relative flex items-center justify-center w-5 h-5 border-2 border-white/50 group-hover:border-white/80 transition-colors">
-            <input
-              type="checkbox"
-              className="opacity-0 absolute w-full h-full cursor-pointer"
-              checked={talkMode}
-              onChange={(e) => setTalkMode(e.target.checked)}
-            />
             {talkMode && <div className="w-2.5 h-2.5 bg-white pointer-events-none" />}
           </div>
           <span className="flex items-center gap-1.5 text-[11px] text-white/80 uppercase tracking-widest font-bold select-none group-hover:text-white transition-colors">
             Talk Mode <TooltipInfo text="Automatically filters out music stations to help you hear spoken languages for easier guessing." />
           </span>
-        </label>
+        </div>
       </div>
 
       {error && <span className="text-[13px] font-semibold text-red-700">{error}</span>}
@@ -154,37 +145,39 @@ export default function StartScreen({ clickSound, globeRef }) {
         <span className="text-[14px] font-medium text-white/90">Created By : <a href="https://github.com/barryspacezero" className="hover:underline">Sparsh</a></span>
       )}
 
-      {import.meta.env.VITE_PORTAL !== 'true' && (
-        <a
-          href="https://github.com/barryspacezero/RadioGuessr"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => logEvent('social_click', { platform: 'github' })}
-          className="absolute bottom-12 right-6 md:bottom-8 md:right-8 group flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
-          title="Star on GitHub"
+      <div className="flex flex-wrap items-center justify-center gap-4 mt-2 px-4">
+        <button
+          onClick={() => { clickSound.currentTime = 0; clickSound.play(); setIsPassportOpen(true); }}
+          className="group flex items-center justify-center gap-2 bg-sky-500/10 hover:bg-sky-500/20 backdrop-blur-md border-2 border-sky-500/30 text-sky-400 p-2.5 md:px-4 md:py-2.5 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+          title="View Passport"
         >
-          <GithubIcon className="w-6 h-6 shrink-0 opacity-90 group-hover:opacity-100" />
-          <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Star on GitHub</span>
-        </a>
-      )}
+          <Book className="w-5 h-5 shrink-0 opacity-90 group-hover:opacity-100" />
+          <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Passport</span>
+        </button>
 
-      <button
-        onClick={() => { clickSound.currentTime = 0; clickSound.play(); logEvent('leaderboard_opened'); setIsLeaderboardOpen(true); }}
-        className="absolute bottom-12 left-6 md:bottom-8 md:left-8 group flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 backdrop-blur-md border-2 border-amber-500/30 text-amber-500 p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
-        title="View Leaderboard"
-      >
-        <Trophy className="w-6 h-6 shrink-0 opacity-90 group-hover:opacity-100" />
-        <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Leaderboard</span>
-      </button>
+        <button
+          onClick={() => { clickSound.currentTime = 0; clickSound.play(); logEvent('leaderboard_opened'); setIsLeaderboardOpen(true); }}
+          className="group flex items-center justify-center gap-2 bg-amber-500/10 hover:bg-amber-500/20 backdrop-blur-md border-2 border-amber-500/30 text-amber-500 p-2.5 md:px-4 md:py-2.5 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+          title="View Leaderboard"
+        >
+          <Trophy className="w-5 h-5 shrink-0 opacity-90 group-hover:opacity-100" />
+          <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Leaderboard</span>
+        </button>
 
-      <button
-        onClick={() => { clickSound.currentTime = 0; clickSound.play(); setIsPassportOpen(true); }}
-        className="absolute bottom-28 left-6 md:bottom-24 md:left-8 group flex items-center justify-center gap-2 bg-sky-500/10 hover:bg-sky-500/20 backdrop-blur-md border-2 border-sky-500/30 text-sky-400 p-3 md:px-4 md:py-3 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
-        title="View Passport"
-      >
-        <Book className="w-6 h-6 shrink-0 opacity-90 group-hover:opacity-100" />
-        <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">Passport</span>
-      </button>
+        {import.meta.env.VITE_PORTAL !== 'true' && (
+          <a
+            href="https://github.com/barryspacezero/RadioGuessr"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => logEvent('social_click', { platform: 'github' })}
+            className="group flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white p-2.5 md:px-4 md:py-2.5 rounded-full transition-all shadow-lg hover:scale-105 active:scale-95 z-50 pointer-events-auto"
+            title="Star on GitHub"
+          >
+            <GithubIcon className="w-5 h-5 shrink-0 opacity-90 group-hover:opacity-100" />
+            <span className="hidden md:inline font-bold tracking-wide opacity-90 group-hover:opacity-100 text-sm">GitHub</span>
+          </a>
+        )}
+      </div>
 
     </motion.div>
     <LeaderboardModal isOpen={isLeaderboardOpen} onClose={() => { clickSound.currentTime = 0; clickSound.play(); setIsLeaderboardOpen(false); }} />
