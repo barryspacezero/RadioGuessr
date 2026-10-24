@@ -22,8 +22,8 @@ export default function FinalScreen({ clickSound }) {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  // Disable ShareCard completely on the portal build, and on mobile devices where it breaks layout.
-  const shouldShowShareCard = import.meta.env.VITE_PORTAL !== 'true' && window.innerWidth >= 768;
+  // Disable ShareCard completely on the portal build. It scales itself to fit small screens.
+  const shouldShowShareCard = import.meta.env.VITE_PORTAL !== 'true';
   const [showShareCard, setShowShareCard] = useState(shouldShowShareCard);
 
   const [scores, setScores] = useState([]);
@@ -131,7 +131,7 @@ export default function FinalScreen({ clickSound }) {
     <>
       <AnimatePresence>
         {showShareCard && (
-          <ShareCard key="share-card" onContinue={() => setShowShareCard(false)} rank={userProjectedRank} />
+          <ShareCard key="share-card" onContinue={() => setShowShareCard(false)} rank={loadingScores || scoresError ? null : userProjectedRank} />
         )}
       </AnimatePresence>
 

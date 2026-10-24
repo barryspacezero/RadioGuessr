@@ -88,4 +88,4 @@ Ensure you have [Node.js](https://nodejs.org/) installed along with standard pac
 
 ---
 
-*Game Version: 2.3*
+*Game Version: 2.4*

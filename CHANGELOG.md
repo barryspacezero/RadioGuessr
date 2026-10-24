@@ -5,7 +5,7 @@ All notable changes to the **RadioGuessr** project will be documented in this fi
 ## [2.4.0] - 2026-08-27
 ### Added
 - **Shareable Endgame Score Card**: Generate a shareable visual summary of your game, including total score, rounds played, global rank, and top collected stamps. Uses the native Web Share API with a seamless image download fallback.
-- **Optimized Rendering**: Replaced `html-to-image` with `html2canvas` for instantaneous card generation without freezing the browser.
+- **High-Resolution Export**: Powered by `html-to-image` for crisp 2x retina card rendering, full Tailwind v4 color compatibility, and responsive scaling across mobile devices.
 
 ## [2.3.0] - 2026-06-22
 ### Added
